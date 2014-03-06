@@ -25,7 +25,7 @@ describe RecordsController do
         response.should redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record]) 
       end
 
-      describe 'with type TuftsTemplate' do
+      pending describe 'with type TuftsTemplate' do
         before { get :new, :type=>'TuftsTemplate' }
 
         it 'creates a new template' do

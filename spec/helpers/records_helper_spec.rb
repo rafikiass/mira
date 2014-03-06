@@ -7,8 +7,8 @@ describe RecordsHelper do
        "Collection guide" => "TuftsEAD",
        "Generic object" => "TuftsGenericObject",
        'Image' => 'TuftsImage',
-       'PDF' => 'TuftsPdf',
-       'Template' => 'TuftsTemplate'}
+       'PDF' => 'TuftsPdf'}
+#       'Template' => 'TuftsTemplate'}
   end
 
   it "should have model_labels" do
