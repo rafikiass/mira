@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 describe CuratedCollection do
-
-  subject { CuratedCollection.new title: 'some title' }
+  subject { CuratedCollection.new title: 'some title', managementType: 'personal' }
 
   describe "members" do
     context "when it's empty" do
@@ -44,8 +43,14 @@ describe CuratedCollection do
   end
 
   describe "to_class_uri" do
-    it "sets the displays" do
+    it "sets default attributes" do
+      today = Date.today
+      allow(Date).to receive(:today) { today }
       expect(subject.displays).to eq ['tdil']
+      expect(subject.note).to eq ["created on using the Tufts Digital Image Library"]
+      expect(subject.createdby).to eq "tdil"
+      expect(subject.date_created).to eq [today.to_s]
+      expect(subject.type).to eq ["collection"]
     end
 
     it "allows tdil as a display" do

@@ -5,7 +5,7 @@ describe 'display curated collection', if: Tufts::Application.til? do
   let(:image1) { FactoryGirl.create(:image, title: 'First') }
   let(:image2) { FactoryGirl.create(:image, title: 'Second') }
   let(:image3) { FactoryGirl.create(:image, title: 'Third') }
-  let(:collection) { FactoryGirl.create(:curated_collection, title: "A very fine collection", user: user) }
+  let(:collection) { FactoryGirl.create(:curated_collection, title: "A very fine collection", user: user, managementType: 'personal') }
 
   before do
     collection.members << image2

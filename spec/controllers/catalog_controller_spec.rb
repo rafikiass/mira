@@ -53,7 +53,7 @@ describe CatalogController do
       end
 
       it 'shows curated collections', if: Tufts::Application.til? do
-        c = CuratedCollection.create(title: 'foo')
+        c = CuratedCollection.create(title: 'foo', managementType: 'personal')
         get :index
         expect(assigns[:curated_collection_to_create]).to be_present
         expect(assigns[:curated_collections]).to include(c)

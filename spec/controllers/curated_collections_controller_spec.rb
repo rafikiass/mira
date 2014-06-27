@@ -4,7 +4,7 @@ describe CuratedCollectionsController, if: Tufts::Application.til? do
 
   let(:image) { FactoryGirl.create(:image) }
 
-  describe "for a not-signed in user" do
+  describe "for an unauthenticated user" do
     describe "create" do
       it "redirects to sign in" do
         post :create
@@ -13,18 +13,32 @@ describe CuratedCollectionsController, if: Tufts::Application.til? do
     end
   end
 
-  describe "for a signed in user" do
+  describe "for an authenticated user" do
     let(:user) { FactoryGirl.create(:user) }
     before { sign_in user }
 
     describe "POST 'create'" do
       it "redirects" do
-        expect {
-          post 'create', curated_collection: {title: 'foo'}
-        }.to change {CuratedCollection.count }.by(1)
+        post 'create', curated_collection: {title: 'foo'}
         expect(response.status).to eq 302
-        expect(assigns[:curated_collection].read_groups).to eq ['public']
-        expect(assigns[:curated_collection].edit_users).to eq [user.user_key]
+      end
+
+      it "creates a CuratedCollection" do
+        CuratedCollection.delete_all
+        count = CuratedCollection.count
+        post 'create', curated_collection: {title: 'foo'}
+        expect(CuratedCollection.count).to eq (count + 1)
+        expect(assigns[:curated_collection].managementType).to eq 'personal'
+      end
+
+      it 'uses the next sequence for the pid' do
+        Sequence.where(name: nil, value: 100).create
+        n = Sequence.where(name: 'curated_collection').first_or_create.value
+        # if multiple sequences have the same value, this test doesn't test anything
+        expect(Sequence.pluck(:value).uniq).to be_truthy
+
+        post 'create', curated_collection: {title: 'foo'}
+        expect(assigns[:curated_collection].pid).to eq "tufts:uc.#{n + 1}"
       end
 
       context 'with a bad title' do
@@ -39,7 +53,11 @@ describe CuratedCollectionsController, if: Tufts::Application.til? do
     end
 
     context "on an existing collection" do
-      let(:collection) { FactoryGirl.create(:curated_collection, user: user) }
+      let(:collection) do
+        FactoryGirl.create(:curated_collection,
+                           user: user,
+                           managementType: 'personal')
+      end
 
       describe "GET 'show'" do
         it "returns http success" do
@@ -55,6 +73,18 @@ describe CuratedCollectionsController, if: Tufts::Application.til? do
           expect(response).to be_successful
           expect(collection.reload.members).to eq [image]
         end
+      end
+    end
+  end
+
+  describe "an admin user" do
+    let(:admin) { FactoryGirl.create(:admin) }
+    before { sign_in admin }
+
+    describe "POST 'create'" do
+      it "creates a course collection" do
+        post 'create', curated_collection: {title: 'foo'}
+        expect(assigns[:curated_collection].managementType).to eq 'curated'
       end
     end
   end
