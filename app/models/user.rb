@@ -1,9 +1,9 @@
 class User < ActiveRecord::Base
-# Connects this user object to Hydra behaviors. 
+# Connects this user object to Hydra behaviors.
  include Hydra::User
-# Connects this user object to Role behaviors. 
+# Connects this user object to Role behaviors.
  include Hydra::RoleManagement::UserRoles
-# Connects this user object to Blacklights Bookmarks. 
+# Connects this user object to Blacklights Bookmarks.
  include Blacklight::User
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable,

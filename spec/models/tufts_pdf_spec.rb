@@ -23,6 +23,7 @@ describe TuftsPdf do
         unless ActiveFedora::Base.exists? collection_id
           ActiveFedora::FixtureLoader.new('spec/fixtures').import_and_index(collection_id)
         end
+        # If you've got problems with this test, the collection may just need to be reindexed
         subject.collection_id = collection_id
       end
       it "should give a remote URL" do

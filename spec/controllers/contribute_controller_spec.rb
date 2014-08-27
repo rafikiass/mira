@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe ContributeController, if: Tufts::Application.mira? do
+describe ContributeController do
 
   before do
     TuftsPdf.destroy_all
@@ -28,7 +28,7 @@ describe ContributeController, if: Tufts::Application.mira? do
 
     describe "GET '/'" do
       it "returns http success" do
-        get :index 
+        get :index
         response.should be_success
       end
     end

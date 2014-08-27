@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe TemplatesController, if: Tufts::Application.mira? do
+describe TemplatesController do
   before do
     @user = FactoryGirl.create(:user)
     @admin = FactoryGirl.create(:admin)

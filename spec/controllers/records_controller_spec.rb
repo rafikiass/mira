@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RecordsController, if: Tufts::Application.mira? do
+describe RecordsController do
 
   describe "an admin" do
     before do
@@ -69,8 +69,8 @@ describe RecordsController, if: Tufts::Application.mira? do
       it "should be successful without a pid" do
         get :new, :type=>'TuftsAudio'
         assigns[:record].should be_kind_of TuftsAudio
-        assigns[:record].should_not be_new_object
-        response.should redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record]) 
+        assigns[:record].should_not be_new_record
+        response.should redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record])
       end
 
       describe 'with type TuftsTemplate' do
@@ -96,8 +96,8 @@ describe RecordsController, if: Tufts::Application.mira? do
         it "should be successful with a pid" do
           get :new, :type=>'TuftsAudio', :pid=>'tufts:123.1231'
           assigns[:record].should be_kind_of TuftsAudio
-          assigns[:record].should_not be_new_object
-          response.should redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record]) 
+          assigns[:record].should_not be_new_record
+          response.should redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record])
           assigns[:record].pid.should == 'tufts:123.1231'
         end
       end
@@ -124,7 +124,7 @@ describe RecordsController, if: Tufts::Application.mira? do
 
       it "should be successful" do
         post :create, :type=>'TuftsAudio', :tufts_audio=>{:title=>"My title", displays: ['dl']}
-        response.should redirect_to("/catalog/#{assigns[:record].pid}") 
+        response.should redirect_to("/catalog/#{assigns[:record].pid}")
         assigns[:record].title.should == 'My title'
       end
     end
@@ -199,7 +199,7 @@ describe RecordsController, if: Tufts::Application.mira? do
           @template.destroy
         end
         it "redirects back to the template index" do
-          put :update, :id=>@template, tufts_template: {template_name: "My Updated Template"}
+          put :update, id: @template, tufts_template: {template_name: "My Updated Template"}
           response.should redirect_to(Tufts::Application.routes.url_helpers.templates_path)
         end
       end
@@ -215,13 +215,13 @@ describe RecordsController, if: Tufts::Application.mira? do
         end
         it "should be successful" do
           put :update, :id=>@audio, :tufts_audio=>{:title=>"My title 3"}
-          response.should redirect_to("/catalog/#{assigns[:record].pid}") 
+          response.should redirect_to("/catalog/#{assigns[:record].pid}")
           assigns[:record].title.should == 'My title 3'
           assigns[:record].reload.audit_log.what.should == ['Metadata updated rightsMetadata, DCA-META, DCA-ADMIN']
         end
         it "should update external datastream paths" do
           put :update, :id=>@audio, :tufts_audio=>{:datastreams=>{"ACCESS_MP3"=>"http://example.com/access.mp3", "ARCHIVAL_SOUND"=>"http://example.com/archival.wav"} }
-          response.should redirect_to("/catalog/#{assigns[:record].pid}") 
+          response.should redirect_to("/catalog/#{assigns[:record].pid}")
           assigns[:record].datastreams['ACCESS_MP3'].dsLocation.should == 'http://example.com/access.mp3'
           assigns[:record].datastreams['ARCHIVAL_SOUND'].dsLocation.should == 'http://example.com/archival.wav'
         end
@@ -230,7 +230,7 @@ describe RecordsController, if: Tufts::Application.mira? do
           assigns[:record].stored_collection_id.should == 'updated_id'
         end
       end
-      
+
       describe "with an image" do
         before do
           @image = TuftsImage.new(title: "test image", displays: ['dl'])
@@ -242,7 +242,7 @@ describe RecordsController, if: Tufts::Application.mira? do
         end
         it "should update external datastream paths" do
           put :update, :id=>@image, :tufts_image=>{:datastreams=>{"Advanced.jpg"=>"http://example.com/advanced.jpg", "Basic.jpg"=>"http://example.com/basic.jpg", "Archival.tif"=>"http://example.com/archival.tif", "Thumbnail.png"=>"http://example.com/thumb.png"} }
-          response.should redirect_to("/catalog/#{assigns[:record].pid}") 
+          response.should redirect_to("/catalog/#{assigns[:record].pid}")
           assigns[:record].datastreams['Advanced.jpg'].dsLocation.should == 'http://example.com/advanced.jpg'
           assigns[:record].datastreams['Basic.jpg'].dsLocation.should == 'http://example.com/basic.jpg'
           assigns[:record].datastreams['Archival.tif'].dsLocation.should == 'http://example.com/archival.tif'
@@ -264,7 +264,7 @@ describe RecordsController, if: Tufts::Application.mira? do
       it "should be successful" do
         TuftsAudio.any_instance.should_receive(:push_to_production!)
         post :publish, :id=>@audio
-        response.should redirect_to("/catalog/#{assigns[:record].pid}") 
+        response.should redirect_to("/catalog/#{assigns[:record].pid}")
         flash[:notice].should == '"My title2" has been pushed to production'
       end
     end
@@ -278,7 +278,7 @@ describe RecordsController, if: Tufts::Application.mira? do
       it "should be successful with a pid" do
         delete :destroy, :id=>@audio
         response.should redirect_to(Tufts::Application.routes.url_helpers.root_path)
-        @audio.reload.state.should == 'D' 
+        @audio.reload.state.should == 'D'
       end
     end
 
@@ -303,11 +303,11 @@ describe RecordsController, if: Tufts::Application.mira? do
     end
 
     describe "who goes to the new page" do
-      before { @routes = HydraEditor::Engine.routes }
+      routes { HydraEditor::Engine.routes }
 
       it "should not be allowed" do
         get :new
-        response.status.should == 302
+        expect(response).to be_redirect
         response.should redirect_to Tufts::Application.routes.url_helpers.root_path
         flash[:alert].should =~ /You are not authorized to access this page/i
       end

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-feature 'Search by batch ID', if: Tufts::Application.mira? do
+feature 'Search by batch ID' do
   before do
     ActiveFedora::Base.delete_all
 

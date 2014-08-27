@@ -169,7 +169,7 @@ private
         else
           begin
             record = MetadataXmlParser.build_record(@batch.metadata_file.read, doc.original_filename)
-            record.batch_id = @batch.id.to_s
+            record.batch_id = [@batch.id.to_s]
             saved = save_record_with_document(record, doc)
             warning = collect_warning(record, doc)
             if saved

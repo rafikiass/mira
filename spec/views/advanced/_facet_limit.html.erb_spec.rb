@@ -5,7 +5,7 @@ describe 'advanced/_facet_limit.html.erb' do
     allow(view).to receive(:display_facet) { double(items: @seven_facet_values) }
     allow(view).to receive(:solr_field) { 'subject_sim' }
     allow(view).to receive(:facet_limit_for) { 2 }
-    allow(Blacklight::Solr::FacetPaginator).to receive(:new) { double(items: [], has_next?: true) }
+    allow(Blacklight::Solr::FacetPaginator).to receive(:new) { double(items: [], last_page?: false) }
   end
 
   describe 'facet drilldown' do

@@ -1,5 +1,5 @@
 # -*- encoding : utf-8 -*-
-class CatalogController < ApplicationController  
+class CatalogController < ApplicationController
 
   include Blacklight::Catalog
   include Hydra::Controller::ControllerBehavior
@@ -8,30 +8,20 @@ class CatalogController < ApplicationController
   # Apply the hydra access controls
   before_filter :enforce_show_permissions, :only => :show
 
-  # This applies appropriate access controls to all solr queries
-  if Tufts::Application.til?
-    CatalogController.solr_search_params_logic += [:add_access_controls_to_solr_params]
-  end
-
   # This filters out objects that you want to exclude from search results, like FileAssets
   CatalogController.solr_search_params_logic += [:exclude_unwanted_models]
 
   def index
-    if Tufts::Application.mira?
-      redirect_to contributions_path unless current_user.admin?
-    elsif Tufts::Application.til?
-      @curated_collection_to_create = CuratedCollection.new
-      @curated_collections = CuratedCollection.all
-    end
+    redirect_to contributions_path unless current_user.admin?
     super
   end
 
 
   configure_blacklight do |config|
-    config.default_solr_params = { 
+    config.default_solr_params = {
       :qt => 'search',
       :qf => 'id creator_tesim title_tesim subject_tesim description_tesim identifier_tesim alternative_tesim contributor_tesim abstract_tesim toc_tesim publisher_tesim source_tesim date_tesim date_created_tesim date_copyrighted_tesim date_submitted_tesim date_accepted_tesim date_issued_tesim date_available_tesim date_modified_tesim language_tesim type_tesim format_tesim extent_tesim medium_tesim persname_tesim corpname_tesim geogname_tesim genre_tesim provenance_tesim rights_tesim access_rights_tesim rights_holder_tesim license_tesim replaces_tesim isReplacedBy_tesim hasFormat_tesim isFormatOf_tesim hasPart_tesim isPartOf_tesim accrualPolicy_tesim audience_tesim references_tesim spatial_tesim bibliographic_citation_tesim temporal_tesim funder_tesim resolution_tesim bitdepth_tesim colorspace_tesim filesize_tesim steward_tesim name_tesim comment_tesim retentionPeriod_tesim displays_ssi embargo_tesim status_tesim startDate_tesim expDate_tesim qrStatus_tesim rejectionReason_tesim note_tesim',
-      :rows => 10 
+      :rows => 10
     }
 
     # solr field configuration for search results/index views

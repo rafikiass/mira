@@ -10,11 +10,7 @@
         </a>
 
         <div class="col-md-3">
-          <% if Tufts::Application.mira? %>
-            <%= link_to image_tag('mira.png', :class => "navbar-brand", :alt => 'Home'), root_path %>
-          <% else %>
-            <%= link_to "Tufts Image Library", root_path, class: 'navbar-brand' %>
-          <% end %>
+          <%= link_to image_tag('mira.png', :class => "navbar-brand", :alt => 'Home'), root_path %>
         </div>
 
         <div class="col-md-6 clearfix" id="searchbar">

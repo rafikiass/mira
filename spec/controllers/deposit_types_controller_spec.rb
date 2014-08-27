@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'import_export/deposit_type_exporter'
 
-describe DepositTypesController, if: Tufts::Application.mira? do
+describe DepositTypesController do
   before :each do
     DepositType.destroy_all
     @dt = FactoryGirl.create(:deposit_type, display_name: 'DT')

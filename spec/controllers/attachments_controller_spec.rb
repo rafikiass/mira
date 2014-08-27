@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe AttachmentsController, if: Tufts::Application.mira? do
+describe AttachmentsController do
   describe "an admin" do
     let(:user) { FactoryGirl.create(:admin) }
     before do

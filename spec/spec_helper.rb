@@ -12,10 +12,11 @@ def clean_up_carrierwave_files
 end
 
 RSpec.configure do |config|
+  config.infer_spec_type_from_file_location!
   config.include FactoryGirl::Syntax::Methods
-  
+
   config.include Devise::TestHelpers, :type => :controller
-  
+
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Templates', if: Tufts::Application.mira? do
+describe 'Templates' do
 
   it 'should require login' do
     visit templates_path

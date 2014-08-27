@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Batch routes:', if: Tufts::Application.mira? do
+describe 'Batch routes:' do
   it 'routes to create' do
     expect(post: 'batches').to route_to(
       controller: 'batches',

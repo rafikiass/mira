@@ -9,7 +9,7 @@ describe CatalogController do
   context 'a non-admin user' do
     before { sign_in @user }
 
-    it 'denied access to catalog', if: Tufts::Application.mira? do
+    it 'denied access to catalog' do
       get :index
       response.should redirect_to(contributions_path)
     end
@@ -43,21 +43,15 @@ describe CatalogController do
         response.should render_template(:index)
       end
 
-      it "handles advanced searches with a 'format'", if: Tufts::Application.mira? do
-        good = FactoryGirl.create(:tufts_pdf, format: 'some format')
-        bad  = FactoryGirl.create(:tufts_pdf, format: 'other format')
+      it "handles advanced searches with a 'format'" do
+        good = FactoryGirl.create(:tufts_pdf, format: ['some format'])
+        bad  = FactoryGirl.create(:tufts_pdf, format: ['other format'])
         get :index, search_field: :advanced, format_attr: 'some format'
         found = assigns[:document_list].map(&:id)
         expect(found).to include good.id
         expect(found).to_not include bad.id
       end
 
-      it 'shows curated collections', if: Tufts::Application.til? do
-        c = CuratedCollection.create(title: 'foo', managementType: 'personal')
-        get :index
-        expect(assigns[:curated_collection_to_create]).to be_present
-        expect(assigns[:curated_collections]).to include(c)
-      end
     end
 
     it 'can view someone elses document' do

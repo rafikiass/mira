@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-feature 'View catalog index', if: Tufts::Application.mira? do
+feature 'View catalog index' do
   before do
     ActiveFedora::Base.delete_all
     sign_in :admin
   end
 
   let!(:reviewed_pdf) {
-    pdf = FactoryGirl.create(:tufts_pdf) 
+    pdf = FactoryGirl.create(:tufts_pdf)
     pdf.reviewed
     pdf.batch_id = ['1']
     pdf.save!

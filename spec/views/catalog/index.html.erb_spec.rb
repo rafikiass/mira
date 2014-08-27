@@ -18,16 +18,6 @@ describe 'catalog/index.html.erb' do
       'catalog/_search_header.html.erb' => '',
       'catalog/_results_pagination.html.erb' => ''
     assign :response, double(:response, empty?: false, params: {}, total: 0, start: 0, limit_value: 10)
-    @curated_collection_to_create = CuratedCollection.new
-    @curated_collections = []
-  end
-
-  context 'viewing the main page' do
-    it "doesn't show the form for creating new collections" do
-      render
-      expect(rendered).to_not have_selector("form#new_curated_collection input[type=text][name='curated_collection[title]']")
-      expect(rendered).to_not have_selector("form#new_curated_collection input[type=submit]")
-    end
   end
 
   context 'viewing search results' do
@@ -35,7 +25,7 @@ describe 'catalog/index.html.erb' do
       allow(view).to receive(:has_search_parameters?) { true }
     end
 
-    describe 'checkboxes', if: Tufts::Application.mira? do
+    describe 'checkboxes' do
       before do
         render
       end
@@ -47,7 +37,7 @@ describe 'catalog/index.html.erb' do
       end
     end
 
-    describe 'batch operations', if: Tufts::Application.mira? do
+    describe 'batch operations' do
       it 'submits to batch#create' do
         render
         expect(rendered).to have_selector("form[method=post][action='#{batches_path}']")
@@ -97,21 +87,6 @@ describe 'catalog/index.html.erb' do
         render
         src = download_path(@document_list.first.id, datastream_id: 'Thumbnail.png')
         expect(rendered).to have_selector("#documents.gallery .document .thumbnail img[src='#{src}']")
-      end
-    end
-
-    describe "showing collections", if: Tufts::Application.til? do
-
-      it 'shows a form for creating new collections' do
-        render
-        expect(rendered).to have_selector("form#new_curated_collection input[type=text][name='curated_collection[title]']")
-        expect(rendered).to have_selector("form#new_curated_collection input[type=submit]")
-      end
-
-      it 'displays the list of curated collections' do
-        @curated_collections = [CuratedCollection.create(title: 'foo')]
-        render
-        expect(rendered).to have_selector(".curated-collection-list li[data-collection-id='#{@curated_collections.first.pid}']")
       end
     end
   end

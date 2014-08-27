@@ -4,10 +4,9 @@ gem 'rails', '4.0.5'
 
 gem 'sqlite3'
 
-# gem 'hydra', '6.2.0'
-gem 'hydra', '7.0.0'
+gem 'hydra', '7.1.0'
 gem 'hydra-role-management', '0.2.0'
-gem 'hydra-editor', '0.3.0'
+gem 'hydra-editor', github: 'projecthydra-labs/hydra-editor', branch: 'refactor_records_controller'
 gem 'hydra-batch-edit', '1.1.1'
 gem 'qa', '0.0.3'
 gem 'sanitize', '2.0.6'
@@ -32,16 +31,19 @@ gem 'resque-status'
 gem 'carrierwave', '~> 0.10.0'
 
 gem 'blacklight_advanced_search', github: 'projectblacklight/blacklight_advanced_search', branch: 'generate_overrides'
+gem 'tufts_models', github: 'curationexperts/tufts_models'
 gem 'blacklight-gallery', github: 'projectblacklight/blacklight-gallery', ref: '2f9f342518'
 
-group :development, :test do
+group :development do
+  gem 'unicorn'
   gem 'jettywrapper'
-  gem 'rspec-rails'
+end
+
+group :development, :test do
+  gem 'rspec-rails', '~> 2.99'
   gem 'capybara'
   gem 'factory_girl_rails'
 end
-
-gem 'unicorn', group: :development
 
 group :debug do
   gem 'launchy'
