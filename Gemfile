@@ -6,7 +6,7 @@ gem 'sqlite3'
 
 gem 'hydra', '7.1.0'
 gem 'hydra-role-management', '0.2.0'
-gem 'hydra-editor', github: 'projecthydra-labs/hydra-editor', branch: 'refactor_records_controller'
+gem 'hydra-editor', '~> 0.5.0'
 gem 'hydra-batch-edit', '1.1.1'
 gem 'qa', '0.0.3'
 gem 'sanitize', '2.0.6'

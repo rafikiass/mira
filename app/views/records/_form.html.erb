@@ -1,5 +1,5 @@
 <div id="descriptions_display">
-  <%= bootstrap_form_for resource, :url=>hydra_editor.record_path(resource), html: {:class => 'form-inline editor'} do |f| %>
+  <%= bootstrap_form_for resource, url: hydra_editor.record_path(resource), html: { class: 'editor' } do |f| %>
 
     <div>
       <dl class="control-group dl-horizontal dl-invert">
@@ -13,27 +13,39 @@
     </div>
     <div class='clearfix'> </div>
 
-    <%= render :partial => "template_fields", :locals => {:f => f } %>
+    <%= render "template_fields", f: f %>
 
     <h3 class="non lower"> Descriptive Metadata <small class="pull-right"><span class="error">*</span> indicates required fields</small> </h3>
 
-    <div class="well">
-      <% resource.descMetadata_display_fields.each do |term| %>
-        <%= render :partial => "edit_field", :locals => {:f =>f, :render_req => true, :key => term } %>
-      <% end %>
-    </div><!-- /well -->
+    <div class="row">
+      <div class="col-sm-8">
+        <div class="well">
+          <% resource.descMetadata_display_fields.each do |term| %>
+            <%= render "edit_field", f: f, render_req: true, key: term  %>
+          <% end %>
+        </div>
+      </div>
+    </div>
 
     <h3>Relationships</h3>
-    <div class="well">
-      <%= relationship_fields(f, resource) %>
+    <div class="row">
+      <div class="col-sm-8">
+        <div class="well">
+          <%= relationship_fields(f, resource) %>
+        </div>
+      </div>
     </div>
 
     <h3>Admin Metadata</h3>
-    <div class="well">
-      <% resource.admin_display_fields.each do |term| %>
-        <%= render :partial => "edit_field", :locals => {:f =>f, :render_req => true, :key => term } %>
-      <% end %>
-    </div><!-- /well -->
+    <div class="row">
+      <div class="col-sm-8">
+        <div class="well">
+          <% resource.admin_display_fields.each do |term| %>
+            <%= render :partial => "edit_field", :locals => {:f =>f, :render_req => true, :key => term } %>
+          <% end %>
+        </div><!-- /well -->
+      </div>
+    </div>
 
     <%= hidden_field_tag :type, params[:type] %>
     <%= hidden_field_tag :pid, params[:pid] if controller.action_name == 'new'%>

@@ -34,18 +34,6 @@ GIT
       blacklight (>= 5.2, < 6.0)
       parslet
 
-GIT
-  remote: git://github.com/projecthydra-labs/hydra-editor.git
-  revision: 68f13437f0b3d0e422892dfeeac488ab2bbf9242
-  branch: refactor_records_controller
-  specs:
-    hydra-editor (0.4.0)
-      active-fedora (>= 6.3.0)
-      bootstrap_form (~> 2.1.1)
-      cancancan
-      deprecation
-      rails (>= 3.2.13, < 5.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -198,6 +186,12 @@ GEM
       hydra-access-controls (= 7.2.0)
       jettywrapper (>= 1.4.1)
       rails (>= 3.2.3, < 5)
+    hydra-editor (0.5.0)
+      active-fedora (>= 6.3.0)
+      bootstrap_form (~> 2.1.1)
+      cancancan
+      deprecation
+      rails (>= 3.2.13, < 5.0)
     hydra-head (7.2.0)
       hydra-access-controls (= 7.2.0)
       hydra-core (= 7.2.0)
@@ -462,7 +456,7 @@ DEPENDENCIES
   factory_girl_rails
   hydra (= 7.1.0)
   hydra-batch-edit (= 1.1.1)
-  hydra-editor!
+  hydra-editor (~> 0.5.0)
   hydra-role-management (= 0.2.0)
   jettywrapper
   jquery-fileupload-rails
