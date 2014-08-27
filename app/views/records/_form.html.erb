@@ -51,12 +51,12 @@
     <%= hidden_field_tag :pid, params[:pid] if controller.action_name == 'new'%>
 
     <div class="form-actions floating">
-      <%= f.submit 'Save', 'data-disable-with'=>"Saving..." %>
+      <%= f.primary 'Save', 'data-disable-with'=>"Saving..." %>
       <% if resource.DCA_META.versions.empty? %>
         <%# if the object was just created (temporary object) delete it if they cancel %>
-        <%= link_to "Cancel", cancel_record_path(resource), :class=>'btn cancel', :method=>:delete %>
+        <%= link_to "Cancel", cancel_record_path(resource), :class=>'btn btn-default cancel', :method=>:delete %>
       <% else %>
-        <%= link_to "Cancel", :back, :class=>'btn cancel' %>
+        <%= link_to "Cancel", :back, :class=>'btn btn-default cancel' %>
       <% end %>
     </div>
   <% end %>
