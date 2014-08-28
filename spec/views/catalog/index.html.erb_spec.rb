@@ -74,20 +74,5 @@ describe 'catalog/index.html.erb' do
         expect(rendered).to have_selector("#documents .document-thumbnail img[src='#{src}']")
       end
     end
-
-    describe 'showing the gallery view' do
-      before do
-        @document_list = [SolrDocument.new(id: 'id2', has_model_ssim: ['fedora/cm:Image.4DS'])]
-        assign :response, double(:response, empty?: false, params: {view: 'gallery'}, total: 0, start: 0, limit_value: 10)
-        assigns[:request].params[:view] = 'gallery'
-        allow(view).to receive(:params) { assigns[:request].params }
-      end
-
-      it 'displays thumbnails' do
-        render
-        src = download_path(@document_list.first.id, datastream_id: 'Thumbnail.png')
-        expect(rendered).to have_selector("#documents.gallery .document .thumbnail img[src='#{src}']")
-      end
-    end
   end
 end

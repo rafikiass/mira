@@ -16,16 +16,6 @@ GIT
       titleize
 
 GIT
-  remote: git://github.com/projectblacklight/blacklight-gallery.git
-  revision: 2f9f342518585a6e48d93a8e4ed5621afcf918a7
-  ref: 2f9f342518
-  specs:
-    blacklight-gallery (0.0.1)
-      blacklight (>= 5.0.0.pre4, < 6.0)
-      bootstrap-sass (~> 3.0)
-      rails
-
-GIT
   remote: git://github.com/projectblacklight/blacklight_advanced_search.git
   revision: 6b68e93ae80f0e0d4bbfcf3ed92db1dacc7ce66b
   branch: generate_overrides
@@ -442,7 +432,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  blacklight-gallery!
   blacklight_advanced_search!
   bootstrap-sass
   bootstrap_form

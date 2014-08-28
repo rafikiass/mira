@@ -32,10 +32,8 @@ gem 'carrierwave', '~> 0.10.0'
 
 gem 'blacklight_advanced_search', github: 'projectblacklight/blacklight_advanced_search', branch: 'generate_overrides'
 gem 'tufts_models', github: 'curationexperts/tufts_models'
-gem 'blacklight-gallery', github: 'projectblacklight/blacklight-gallery', ref: '2f9f342518'
 
 group :development do
-  gem 'unicorn'
   gem 'jettywrapper'
 end
 
@@ -46,6 +44,7 @@ group :development, :test do
 end
 
 group :debug do
+  gem 'unicorn'
   gem 'launchy'
   gem 'byebug', require: false
 end
