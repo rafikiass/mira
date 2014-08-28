@@ -199,7 +199,7 @@ private
       flash[:error] = "Please select some files to upload."
       render :edit
     else
-      attrs = @batch.template.attributes_to_update.merge(batch_id: @batch.id.to_s)
+      attrs = @batch.template.attributes_to_update.merge(batch_id: [@batch.id.to_s])
       record_class = @batch.record_type.constantize
 
       document_statuses = params[:documents].map do |doc|

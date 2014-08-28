@@ -9,31 +9,28 @@ end
 
 describe Job::RunAsBatchItem do
   describe '#run_as_batch_item' do
+    let(:old_batch_id) { '456' }
+    let(:batch_id) { 123 }
+    let(:old_status) { 'some existing status message' }
+    let(:pdf) { FactoryGirl.create(:tufts_pdf, batch_id: [old_batch_id], qrStatus: [Reviewable.batch_review_text, old_status]) }
 
-    before do
-      @batch_id = 123
-      @old_batch_id = '456'
-      @old_status = 'some existing status message'
+    let(:job) { Job::MyJob.new }
 
-      @pdf = FactoryGirl.create(:tufts_pdf, batch_id: @old_batch_id, qrStatus: [Reviewable.batch_review_text, @old_status])
-      @job = Job::MyJob.new
-    end
-
-    after { @pdf.delete }
+    after { pdf.delete }
 
     it 'yields the record' do
-      yielded = @job.run_as_batch_item(@pdf.id, @batch_id) do |record|
+      yielded = job.run_as_batch_item(pdf.id, batch_id) do |record|
         record.pid
       end
-      expect(yielded).to eq @pdf.pid
+      expect(yielded).to eq pdf.pid
     end
 
     it 'adds batch id to the object without removing existing batch ids' do
-      @job.run_as_batch_item(@pdf.id, @batch_id) do |record|
+      job.run_as_batch_item(pdf.id, batch_id) do |record|
         record.save!
       end
-      @pdf.reload
-      expect(@pdf.batch_id).to eq [@old_batch_id, @batch_id.to_s]
+      pdf.reload
+      expect(pdf.batch_id).to eq [old_batch_id, batch_id.to_s]
     end
   end
 
