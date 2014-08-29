@@ -16,7 +16,7 @@ describe TuftsAudio do
     let (:ability) {  Ability.new(nil) }
 
     it "should be visible to a not-signed-in user" do
-      ability.can?(:read, @audio.pid).should be_truthy
+      expect(ability.can?(:read, @audio.pid)).to be true
     end
   end
 
@@ -28,10 +28,8 @@ describe TuftsAudio do
 
   describe "required terms" do
     it "should be required" do
-       subject.required?(:title).should be_truthy
-       # subject.required?(:creator).should be_truthy
-       # subject.required?(:description).should be_truthy
-       subject.required?(:source2).should be_falsey
+       expect(subject.required?(:title)).to be true
+       expect(subject.required?(:source2)).to be false
     end
   end
 
@@ -42,37 +40,37 @@ describe TuftsAudio do
       end
       describe "subject field" do
         it "should save both" do
-          subject.subject = "subject1"
-          subject.funder = "subject2"
+          subject.subject = ["subject1"]
+          subject.funder = ["subject2"]
           solr_doc = subject.to_solr
-          solr_doc["subject_tesim"].should == ["subject1"]
-          solr_doc["funder_tesim"].should == ["subject2"]
+          expect(solr_doc["subject_tesim"]).to eq ["subject1"]
+          expect(solr_doc["funder_tesim"]).to eq ["subject2"]
           # TODO is this right? Presumably this is for the facet
-          solr_doc["subject_sim"].should == ["Subject1"]
+          expect(solr_doc["subject_sim"]).to eq ["Subject1"]
         end
       end
 
       describe "displays" do
         it "should save it" do
-          subject.displays = "dl"
+          subject.displays = ["dl"]
           solr_doc = subject.to_solr
-          solr_doc['displays_ssi'].should == 'dl'
+          expect(solr_doc['displays_ssim']).to eq ['dl']
         end
       end
       describe "title" do
         it "should be searchable and facetable" do
           subject.title = "My title"
           solr_doc = subject.to_solr
-          solr_doc['title_si'].should == 'My title'
-          solr_doc['title_tesim'].should == ['My title']
+          expect(solr_doc['title_si']).to eq 'My title'
+          expect(solr_doc['title_tesim']).to eq ['My title']
         end
       end
 
       describe "contributor added" do
         it "should save it" do
-          subject.contributor = "Michael Jackson"
+          subject.contributor = ["Michael Jackson"]
           solr_doc = subject.to_solr
-          solr_doc['names_sim'].should == ['Michael Jackson']
+          expect(solr_doc['names_sim']).to eq ['Michael Jackson']
         end
       end
     end
@@ -92,17 +90,17 @@ describe TuftsAudio do
     it "should only allow one of the approved values" do
       subject.title = 'test title' #make it valid
       subject.displays = ['dl']
-      subject.should be_valid
+      expect(subject).to be_valid
       subject.displays = ['tisch']
-      subject.should be_valid
+      expect(subject).to be_valid
       subject.displays = ['aah']
-      subject.should be_valid
+      expect(subject).to be_valid
       subject.displays = ['perseus']
-      subject.should be_valid
+      expect(subject).to be_valid
       subject.displays = ['elections']
-      subject.should be_valid
+      expect(subject).to be_valid
       subject.displays = ['dark']
-      subject.should be_valid
+      expect(subject).to be_valid
       subject.displays = ['fake']
       subject.should_not be_valid
     end
@@ -117,7 +115,7 @@ describe TuftsAudio do
 
   describe "external_datastreams" do
     it "should have the correct ones" do
-      subject.external_datastreams.keys.should include('ACCESS_MP3', 'ARCHIVAL_SOUND')
+      expect(subject.external_datastreams.keys).to include('ACCESS_MP3', 'ARCHIVAL_SOUND')
     end
   end
 
@@ -136,13 +134,13 @@ describe TuftsAudio do
     it "should publish to production" do
       @audio.should_not be_published
       @audio.push_to_production!
-      @audio.should be_published
+      expect(@audio).to be_published
     end
   end
 
 
   it "should have an original_file_datastream" do
-    TuftsAudio.original_file_datastreams.should == ["ARCHIVAL_SOUND"]
+    expect(TuftsAudio.original_file_datastreams).to eq ["ARCHIVAL_SOUND"]
   end
 
   describe "an audio with a pid" do
@@ -150,10 +148,10 @@ describe TuftsAudio do
       subject.inner_object.pid = 'tufts:MS054.003.DO.02108'
     end
     it "should give a remote url" do
-      subject.remote_url_for('ARCHIVAL_SOUND', 'mp3').should == 'http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MS054/archival_sound/MS054.003.DO.02108.archival.mp3'
+      expect(subject.remote_url_for('ARCHIVAL_SOUND', 'mp3')).to eq 'http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MS054/archival_sound/MS054.003.DO.02108.archival.mp3'
     end
     it "should give a local_path" do
-      subject.local_path_for('ARCHIVAL_SOUND', 'mp3').should == "#{Rails.root}/spec/fixtures/local_object_store/data01/tufts/central/dca/MS054/archival_sound/MS054.003.DO.02108.archival.mp3"
+      expect(subject.local_path_for('ARCHIVAL_SOUND', 'mp3')).to eq "#{Rails.root}/spec/fixtures/local_object_store/data01/tufts/central/dca/MS054/archival_sound/MS054.003.DO.02108.archival.mp3"
     end
   end
 
@@ -167,9 +165,9 @@ describe TuftsAudio do
     describe "basic" do
       before { subject.create_derivatives }
       it "should create ACCESS_MP3" do
-        File.exists?(subject.local_path_for('ACCESS_MP3', 'mp3')).should be_truthy
-        subject.datastreams["ACCESS_MP3"].dsLocation.should == "http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/access_mp3/MISS.ISS.IPPI.access.mp3"
-        subject.datastreams["ACCESS_MP3"].mimeType.should == "audio/mpeg"
+        expect(File).to exist(subject.local_path_for('ACCESS_MP3', 'mp3'))
+        expect(subject.datastreams["ACCESS_MP3"].dsLocation).to eq "http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/access_mp3/MISS.ISS.IPPI.access.mp3"
+        expect(subject.datastreams["ACCESS_MP3"].mimeType).to eq "audio/mpeg"
       end
     end
   end
@@ -183,7 +181,7 @@ describe TuftsAudio do
         subject.audit(user, 'updated stuff')
       end
       it "should get an entry" do
-        subject.audit_log.who.should == [user.display_name]
+        expect(subject.audit_log.who).to eq [user.display_name]
       end
     end
 

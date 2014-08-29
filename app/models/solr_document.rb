@@ -1,10 +1,10 @@
 # -*- encoding : utf-8 -*-
-class SolrDocument 
+class SolrDocument
 
   include Blacklight::Solr::Document
 
   # self.unique_key = 'id'
-  
+
   def reviewed?
     Array(self['qrStatus_tesim']).include?(Reviewable.batch_review_text)
   end
@@ -18,7 +18,7 @@ class SolrDocument
   end
 
   def published?
-    self[Solrizer.solr_name("edited_at", :stored_sortable, type: :date)] == 
+    self[Solrizer.solr_name("edited_at", :stored_sortable, type: :date)] ==
       self[Solrizer.solr_name("published_at", :stored_sortable, type: :date)]
   end
 
@@ -39,13 +39,13 @@ class SolrDocument
   end
 
   def preview_fedora_path
-    Settings.preview_fedora_url + "/objects/#{id}" 
+    Settings.preview_fedora_url + "/objects/#{id}"
   end
-  
+
   def preview_dl_path
     return nil if template?
-    if self['displays_ssi'].blank? || self['displays_ssi'] == 'dl'
-      Settings.preview_dl_url + "/catalog/#{id}" 
+    if self['displays_ssim'].blank? || self['displays_ssim'] == [''] || self['displays_ssim'].include?('dl')
+      Settings.preview_dl_url + "/catalog/#{id}"
     else
       return nil
     end

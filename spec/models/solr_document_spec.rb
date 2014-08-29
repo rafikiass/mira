@@ -12,11 +12,11 @@ describe SolrDocument do
   describe "#preview_fedora_path" do
     it "should always have link to fedora object" do
       url = 'http://localhost:8983/fedora/objects/tufts:7'
-      subject['displays_ssi'] = nil
+      subject['displays_ssim'] = nil
       expect(subject.preview_fedora_path).to eq url
-      subject['displays_ssi'] = 'dl'
+      subject['displays_ssim'] = ['dl']
       expect(subject.preview_fedora_path).to eq url
-      subject['displays_ssi'] = 'tufts'
+      subject['displays_ssim'] = ['tufts']
       expect(subject.preview_fedora_path).to eq url
     end
   end
@@ -24,28 +24,28 @@ describe SolrDocument do
   describe "#preview_dl_path" do
     let(:url) { 'http://dev-dl.lib.tufts.edu/catalog/tufts:7' }
     describe "when displays is 'dl'" do
-      before { subject['displays_ssi'] = 'dl' }
+      before { subject['displays_ssim'] = ['dl'] }
       it "has a link to the fedora object" do
         expect(subject.preview_dl_path).to eq url
       end
     end
     describe "when displays is not set" do
       it "has a link to the fedora object" do
-        subject['displays_ssi'] = nil
+        subject['displays_ssim'] = nil
         expect(subject.preview_dl_path).to eq url
-        subject['displays_ssi'] = ''
+        subject['displays_ssim'] = ['']
         expect(subject.preview_dl_path).to eq url
       end
     end
     describe "when displays is something else" do
-      before { subject['displays_ssi'] = 'tisch'}
+      before { subject['displays_ssim'] = ['tisch']}
       it "has a link to the fedora object" do
         expect(subject.preview_dl_path).to be_nil
       end
     end
     describe "when the object is a template" do
       before do
-        subject['displays_ssi'] = 'dl'
+        subject['displays_ssim'] = ['dl']
         subject['active_fedora_model_ssi'] = 'TuftsTemplate'
       end
       it "has a link to the fedora object" do

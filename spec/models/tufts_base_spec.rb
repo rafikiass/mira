@@ -41,7 +41,7 @@ describe TuftsBase do
         it "should save it" do
           subject.displays = ["dl"]
           solr_doc = subject.to_solr
-          expect(solr_doc['displays_ssi']).to eq 'dl'
+          expect(solr_doc['displays_ssim']).to eq ['dl']
         end
       end
       describe "title" do
