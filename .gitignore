@@ -20,10 +20,6 @@
 # Ignore jetty data and config files
 jetty
 
-# Don't send local rvm config
-.rvmrc
-.ruby-gemset
-
 # Don't send system specific config files
 config/initializers/secret_token.rb
 config/database.yml
