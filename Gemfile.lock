@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/curationexperts/tufts_models.git
-  revision: 1ff6f997dee10b423603c34623d8d5054e0eb6ae
+  revision: f25256bb38ecc2daec066426de2d4bb1d1d78a8b
   specs:
     tufts_models (0.0.1)
       active-fedora (~> 7.0)
@@ -81,7 +81,7 @@ GEM
     blankslate (2.1.2.4)
     block_helpers (0.3.3)
       activesupport (>= 2.0)
-    bootstrap-sass (3.2.0.1)
+    bootstrap-sass (3.2.0.2)
       sass (~> 3.2)
     bootstrap_form (2.1.1)
     builder (3.1.4)

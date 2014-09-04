@@ -40,7 +40,8 @@
     <div class="row">
       <div class="col-sm-8">
         <div class="well">
-          <% resource.admin_display_fields.each do |term| %>
+          <% # We exclude :template_name because we want it to appear at the top of the form %>
+          <% (resource.admin_display_fields - [:template_name]).each do |term| %>
             <%= render :partial => "edit_field", :locals => {:f =>f, :render_req => true, :key => term } %>
           <% end %>
         </div><!-- /well -->

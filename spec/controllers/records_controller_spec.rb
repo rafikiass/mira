@@ -201,6 +201,7 @@ describe RecordsController do
         it "redirects back to the template index" do
           put :update, id: @template, tufts_template: {template_name: "My Updated Template"}
           response.should redirect_to(Tufts::Application.routes.url_helpers.templates_path)
+          expect(@template.reload.template_name).to eq "My Updated Template"
         end
       end
 
