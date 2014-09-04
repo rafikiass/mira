@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140418153039) do
+ActiveRecord::Schema.define(version: 20140627021106) do
 
   create_table "batches", force: true do |t|
     t.integer  "creator_id"
@@ -68,6 +68,7 @@ ActiveRecord::Schema.define(version: 20140418153039) do
 
   create_table "sequences", force: true do |t|
     t.integer "value", default: 0
+    t.string  "name"
   end
 
   create_table "users", force: true do |t|

@@ -1,4 +1,4 @@
-<ul>
+<ul class="facet-values list-unstyled blacklight-advanced-facet-select">
   <% paginator =
       Blacklight::Solr::FacetPaginator.new(display_facet.items,
         :limit => facet_limit_for(solr_field))
@@ -13,8 +13,9 @@
     </li>
   <% end %>
 
-  <% if(paginator.has_next?)  %>
-    <li class="more_facets_link"><%= link_to(t('blacklight.search.facets.more'), params.merge(id: solr_field, action: :facet, page: nil), :class => "more_facets_link") %></li>
+  <% unless paginator.last_page? || params[:action] == "facet" %>
+    <li class="more_facets_link"><%= link_to t('blacklight.search.facets.more'),
+       params.merge(id: solr_field, action: "facet", page: nil), class: "more_facets_link" %></li>
   <% end %>
 
 </ul>

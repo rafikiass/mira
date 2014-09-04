@@ -169,7 +169,7 @@ private
         else
           begin
             record = MetadataXmlParser.build_record(@batch.metadata_file.read, doc.original_filename)
-            record.batch_id = @batch.id.to_s
+            record.batch_id = [@batch.id.to_s]
             saved = save_record_with_document(record, doc)
             warning = collect_warning(record, doc)
             if saved
@@ -199,7 +199,7 @@ private
       flash[:error] = "Please select some files to upload."
       render :edit
     else
-      attrs = @batch.template.attributes_to_update.merge(batch_id: @batch.id.to_s)
+      attrs = @batch.template.attributes_to_update.merge(batch_id: [@batch.id.to_s])
       record_class = @batch.record_type.constantize
 
       document_statuses = params[:documents].map do |doc|

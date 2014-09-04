@@ -7,7 +7,7 @@ class HonorsThesis < Contribution
   protected
   def copy_attributes
     super
-    @tufts_pdf.subject = department
+    @tufts_pdf.subject = [department]
     @tufts_pdf.creatordept = creatordept
   end
 

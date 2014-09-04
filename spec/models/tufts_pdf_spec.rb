@@ -4,7 +4,9 @@ describe TuftsPdf do
 
   describe "to_class_uri" do
     subject { TuftsPdf }
-    its(:to_class_uri) { should == 'info:fedora/cm:Text.PDF' }
+    it "has sets the class_uri" do
+      expect(subject.to_class_uri).to eq 'info:fedora/cm:Text.PDF'
+    end
   end
 
   it "should have an original_file_datastream" do
@@ -21,6 +23,7 @@ describe TuftsPdf do
         unless ActiveFedora::Base.exists? collection_id
           ActiveFedora::FixtureLoader.new('spec/fixtures').import_and_index(collection_id)
         end
+        # If you've got problems with this test, the collection may just need to be reindexed
         subject.collection_id = collection_id
       end
       it "should give a remote URL" do

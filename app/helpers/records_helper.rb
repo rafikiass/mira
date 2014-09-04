@@ -7,8 +7,8 @@ module RecordsHelper
   # normally come from hydra-editor and display the
   # template_name instead.
   def render_record_title
-    if @record.respond_to?(:template_name)
-      @record.template_name
+    if resource.respond_to?(:template_name)
+      resource.template_name
     else
       super
     end

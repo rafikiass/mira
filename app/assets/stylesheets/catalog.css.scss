@@ -5,6 +5,7 @@
 .document-checkbox {
   margin: 6px 5px 6px 0px;
 }
+
 #check_all {
   margin-right: 5px;
 }
@@ -15,4 +16,12 @@
 
   /* Reserve space so that the page won't rearrange when the javascript adds the content to that div */
   min-height: 20px;
+}
+
+.documentHeader {
+  margin-left: 0px;
+}
+
+.drop-target-hover {
+  background-color: lightgray;
 }

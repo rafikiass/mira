@@ -2,7 +2,7 @@ class Contribution
   include ActiveModel::Validations
   include ActiveModel::Conversion
   extend ActiveModel::Naming
-  
+
   validates :title, presence: true, length: {maximum: 250}
   validates :description, presence: true, length: {maximum: 2000}
   validates :creator, presence: true
@@ -10,10 +10,10 @@ class Contribution
   validate  :attachment_has_valid_content_type
 
   class_attribute :ignore_attributes, :attributes
-  
+
   self.ignore_attributes = [:attachment]
 
-  self.attributes = [:title, :description, :creator, :contributor, 
+  self.attributes = [:title, :description, :creator, :contributor,
                      :bibliographic_citation, :subject, :attachment, :license]
 
   SELFDEP = 'selfdep'.freeze
@@ -27,11 +27,11 @@ class Contribution
     now = Time.now
 
     note = "#{creator} self-deposited on #{now.strftime('%Y-%m-%d at %H:%M:%S %Z')} using the Deposit Form for the Tufts Digital Library"
-    @tufts_pdf = TuftsPdf.new(pid: Sequence.next_val, createdby: SELFDEP, 
-                    steward: 'dca', displays: 'dl', format: 'application/pdf',
-                    publisher: 'Tufts University. Digital Collections and Archives.',
-                    rights: 'http://dca.tufts.edu/ua/access/rights-creator.html',
-                    date_available: now.to_s, date_submitted: now.to_s, note: note)
+    @tufts_pdf = TuftsPdf.new(pid: Sequence.next_val, createdby: SELFDEP,
+                    steward: ['dca'], displays: ['dl'], format: ['application/pdf'],
+                    publisher: ['Tufts University. Digital Collections and Archives.'],
+                    rights: ['http://dca.tufts.edu/ua/access/rights-creator.html'],
+                    date_available: [now.to_s], date_submitted: [now.to_s], note: [note])
 
     copy_attributes
     @tufts_pdf
@@ -60,7 +60,11 @@ protected
 
   def copy_attributes
     (self.class.attributes - self.class.ignore_attributes).each do |attribute|
-      @tufts_pdf.send("#{attribute}=", send(attribute))
+      if @tufts_pdf.class.defined_attributes[attribute].multiple
+        @tufts_pdf.send("#{attribute}=", [send(attribute)])
+      else
+        @tufts_pdf.send("#{attribute}=", send(attribute))
+      end
     end
     @tufts_pdf.license = license_data(@tufts_pdf)
     insert_rels_ext_relationships

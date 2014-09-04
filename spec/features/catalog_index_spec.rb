@@ -7,7 +7,7 @@ feature 'View catalog index' do
   end
 
   let!(:reviewed_pdf) {
-    pdf = FactoryGirl.create(:tufts_pdf) 
+    pdf = FactoryGirl.create(:tufts_pdf)
     pdf.reviewed
     pdf.batch_id = ['1']
     pdf.save!

@@ -4,8 +4,10 @@ class RecordsController < ApplicationController
   before_filter :load_object, only: [:review, :publish, :destroy, :cancel]
   authorize_resource only: [:review]
 
+  # We don't even want them to see the 'choose_type' page if they can't create
+  prepend_before_filter :ensure_can_create, only: :new
+
   def new
-    authorize! :create, ActiveFedora::Base
     unless has_valid_type?
       render 'choose_type'
       return
@@ -86,17 +88,23 @@ class RecordsController < ApplicationController
   end
 
   def set_attributes
-    @record.working_user = current_user
+    resource.working_user = current_user
     # set rightsMetadata access controls
-    @record.apply_depositor_metadata(current_user)
+    resource.apply_depositor_metadata(current_user)
 
     # pull out because it's not a real attribute (it's derived, but still updatable)
-    @record.stored_collection_id = params[ActiveModel::Naming.singular(@record)].delete(:stored_collection_id).try(&:first)
+    resource.stored_collection_id = raw_attributes.delete(:stored_collection_id).try(&:first)
 
+    resource.datastreams= raw_attributes[:datastreams] if raw_attributes[:datastreams]
+    resource.relationship_attributes = raw_attributes['relationship_attributes'] if raw_attributes['relationship_attributes']
     super
   end
 
   private
+
+  def ensure_can_create
+    authorize! :create, ActiveFedora::Base
+  end
 
   def load_object
     @record = ActiveFedora::Base.find(params[:id], cast: true)
@@ -109,5 +117,13 @@ class RecordsController < ApplicationController
       record_attachments_path(@record)
     end
   end
+
+  # Override method from hydra-editor to include rels-ext fields
+  # def set_attributes
+  #   puts "params #{params}"
+  #   rels_ext_fields = { relationship_attributes: params[ActiveModel::Naming.singular(resource)]['relationship_attributes'] }
+  #   puts "Rels #{rels_ext_fields}"
+  #   resource.attributes = collect_form_attributes.merge(rels_ext_fields)
+  # end
 
 end

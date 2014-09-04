@@ -3,10 +3,10 @@ require 'spec_helper'
 feature 'View unpublished documents' do
   before do
     TuftsAudio.where(title: "Very unique title").destroy_all
-    @production = TuftsAudio.new(title: 'Very unique title', description: 'eh?', creator: 'Fred', displays: ['dl'])
+    @production = TuftsAudio.new(title: 'Very unique title', description: ['eh?'], creator: ['Fred'], displays: ['dl'])
     @production.push_to_production!
 
-    @not_production = TuftsAudio.new(title: 'Very unique title', description: 'eh?', creator: 'Fred', displays: ['dl'])
+    @not_production = TuftsAudio.new(title: 'Very unique title', description: ['eh?'], creator: ['Fred'], displays: ['dl'])
     @not_production.save!
 
     sign_in :admin
@@ -53,7 +53,7 @@ feature "Finding self-deposited documents using facets" do
   it 'shows only the self-deposited docs' do
     visit unpublished_index_path
     within(".blacklight-deposit_method_ssi") do
-      click_link 'self-deposit' 
+      click_link 'self-deposit'
     end
     page.should have_css('#documents .document', count: 1) # filtered out all but one
     page.should have_link(@self_deposit.title, href: catalog_path(@self_deposit))
