@@ -3,7 +3,7 @@
 
 en:
   blacklight:
-    application_name: "Tufts Digital Library"
+    application_name: "MIRA - Tufts Digital Library"
     back_to_search: "Back to Search Results"
   hydra_editor:
     form:
