@@ -4,6 +4,9 @@ gem 'rails', '4.0.5'
 
 gem 'sqlite3'
 gem 'mysql2'
+gem 'capistrano'
+gem 'capistrano-rails'
+gem 'capistrano-bundler'
 
 gem 'hydra', '7.1.0'
 gem 'hydra-role-management', '0.2.0'
