@@ -31,8 +31,8 @@ gem 'rmagick', '2.13.2', require: 'RMagick'
 gem 'resque-status'
 gem 'carrierwave', '~> 0.10.0'
 
-gem 'blacklight_advanced_search', github: 'projectblacklight/blacklight_advanced_search', branch: 'generate_overrides'
-gem 'tufts_models', github: 'curationexperts/tufts_models'
+gem 'blacklight_advanced_search'
+gem 'tufts_models', github: 'curationexperts/tufts_models', :tag => 'v1.0.0.rc1'
 
 group :development do
   gem 'jettywrapper'

@@ -1,6 +1,7 @@
 GIT
   remote: git://github.com/curationexperts/tufts_models.git
-  revision: f25256bb38ecc2daec066426de2d4bb1d1d78a8b
+  revision: 7660e24d36d892fe4d0cbb72cc6b3092d413e996
+  tag: v1.0.0.rc1
   specs:
     tufts_models (0.0.1)
       active-fedora (~> 7.0)
@@ -14,15 +15,6 @@ GIT
       rmagick (= 2.13.2)
       settingslogic
       titleize
-
-GIT
-  remote: git://github.com/projectblacklight/blacklight_advanced_search.git
-  revision: 6b68e93ae80f0e0d4bbfcf3ed92db1dacc7ce66b
-  branch: generate_overrides
-  specs:
-    blacklight_advanced_search (5.1.0)
-      blacklight (>= 5.2, < 6.0)
-      parslet
 
 GEM
   remote: https://rubygems.org/
@@ -78,6 +70,9 @@ GEM
       nokogiri (~> 1.6)
       rails (>= 3.2.6, < 5)
       rsolr (~> 1.0.6)
+    blacklight_advanced_search (5.1.1)
+      blacklight (>= 5.2, < 6.0)
+      parslet
     blankslate (2.1.2.4)
     block_helpers (0.3.3)
       activesupport (>= 2.0)
@@ -433,7 +428,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  blacklight_advanced_search!
+  blacklight_advanced_search
   bootstrap-sass
   bootstrap_form
   byebug
