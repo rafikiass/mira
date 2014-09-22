@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'Catalog routes: ' do
-  let(:id) { 'tufts:T123.1.2.3' }
+  let(:id) { 'tufts:T123.1-2.3' }
 
   it 'route to index page' do
     expect(get: 'catalog').to route_to(
