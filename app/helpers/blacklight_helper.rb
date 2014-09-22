@@ -39,10 +39,6 @@ module BlacklightHelper
     pretty_object_state(object_state)
   end
 
-  def make_thumbnail(document, image_options={})
-    image_tag download_path(document.id, datastream_id: 'Thumbnail.png')
-  end
-
   def pretty_object_state(state)
     case state
     when 'A'

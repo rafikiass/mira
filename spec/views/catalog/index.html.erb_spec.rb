@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'catalog/index.html.erb' do
   before do
-    @document_list = [SolrDocument.new(id: 'some_id')]
+    @document_list = [SolrDocument.new(id: 'some_id', active_fedora_model_ssi: 'TuftsImage')]
     {current_user: double(admin?: true),
       has_search_parameters?: false,
       render_grouped_response?: false,

@@ -29,7 +29,7 @@ class CatalogController < ApplicationController
     config.index.display_type_field = 'has_model_ssim'
 
     # the method for generating thumbnails
-    config.index.thumbnail_method = :make_thumbnail
+    config.index.thumbnail_method = :thumbnail_tag
 
     # solr field configuration for document/show views
     config.show.title_field = 'title_tesim'
