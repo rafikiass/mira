@@ -1,18 +1,22 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.0.5'
+gem 'rails', '4.1.6'
 
 gem 'sqlite3'
 gem 'mysql2'
+
+gem 'hydra-head', '~> 7.2.1'
+gem 'blacklight', '~> 5.7.1'
+gem 'active-fedora', '~> 7.1.1'
+gem 'hydra-editor', '~> 0.5.0'
+gem 'hydra-role-management', '0.2.0'
+gem 'hydra-batch-edit', '1.1.1'
+gem 'qa', '0.3.0'
+
 gem 'capistrano'
 gem 'capistrano-rails'
 gem 'capistrano-bundler'
 
-gem 'hydra', '7.1.0'
-gem 'hydra-role-management', '0.2.0'
-gem 'hydra-editor', '~> 0.5.0'
-gem 'hydra-batch-edit', '1.1.1'
-gem 'qa', '0.0.3'
 gem 'sanitize', '2.0.6'
 
 gem 'disable_assets_logger', group: :development
@@ -35,7 +39,7 @@ gem 'resque-status'
 gem 'carrierwave', '~> 0.10.0'
 
 gem 'blacklight_advanced_search'
-gem 'tufts_models', github: 'curationexperts/tufts_models', :tag => 'v1.0.0.rc1'
+gem 'tufts_models', github: 'curationexperts/tufts_models', tag: 'v1.0.0.rc1'
 
 group :development do
   gem 'jettywrapper'
