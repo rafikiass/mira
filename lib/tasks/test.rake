@@ -8,11 +8,11 @@ task :fixtures => :environment do
     tufts:UA069.005.DO.00239
     tufts:UA069.005.DO.00339
     tufts:UP022.001.001.00001.00003
-    tufts:UP022.001.001.00001.00004 
+    tufts:UP022.001.001.00001.00004
     tufts:UP022.001.001.00001.00005
-    tufts:UP029.003.003.00014 
+    tufts:UP029.003.003.00014
     tufts:UP029.003.003.00012
-    tufts:UP029.020.031.00108 
+    tufts:UP029.020.031.00108
 
     tufts:MS054.003.DO.02108
     tufts:MS115.003.001.00001
@@ -52,9 +52,7 @@ task :fixtures => :environment do
     tufts:me.uscongress3.second.1825
     tufts:sample001
     tufts:sample002
-    
-    
-    )
+  )
   loader = ActiveFedora::FixtureLoader.new("#{Rails.root}/spec/fixtures")
   FIXTURES.each do |pid|
     puts("Refreshing #{pid}")

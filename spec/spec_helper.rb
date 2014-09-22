@@ -11,6 +11,9 @@ def clean_up_carrierwave_files
   FileUtils.rm_rf(CarrierWave::Uploader::Base.root)
 end
 
+# Checks for pending migrations before tests are run.
+ActiveRecord::Migration.maintain_test_schema!
+
 RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
   config.include FactoryGirl::Syntax::Methods
