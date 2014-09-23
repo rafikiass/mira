@@ -1,28 +1,21 @@
+$logo_image: 'mira.png';
 @import 'bootstrap-sprockets';
 @import 'bootstrap';
 @import 'blacklight/blacklight';
 
-.navbar .navbar-brand {
-  background: none;
+.navbar > .container .navbar-brand {
+  background:transparent image_url($logo_image) no-repeat top left;
   width: 216px;
-  text-indent: 0;
-  padding: 0;
-  margin-left: 1em;
-  margin-right: 1em;
+  white-space: nowrap;
+  text-indent: 100%;
+  overflow: hidden;
+  // padding: 0;
+  margin-right: 20px;
+  margin-left: 20px;
   margin-top: 0.7em;
 }
-
-.navbar-collapse {
-  padding-top: 1em;
-}
-
 #searchbar {
   padding-top: 0.5em;
-
-  form {
-    width: 450px;
-    margin-left: 1em;
-  }
 }
 
 #search_link {
