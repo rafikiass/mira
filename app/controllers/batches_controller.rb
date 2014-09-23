@@ -161,7 +161,6 @@ private
       flash[:error] = "Please select some files to upload."
       render :edit
     else
-
       document_statuses = params[:documents].map do |doc|
         record, warning, error = nil, nil, nil
         if @batch.uploaded_files.keys.include? doc.original_filename

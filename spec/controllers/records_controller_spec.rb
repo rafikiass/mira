@@ -112,10 +112,10 @@ describe RecordsController do
       end
 
       it "should be an error with an invalid pid" do
-        get :new, :type=>'TuftsAudio', :pid => '123.1231'
+        get :new, :type=>'TuftsAudio', :pid => 'demo:FLORA:01.01'
         response.should be_successful
         response.should render_template(:choose_type)
-        flash[:error].should == "You have specified an invalid pid. A valid pid must contain a colon (i.e. tufts:1231)"
+        flash[:error].should == "You have specified an invalid pid. Pids must be in this format: tufts:1231"
       end
     end
 

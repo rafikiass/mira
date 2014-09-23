@@ -15,7 +15,7 @@ class RecordsController < ApplicationController
 
     args = params[:pid].present? ? {pid: params[:pid]} : {}
 
-    if !args[:pid] || (args[:pid] && /:/.match(args[:pid]))
+    if !args[:pid] || (args[:pid] && TuftsBase.valid_pid?(args[:pid]))
       if ActiveFedora::Base.exists?(args[:pid])
         flash[:alert] = "A record with the pid \"#{args[:pid]}\" already exists."
         redirect_to hydra_editor.edit_record_path(args[:pid])
@@ -25,7 +25,7 @@ class RecordsController < ApplicationController
         redirect_to next_page
       end
     else
-      flash[:error] = "You have specified an invalid pid. A valid pid must contain a colon (i.e. tufts:1231)"
+      flash.now[:error] = "You have specified an invalid pid. Pids must be in this format: tufts:1231"
       render 'choose_type'
     end
   end
