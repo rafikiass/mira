@@ -1,12 +1,13 @@
 require 'spec_helper'
 
 describe "batches/new_template_import.html.erb" do
+  let(:batch) { BatchTemplateImport.new }
   before do
     @templates = [
       FactoryGirl.create(:tufts_template),
       FactoryGirl.create(:tufts_template)
     ]
-    assign :batch, BatchTemplateImport.new
+    assign :batch, batch
     render
   end
 
@@ -21,5 +22,13 @@ describe "batches/new_template_import.html.erb" do
       rendered.should have_selector("option[value='#{t.id}']")
     end
     expect(rendered).to have_selector("select[name='batch[record_type]']")
+  end
+
+  context "with errors" do
+    let(:batch){ BatchTemplateImport.new.tap{|b| b.errors[:base] << "some error"}}
+
+    it "displays errors" do
+      expect(rendered).to have_selector(".alert li", text: "some error")
+    end
   end
 end

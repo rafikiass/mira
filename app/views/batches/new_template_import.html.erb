@@ -5,6 +5,16 @@
 </div>
 
 <%= bootstrap_form_for @batch, as: :batch, url: batches_path do |f| %>
+  <% if @batch.errors[:base].present? %>
+    <div class="alert alert-danger">
+      <h4>There were errors that prevented this Batch xml import from being saved:</h4>
+      <ul>
+        <% @batch.errors[:base].each do |error| %>
+          <li><%= error %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
   <%= f.hidden_field :type %>
   <%= f.select :template_id, options_from_collection_for_select(TuftsTemplate.active, :id, :template_name, @batch.template_id), prompt: 'Select a Template' %>
   <%= f.select :record_type, options_for_select(sorted_object_types.delete_if{|x| x.any? {|t| t == 'TuftsTemplate'}}), prompt: 'Select an object type' %>

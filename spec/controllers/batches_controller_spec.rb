@@ -261,7 +261,7 @@ describe BatchesController do
         let(:batch) { FactoryGirl.create(:batch_xml_import) }
 
         before do
-          TuftsPdf.delete_all
+          ActiveFedora::Base.delete_all
           TuftsPdf.create(FactoryGirl.attributes_for(:tufts_pdf, pid: 'tufts:1'))
           get :edit, id: batch.id
         end
