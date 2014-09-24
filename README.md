@@ -55,14 +55,17 @@ end
 
 ```
 
-##Start background workers
+## Start redis
+```bash
+redis-server
+```
 
+##Start background workers
 ```bash
 $ QUEUE=* rake resque:work
 ```
 
 ### Optional: start resque-web
-
 ```bash
 resque-web config/resque_conf.rb
 ```
@@ -72,11 +75,7 @@ resque-web config/resque_conf.rb
 $ rake jetty:start
 ```
 
-## Start redis
-```bash
-redis-server
-```
-
+## Start MIRA
 ```bash
 $ rails s
 ```
@@ -88,7 +87,7 @@ $ rails s
 Make sure jetty is running, then run the rake task:
 
 ```bash
-rake fixtures
+rake tufts:fixtures
 ```
 
 ### Importing deposit types from a CSV file
