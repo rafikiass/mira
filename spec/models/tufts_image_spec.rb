@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe TuftsImage do
-  
+
   describe "with access rights" do
     before do
       @image = TuftsImage.new(title: 'test image', displays: ['dl'])

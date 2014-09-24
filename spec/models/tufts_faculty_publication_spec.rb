@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe TuftsFacultyPublication do
-  
+
   describe "with access rights" do
     before do
       @audio = TuftsFacultyPublication.new(title: 'test facpub', displays: ['dl'])
@@ -19,16 +19,4 @@ describe TuftsFacultyPublication do
       ability.can?(:read, @audio.pid).should be_truthy
     end
   end
-
-  describe "to_class_uri" do
-    subject {TuftsFacultyPublication}
-    it "has sets the class_uri" do
-      expect(subject.to_class_uri).to eq 'info:fedora/cm:Text.FacPub'
-    end
-  end
-
-  it "should have an original_file_datastream" do
-    TuftsFacultyPublication.original_file_datastreams.should == ["Archival.pdf"]
-  end
-
 end
