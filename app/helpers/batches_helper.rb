@@ -12,7 +12,7 @@ module BatchesHelper
 
   def job_status_text(batch, job)
     if job.nil?
-      if batch.created_at <= Resque::Plugins::Status::Hash.expire_in.ago
+      if batch.created_at <= Resque::Plugins::Status::Hash.expire_in.seconds.ago
         'Status expired'
       else
         'Status not available'

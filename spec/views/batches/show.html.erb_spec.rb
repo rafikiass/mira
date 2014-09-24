@@ -123,7 +123,7 @@ describe "batches/show.html.erb" do
       subject { FactoryGirl.create(:batch_template_update,
                                    pids: records.map(&:id),
                                    job_ids: ['missing'],
-                                   created_at: Resque::Plugins::Status::Hash.expire_in.ago) }
+                                   created_at: Resque::Plugins::Status::Hash.expire_in.seconds.ago) }
 
       it 'says the batch status is not availble' do
         render
