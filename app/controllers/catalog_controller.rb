@@ -201,9 +201,16 @@ protected
     solr_parameters[:fq] ||= []
     solr_parameters[:fq] << "NOT #{ActiveFedora::SolrService.solr_name("object_state", :stored_sortable)}:\"D\""
     solr_parameters[:fq] << filter_templates
+    solr_parameters[:fq] << filter_tdil_collections
   end
 
   def filter_templates
     "NOT active_fedora_model_ssi:TuftsTemplate"
   end
+
+  def filter_tdil_collections
+    %{NOT active_fedora_model_ssi:CourseCollection
+      NOT active_fedora_model_ssi:PersonalCollection}
+  end
+
 end 
