@@ -1,10 +1,10 @@
 require 'import_export/metadata_xml_parser'
 
 class BatchesController < ApplicationController
-  before_filter :build_batch, only: [:create]
+  before_filter :build_batch, only: :create
   load_resource only: [:index, :show, :edit]
   before_filter :paginate, only: :index
-  before_filter :load_batch, only: [:update]
+  before_filter :load_batch, only: :update
   authorize_resource
 
   def index
@@ -58,10 +58,11 @@ class BatchesController < ApplicationController
   end
 
   def update
+    @batch.lock! # ensure that multiple processes aren't attempting to update the same batch
     case @batch.type
     when 'BatchTemplateImport'
       handle_update_for_template_import
-   when 'BatchXmlImport'
+    when 'BatchXmlImport'
      handle_update_for_xml_import
     else
       flash[:error] = 'Unable to handle batch request.'
