@@ -6,7 +6,7 @@
       </div>
       <div class="navbar-right">
         <div class="nav navbar-nav" id="searchbar">
-          <% unless controller_name.in?(['contribute','templates','records']) %>
+          <% unless controller_name.in?(['contribute', 'templates', 'records', 'sessions']) %>
             <%= render_search_bar %>
             <div id='search_link'>
               <%= link_to 'Advanced Search', advanced_search_path %>
