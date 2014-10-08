@@ -3,17 +3,13 @@ $logo_image: 'mira.png';
 @import 'bootstrap';
 @import 'blacklight/blacklight';
 
-.navbar > .container .navbar-brand {
-  background:transparent image_url($logo_image) no-repeat top left;
+#header-navbar .navbar-brand {
   width: 216px;
-  white-space: nowrap;
-  text-indent: 100%;
-  overflow: hidden;
-  // padding: 0;
   margin-right: 20px;
   margin-left: 20px;
   margin-top: 0.7em;
 }
+
 #searchbar {
   padding-top: 0.5em;
 }
