@@ -321,7 +321,7 @@ describe BatchesController do
 
           describe 'error path (failed to save batch)' do
             before do
-              allow(Batch).to receive(:find) { batch }
+              allow_any_instance_of(ActiveRecord::Relation).to receive(:find) { batch }
               allow(batch).to receive(:save) { false }
               @batch_error = 'Batch Error 1'
               batch.errors.add(:base, @batch_error)
@@ -470,7 +470,7 @@ describe BatchesController do
 
           describe 'error path (failed to save batch)' do
             before do
-              allow(Batch).to receive(:find) { batch }
+              allow_any_instance_of(ActiveRecord::Relation).to receive(:find) { batch }
               allow(batch).to receive(:save) { false }
               @batch_error = 'Batch Error 1'
               batch.errors.add(:base, @batch_error)
