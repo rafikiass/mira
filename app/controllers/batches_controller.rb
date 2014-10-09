@@ -58,7 +58,6 @@ class BatchesController < ApplicationController
   end
 
   def update
-    @batch.lock! # ensure that multiple processes aren't attempting to update the same batch
     case @batch.type
     when 'BatchTemplateImport'
       handle_update_for_template_import
@@ -78,7 +77,7 @@ private
   end
 
   def load_batch
-    @batch = Batch.find(params.require(:id))
+    @batch = Batch.lock.find(params.require(:id))
   end
 
   def paginate
