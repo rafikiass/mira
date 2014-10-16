@@ -161,6 +161,7 @@ private
       flash[:error] = "Please select some files to upload."
       render :edit
     else
+      save_status = nil
       document_statuses = params[:documents].map do |doc|
         record, warning, error = nil, nil, nil
         if @batch.uploaded_files.keys.include? doc.original_filename
@@ -172,7 +173,11 @@ private
             saved = save_record_with_document(record, doc)
             warning = collect_warning(record, doc)
             if saved
-              @batch.uploaded_files[doc.original_filename] = record.pid
+              Batch.transaction do
+                load_batch #reload batch within the transaction
+                @batch.uploaded_files[doc.original_filename] = record.pid
+                save_status = @batch.save
+              end
             end
           rescue MetadataXmlParserError => e
             error = e.message
@@ -182,7 +187,7 @@ private
       end
       docs, records, warnings, errors = document_statuses.transpose
 
-      successful = @batch.save &&  # our batch saved
+      successful = save_status &&  # our batch saved
         errors.compact.empty? &&   # we have no errors from building records
         records.all?(&:persisted?) # all our records saved
 
