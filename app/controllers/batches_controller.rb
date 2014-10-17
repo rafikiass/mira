@@ -149,10 +149,6 @@ private
     end
   end
 
-  def collect_errors(batch, records)
-    (batch.errors.full_messages + records.map{|r| r.errors.full_messages }.flatten).compact
-  end
-
   # TODO: Take a look at the handle_update_for_template_import method, handle_update_for_xml_import method and attachments_controller update method, and see if we can pull out any common code.
 
   def handle_update_for_xml_import
@@ -231,6 +227,10 @@ private
     else
       false
     end
+  end
+
+  def collect_errors(batch, records)
+    (batch.errors.full_messages + records.map{|r| r.errors.full_messages }.flatten).compact
   end
 
   def respond_to_import(successful, batch, document_statuses)

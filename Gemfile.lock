@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/curationexperts/tufts_models.git
-  revision: c4f12f2a729030e375588a0228172b226219cda0
+  revision: 6a5232c957d5dd0dc29ef33b6237de7d948ca2f0
   specs:
     tufts_models (0.0.1)
       active-fedora (~> 7.0)
@@ -238,7 +238,7 @@ GEM
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (2.9.1)
-    netrc (0.7.8)
+    netrc (0.8.0)
     nokogiri (1.6.3.1)
       mini_portile (= 0.6.0)
     nom-xml (0.5.1)
