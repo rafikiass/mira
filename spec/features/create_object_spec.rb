@@ -9,6 +9,7 @@ feature 'Admin user creates document' do
     rescue ActiveFedora::ObjectNotFoundError
     end
   end
+
   scenario 'with a TuftsAudio' do
     visit root_path
     click_link 'Create a new object'
@@ -24,9 +25,10 @@ feature 'Admin user creates document' do
     click_button 'Next'
 
     fill_in '*Title', with: 'My title'
+    select('dl', from: 'Displays in Portal')
     click_button 'Save'
 
-    page.should have_selector('h1', text: 'My title')
+    page.should have_selector('div.alert', text: 'Object was successfully updated.')
   end
 
 end
