@@ -1,6 +1,7 @@
 GIT
   remote: git://github.com/curationexperts/tufts_models.git
-  revision: 6a5232c957d5dd0dc29ef33b6237de7d948ca2f0
+  revision: 8bb0b0f078917ad1fbaa0d057d687106ecaed940
+  tag: v1.0.0
   specs:
     tufts_models (0.0.1)
       active-fedora (~> 7.0)
@@ -140,10 +141,10 @@ GEM
       nokogiri (>= 1.4.3)
     erubis (2.7.0)
     execjs (2.2.2)
-    factory_girl (4.4.0)
+    factory_girl (4.5.0)
       activesupport (>= 3.0.0)
-    factory_girl_rails (4.4.1)
-      factory_girl (~> 4.4.0)
+    factory_girl_rails (4.5.0)
+      factory_girl (~> 4.5.0)
       railties (>= 3.0.0)
     fastercsv (1.5.5)
     ffi (1.9.6)
@@ -228,7 +229,7 @@ GEM
     logger (1.2.8)
     mail (2.6.1)
       mime-types (>= 1.16, < 3)
-    mime-types (2.4.2)
+    mime-types (2.4.3)
     mini_portile (0.6.0)
     minitest (5.4.2)
     mono_logger (1.1.0)
