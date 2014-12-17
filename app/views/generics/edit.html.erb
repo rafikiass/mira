@@ -34,14 +34,12 @@
       </tbody>
     </table>
   </div><!-- /well -->
-  <%= f.actions do %>
     <%= f.submit 'Save', 'data-disable-with'=>"Saving..." %>
     <% if @generic.DCA_META.versions.empty? %>
       <%# if the object was just created (temporary object) delete it if they cancel %>
-      <%= link_to "Cancel", cancel_record_path(@generic), :class=>'btn cancel', :method=>:delete %>
+      <%= link_to "Cancel", cancel_record_path(@generic), :class=>'btn btn-default cancel', :method=>:delete %>
     <% else %>
-      <%= link_to "Cancel", :back, :class=>'btn cancel' %>
+      <%= link_to "Cancel", :back, :class=>'btn btn-default cancel' %>
     <% end %>
-  <% end %>
 <% end %>
 
