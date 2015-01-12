@@ -1,5 +1,5 @@
       <div class="input-group" <%  if index == 0 %> id="additional_<%= key.to_s %>_clone" <% end %>>
-        <%= select_tag "#{resource.class.model_name.singular}[#{key.to_s}][]", options_for_select(%w(dl trove tisch perseus elections dark), v), include_blank: true, id: "#{resource.class.model_name.singular}_#{key.to_s}"%>
+        <%= select_tag "#{resource.class.model_name.singular}[#{key.to_s}][]", options_for_select(%w(dl trove tisch perseus elections dark nowhere), v), include_blank: true, id: "#{resource.class.model_name.singular}_#{key.to_s}"%>
         <%= render :partial=>"records/edit_fields/suffix", :locals=>{key: key, index: index} %>
       </div>
       <div id="additional_<%= key %>_elements"></div>
