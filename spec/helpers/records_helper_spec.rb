@@ -8,7 +8,8 @@ describe RecordsHelper do
        "Generic object" => "TuftsGenericObject",
        'Image' => 'TuftsImage',
        'PDF' => 'TuftsPdf',
-       'Template' => 'TuftsTemplate'}
+       'Template' => 'TuftsTemplate',
+       'Voting Record' => 'TuftsVotingRecord'}
   end
 
   it "should have model_labels" do
@@ -25,6 +26,7 @@ describe RecordsHelper do
                            ["Generic object", "TuftsGenericObject"],
                            ["Image", "TuftsImage"],
                            ["PDF", "TuftsPdf"],
-                           ["Template", "TuftsTemplate"]]
+                           ["Template", "TuftsTemplate"],
+                           ["Voting Record", "TuftsVotingRecord"]]
   end
 end
