@@ -1,10 +1,10 @@
 GIT
   remote: git://github.com/curationexperts/tufts_models.git
-  revision: a75c9b42929fd1e2c3bca4261e94189e6b45f927
-  ref: a75c9b42929fd1e2c3bca4261e94189e6b45f927
+  revision: dd0c8fcb75fdf0dabd3b0f3c1d89e24ca17db491
+  ref: dd0c8fcb75fdf0dabd3b0f3c1d89e24ca17db491
   specs:
     tufts_models (0.0.1)
-      active-fedora (~> 7.0)
+      active-fedora (~> 7.1)
       carrierwave
       chronic
       hydra-core
