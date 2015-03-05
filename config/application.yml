@@ -1,5 +1,6 @@
 # config/application.yml
 defaults: &defaults
+  derivatives_failure_address: "brian.goodmon@tufts.edu"
   tdl_feedback_address: "brian.goodmon@tufts.edu"
   tdl_feedback_subject: "TDL Content Feedback"
   trim_bucket_url: "http://bucket01.lib.tufts.edu"
@@ -37,6 +38,7 @@ test:
   preview_fedora_url: 'http://localhost:8983/fedora'
 production:
   <<: *defaults
+  derivatives_failure_address: "dldev@elist.tufts.edu"
   tdl_feedback_address: "deborah.kaplan@tufts.edu"
   object_store_root: "/tdr/dcadata02/tufts/central/dca/fake_bucket"
   processing_url: "http://processing01.lib.tufts.edu:8080"

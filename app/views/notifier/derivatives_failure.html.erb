@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  </head>
+  <body>
+    <h1>MIRA has experienced an error while creating derivatives<%= @params[:pid] != nil ? ' for ' + @params[:pid] : '' %>.</h1>
+    <p><%= @params[:message] %></p>
+    <p>Please see MIRA/log/derivatives.log for details.</p>
+  </body>
+</html>
