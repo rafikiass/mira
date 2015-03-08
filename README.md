@@ -1,6 +1,6 @@
 #Tufts Hydra Admin
 
-[![Build Status](https://travis-ci.org/curationexperts/tufts.png?branch=master)](https://travis-ci.org/curationexperts/tufts)
+[![Build Status](https://travis-ci.org/curationexperts/mira.svg?branch=master)](https://travis-ci.org/curationexperts/mira)
 
 ##Initial Setup
 
