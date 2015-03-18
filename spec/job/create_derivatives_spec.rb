@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'spec_helper'	
 
 describe Job::CreateDerivatives do
 
@@ -40,7 +40,7 @@ describe Job::CreateDerivatives do
 
     it 'raises an error if it doesn''t have write permission to the derivatives folder' do
       job = Job::CreateDerivatives.new('uuid', 'record_id' => subject.id)
-			derivatives_path = subject.local_path_for_pdf_derivatives
+      derivatives_path = subject.local_path_for_pdf_derivatives
       FileUtils.mkdir_p(derivatives_path)  # in case the derivatives folder doesn't already exist
       FileUtils.chmod(0444, derivatives_path)
 
