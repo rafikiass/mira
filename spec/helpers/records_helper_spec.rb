@@ -9,6 +9,7 @@ describe RecordsHelper do
        "Generic object" => "TuftsGenericObject",
        'Image' => 'TuftsImage',
        'PDF' => 'TuftsPdf',
+       'TEI' => 'TuftsTEI',
        'Template' => 'TuftsTemplate',
        'Voting Record' => 'TuftsVotingRecord'}
   end
@@ -28,6 +29,7 @@ describe RecordsHelper do
                            ["Generic object", "TuftsGenericObject"],
                            ["Image", "TuftsImage"],
                            ["PDF", "TuftsPdf"],
+                           ["TEI", "TuftsTEI"],
                            ["Template", "TuftsTemplate"],
                            ["Voting Record", "TuftsVotingRecord"]]
   end
