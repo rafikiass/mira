@@ -15,7 +15,14 @@ module Job
 
     def perform
       record = ActiveFedora::Base.find(options['record_id'], cast: true)
-      record.create_derivatives
+
+      begin
+        record.create_derivatives
+      rescue StandardError => ex
+        Notifier.derivatives_failure({:pid => options['record_id'], :message => ex.message})
+        raise(ex)
+      end
+
       record.save(validate: false)
     end
   end
