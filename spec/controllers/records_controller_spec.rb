@@ -221,10 +221,10 @@ describe RecordsController do
           assigns[:record].reload.audit_log.what.should == ['Metadata updated rightsMetadata, DCA-META, DCA-ADMIN']
         end
         it "should update external datastream paths" do
-          put :update, :id=>@audio, :tufts_audio=>{:datastreams=>{"ACCESS_MP3"=>"http://example.com/access.mp3", "ARCHIVAL_SOUND"=>"http://example.com/archival.wav"} }
+          put :update, :id=>@audio, :tufts_audio=>{:datastreams=>{"ACCESS_MP3"=>"http://example.com/access.mp3", "ARCHIVAL_WAV"=>"http://example.com/archival.wav"} }
           response.should redirect_to("/catalog/#{assigns[:record].pid}")
           assigns[:record].datastreams['ACCESS_MP3'].dsLocation.should == 'http://example.com/access.mp3'
-          assigns[:record].datastreams['ARCHIVAL_SOUND'].dsLocation.should == 'http://example.com/archival.wav'
+          assigns[:record].datastreams['ARCHIVAL_WAV'].dsLocation.should == 'http://example.com/archival.wav'
         end
         it 'should update the collection id' do
           put :update, :id=>@audio, :tufts_audio=>{:stored_collection_id=>["updated_id"]}
