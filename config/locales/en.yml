@@ -50,7 +50,6 @@ en:
         TuftsAudio: "audio"
         TuftsImage: "image"
         TuftsEAD: "collection guide"
-        TuftsAudioText: 'audio text'
         TuftsGenericObject: 'generic object'
         TuftsTemplate: 'Template'
         TuftsVotingRecord: 'Voting Record'
