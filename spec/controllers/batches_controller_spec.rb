@@ -408,7 +408,7 @@ describe BatchesController do
         end
 
         context "with a file that isn't in the metadata" do
-          let(:file1) { Rack::Test::UploadedFile.new(File.join(Rails.root, 'spec', 'fixtures', 'tufts_WP0001.foxml.xml')) }
+          let(:file1) { Rack::Test::UploadedFile.new(File.join(Rails.root, 'spec', 'fixtures', 'tufts_RCR00728.foxml.xml')) }
           before do
             TuftsPdf.delete_all
             patch :update, id: batch.id, documents: [file1], batch: {}
@@ -451,7 +451,7 @@ describe BatchesController do
           end
 
           context "with a file that isn't in the metadata" do
-          let(:file1) { Rack::Test::UploadedFile.new(File.join(Rails.root, 'spec', 'fixtures', 'tufts_WP0001.foxml.xml')) }
+          let(:file1) { Rack::Test::UploadedFile.new(File.join(Rails.root, 'spec', 'fixtures', 'tufts_RCR00728.foxml.xml')) }
             before do
               TuftsPdf.delete_all
               patch :update, id: batch.id, documents: [file1], batch: {}, format: :json
