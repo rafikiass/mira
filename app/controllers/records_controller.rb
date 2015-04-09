@@ -20,7 +20,12 @@ class RecordsController < ApplicationController
         flash[:alert] = "A record with the pid \"#{args[:pid]}\" already exists."
         redirect_to hydra_editor.edit_record_path(args[:pid])
       else
-        @record = params[:type].constantize.new(args)
+        klass = params[:type].constantize
+        @record = if klass.respond_to?(:build_draft_version)
+                    klass.build_draft_version(args)
+                  else
+                    klass.new(args)
+                  end
         @record.save(validate: false)
         redirect_to next_page
       end

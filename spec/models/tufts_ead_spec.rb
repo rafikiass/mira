@@ -2,6 +2,10 @@ require 'spec_helper'
 
 describe TuftsEAD do
 
+  it 'has methods to support a draft version of the object' do
+    expect(TuftsEAD.respond_to?(:build_draft_version)).to be_truthy
+  end
+
   describe "with access rights" do
     before do
       @ead = TuftsEAD.new(title: 'test ead', displays: ['dl'])

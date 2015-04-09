@@ -2,6 +2,10 @@ require 'spec_helper'
 
 describe TuftsGenericObject do
 
+  it 'has methods to support a draft version of the object' do
+    expect(TuftsGenericObject.respond_to?(:build_draft_version)).to be_truthy
+  end
+
   describe "with access rights" do
     before do
       @generic_object = TuftsGenericObject.new(title: 'test generic', displays: ['dl'])
