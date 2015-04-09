@@ -10,7 +10,7 @@ end
 desc 'Install hydra-jetty (download if necessary)'
 task :jetty do
   unless File.exist?('jetty')
-    puts "Downloading jetty - wrapper_version: #{JettyWrapper.hydra_jetty_version}"
+    puts "Downloading jetty - wrapper_version: #{Jettywrapper.hydra_jetty_version}"
     `rails generate hydra:jetty`
   end
 end
