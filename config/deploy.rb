@@ -17,7 +17,7 @@ set :keep_releases, 5
 # set :pty, true
 
 # Default value for :linked_files is []
-set :linked_files, %w{config/initializers/devise.rb config/initializers/secret_token.rb config/application.yml config/database.yml config/devise.yml config/fedora.yml config/redis.yml config/solr.yml}
+set :linked_files, %w{config/initializers/devise.rb config/initializers/secret_token.rb config/application.yml config/database.yml config/devise.yml config/fedora.yml config/resque-pool.yml config/redis.yml config/solr.yml}
 
 # Default value for linked_dirs is []
 set :linked_dirs, %w{bin tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
