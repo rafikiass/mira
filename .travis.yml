@@ -7,6 +7,8 @@ notifications:
     - justin@curationexperts.com
 
 before_script:
+  - mysql -e 'create database mira_test'
+  - bundle exec rake db:setup
   - cp config/database.yml.sample config/database.yml
   - cp config/fedora.yml.sample config/fedora.yml
   - cp config/solr.yml.sample config/solr.yml
@@ -23,3 +25,4 @@ bundler_args: --without development debug
 
 services:
   - redis-server
+  - mysql
