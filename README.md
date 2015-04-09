@@ -19,6 +19,7 @@ Or else you may get errors like this when you run the specs:
 "Magick::ImageMagickError: no decode delegate for this image format (something.tif)"
 
 ```bash
+$ brew install ghostscript
 $ bundle install
 $ cp config/initializers/secret_token.rb.sample config/initializers/secret_token.rb
 !!! Important. Open config/initializer/secret_token.rb and generate a new id
