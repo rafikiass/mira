@@ -5,8 +5,15 @@
 ##Initial Setup
 
 ### Prerequisites
+* MySQL
+* Redis
 * [ImageMagick](http://www.imagemagick.org/)
 * [ffmpeg](http://www.ffmpeg.org/)
+
+```bash
+$ brew install mysql
+$ mysql.server start
+```
 
 **Note:**
 If you install ImageMagick using homebrew, you may need to add a switch for libtiff:
@@ -21,19 +28,30 @@ Or else you may get errors like this when you run the specs:
 ```bash
 $ brew install ghostscript
 $ bundle install
-$ cp config/initializers/secret_token.rb.sample config/initializers/secret_token.rb
+$ rake config:copy
+```
+
 !!! Important. Open config/initializer/secret_token.rb and generate a new id
-$ cp config/database.yml.sample config/database.yml
-$ cp config/solr.yml.sample config/solr.yml
-$ cp config/redis.yml.sample config/redis.yml
-$ cp config/fedora.yml.sample config/fedora.yml
-$ cp config/devise.yml.sample config/devise.yml
 !!! Important. Open config/devise.yml and generate a new id
 
-$ rake db:schema:load
-$ rake db:seed
+You can do this by using:
+
+```bash
+$ rake secret
+```
+
+Load the database, and seed data:
+
+```bash
+$ rake db:setup
+```
+
+Install & configure hydra-jetty:
+
+```bash
 $ rails g hydra:jetty
 $ rake jetty:config
+$ rake jetty:start
 ```
 
 ##Configure Authentication services
@@ -56,9 +74,10 @@ end
 
 ```
 
-## Start redis
+## Install & start redis
 ```bash
-redis-server
+brew install redis
+redis-server &
 ```
 
 ##Start background workers
@@ -69,11 +88,6 @@ $ QUEUE=* rake resque:work
 ### Optional: start resque-web
 ```bash
 resque-web config/resque_conf.rb
-```
-
-## Start hydra-jetty
-```bash
-$ rake jetty:start
 ```
 
 ## Start MIRA

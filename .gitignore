@@ -42,3 +42,6 @@ tags
 # ignore carrierwave uploads
 uploads
 
+# redis junk
+dump.rdb
+
