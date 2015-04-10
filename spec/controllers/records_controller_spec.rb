@@ -86,19 +86,23 @@ describe RecordsController do
       end
 
       describe "with a pid" do
+        let(:pid) { 'tufts:123.1231' }
+        let(:draft_pid) { 'draft:123.1231' }
+
         before do
           begin
-            a = TuftsAudio.find('tufts:123.1231')
+            a = TuftsAudio.find(pid)
             a.destroy
           rescue ActiveFedora::ObjectNotFoundError
           end
         end
-        it "should be successful with a pid" do
-          get :new, :type=>'TuftsAudio', :pid=>'tufts:123.1231'
+
+        it "should assign a draft pid" do
+          get :new, :type=>'TuftsAudio', :pid=>pid
           assigns[:record].should be_kind_of TuftsAudio
           assigns[:record].should_not be_new_record
           response.should redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record])
-          assigns[:record].pid.should == 'tufts:123.1231'
+          assigns[:record].pid.should == draft_pid
         end
       end
 

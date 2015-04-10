@@ -1,10 +1,13 @@
 require 'spec_helper'
 
 feature 'Admin user creates document' do
+  let(:pid)       { 'tufts:001.102.201' }
+  let(:draft_pid) { 'draft:001.102.201' }
+
   before(:each) do
     sign_in :admin
     begin
-      a = TuftsAudio.find('tufts:001.102.201')
+      a = TuftsAudio.find(draft_pid)
       a.destroy
     rescue ActiveFedora::ObjectNotFoundError
     end
@@ -15,7 +18,7 @@ feature 'Admin user creates document' do
     click_link 'Create a new object'
 
     select "Audio", from: 'Select an object type'
-    fill_in 'Pid', with: 'tufts:001.102.201'
+    fill_in 'Pid', with: pid
     click_button 'Next'
 
     # On the upload page
@@ -37,7 +40,7 @@ feature 'Admin user creates document' do
     click_link 'Create a new object'
 
     select "Audio", from: 'Select an object type'
-    fill_in 'Pid', with: 'tufts:001.102.201'
+    fill_in 'Pid', with: pid
     click_button 'Next'
 
     click_button 'Next'
@@ -57,16 +60,17 @@ feature 'Admin user creates document' do
     click_link 'Create a new object'
 
     select "Audio", from: 'Select an object type'
-    fill_in 'Pid', with: 'tufts:001.102.201'
+    fill_in 'Pid', with: pid
+    click_button 'Next'
+
     click_button 'Next'
 
     fill_in '*Title', with: 'My title to be recreated'
     select('dl', from: 'Displays in Portal')
     click_button 'Save'
     
-    audio = TuftsAudio.find('tufts:001.102.201')
+    audio = TuftsAudio.find(draft_pid)
     expect(audio.state).to eq "A"
   end
-
 
 end
