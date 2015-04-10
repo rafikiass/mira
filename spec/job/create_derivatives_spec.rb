@@ -27,7 +27,7 @@ describe Job::CreateDerivatives do
     end
 
     it 'raises an error if it fails to find the object' do
-      job = Job::CreateDerivatives.new('uuid', 'record_id' => 'tufts_1')
+      job = Job::CreateDerivatives.new('uuid', 'record_id' => 'tufts:1')
       expect{job.perform}.to raise_error(ActiveFedora::ObjectNotFoundError)
     end
 
