@@ -43,6 +43,8 @@ describe DepositTypeExporter do
   end
 
   it 'exports the deposit types to a csv file' do
+    DepositType.delete_all
+    
     pdf_name = 'PDF Document'
     pdf_agreement = 'Some agreement text for PDF deposits'
     pdf_license = 'A license for PDFs'
@@ -71,7 +73,7 @@ describe DepositTypeExporter do
   end
 
   def test_export_dir
-    timestamp = Time.now.strftime("%Y_%m_%d_%H%M%S")
+    timestamp = Time.now.strftime("%Y_%m_%d_%H%M%S%N")
     File.join(Rails.root, 'tmp', "export_test_#{timestamp}")
   end
 end
