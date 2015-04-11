@@ -27,10 +27,11 @@ describe DepositTypeImporter do
   end
 
   it 'imports CSV data' do
-    importer = DepositTypeImporter.new(test_import_file)
+    DepositType.delete_all
 
-    DepositType.count.should == 0
+    importer = DepositTypeImporter.new(test_import_file)
     importer.import_from_csv
+
     DepositType.count.should == 3
 
     pdf = DepositType.where(display_name: 'PDF Document').first
@@ -45,6 +46,7 @@ describe DepositTypeImporter do
   end
 
   it 'updates existing deposit types' do
+    DepositType.delete_all
     importer = DepositTypeImporter.new(test_import_file)
     pdf = FactoryGirl.create(:deposit_type, display_name: 'PDF Document', deposit_agreement: 'old text')
     DepositType.count.should == 1
@@ -56,7 +58,7 @@ describe DepositTypeImporter do
   end
 
   it 'doesnt create duplicate deposit types' do
-    DepositType.count.should == 0
+    DepositType.delete_all
     importer = DepositTypeImporter.new(File.join(fixture_path, 'import', 'deposit_types_with_duplicate_entries.csv'))
     importer.import_from_csv
 
