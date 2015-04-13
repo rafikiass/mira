@@ -63,9 +63,9 @@ describe Contribution do
       subject.stub(:valid? => true)
     end
 
-    it "should use the sequence for the pid" do
-      pid = Sequence.next_val
-      Sequence.should_receive(:next_val).and_return(pid)
+    it "should use the sequence with draft namespace for the pid" do
+      pid = Sequence.next_val(namespace: 'draft')
+      Sequence.should_receive(:next_val).with(namespace: 'draft').and_return(pid)
       subject.save
       expect(subject.tufts_pdf.pid).to eq pid
     end
