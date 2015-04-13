@@ -307,6 +307,9 @@ describe BatchesController do
             expect(TuftsPdf.first.title).to eq batch.template.title
           end
 
+          it 'creates a draft object' do
+            expect(TuftsPdf.first.pid).to match /^#{TuftsPdf.draft_namespace}:.*$/
+          end
         end
 
         it_behaves_like 'an import error path (no documents uploaded)'

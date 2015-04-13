@@ -203,7 +203,11 @@ private
       record_class = @batch.record_type.constantize
 
       document_statuses = params[:documents].map do |doc|
-        record = record_class.new(attrs)
+        record = if record_class.respond_to?(:build_draft_version)
+                   record_class.build_draft_version(attrs)
+                 else
+                   record_class.new(attrs)
+                 end
         save_record_with_document(record, doc)
         [doc, record, collect_warning(record, doc), nil]
       end
