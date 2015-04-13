@@ -1,6 +1,6 @@
 set :stage, :staging
 set :rails_env, 'production'
-server 'devmira.curationexperts.com', user: 'deploy', roles: [:web, :app, :db]
+server 'devmira.curationexperts.com', user: 'deploy', roles: [:web, :app, :db, :resque_worker]
 
 # Simple Role Syntax
 # ==================
