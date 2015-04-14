@@ -6,6 +6,10 @@ module ContributeHelper
   # box as the hash key and the value you would like to have returned in the input field as the hash value.
   # Hashes used for selections will display in the order listed here unless further sorting is applied in the view.
 
+  def standard_embargos
+    [['None', '0'], ['6 months', '6'],['1 year','12'], ['2 years','24']]
+  end
+
   def fletcher_degrees
     Qa::Authorities::Local.sub_authority('fletcher_degrees').terms.map do |element|
       [element[:term], element[:id]]

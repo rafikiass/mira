@@ -11,9 +11,9 @@ class Contribution
 
   class_attribute :ignore_attributes, :attributes
 
-  self.ignore_attributes = [:attachment]
+  self.ignore_attributes = [:attachment,:embargo]
 
-  self.attributes = [:title, :description, :creator, :contributor,
+  self.attributes = [:title, :description, :creator, :contributor, :embargo,
                      :bibliographic_citation, :subject, :attachment, :license]
 
   SELFDEP = 'selfdep'.freeze
@@ -67,7 +67,9 @@ protected
       end
     end
     @tufts_pdf.license = license_data(@tufts_pdf)
+
     insert_rels_ext_relationships
+    insert_embargo_date
   end
 
   def parent_collection
@@ -78,6 +80,14 @@ protected
     return contribution.license unless @deposit_type
     contribution.license = Array(contribution.license)
     contribution.license << @deposit_type.license_name
+  end
+
+  def insert_embargo_date
+    return unless @tufts_pdf
+
+    unless (embargo || '0').eql? '0'
+      @tufts_pdf.embargo = (Time.now + (embargo.to_i).months).iso8601
+    end
   end
 
   def insert_rels_ext_relationships

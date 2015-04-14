@@ -35,6 +35,11 @@ describe Contribution do
 
   end
 
+  it "should have 'embargo'" do
+    subject.embargo = '2023-06-12'
+    subject.embargo.should == '2023-06-12'
+  end
+
   it "should have 'subject'" do
       subject.subject = 'test subject'
       subject.subject.should == 'test subject'
@@ -60,6 +65,7 @@ describe Contribution do
       path = '/local_object_store/data01/tufts/central/dca/MISS/archival_pdf/MISS.ISS.IPPI.archival.pdf'
       subject.attachment = Rack::Test::UploadedFile.new("#{fixture_path}#{path}", 'application/pdf', false)
       subject.title = 'test title'
+      subject.embargo = '6'
       subject.stub(:valid? => true)
     end
 
@@ -77,6 +83,15 @@ describe Contribution do
       namespace = "http://www.openarchives.org/OAI/2.0/"
       prefix = rels_ext.namespaces.key(namespace).match(/xmlns:(.*)/)[1]
       rels_ext.xpath("//rdf:Description/#{prefix}:itemID").text.should == expected_value
+    end
+
+    it "should have a valid embargo date" do
+      subject.save
+      embargo_date = Time.parse(subject.tufts_pdf.embargo.first)
+      future_date  = Time.now + 6.months
+
+      expect(embargo_date).to be_within(1.minute).of future_date
+
     end
 
   end
