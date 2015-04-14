@@ -21,7 +21,6 @@ describe "contribute/new.html.erb" do
     end
 
     it 'has a select element for emargo' do
-      puts "#{rendered}"
       expect(rendered).to have_selector("select[name='contribution[embargo]']")
     end
   end
