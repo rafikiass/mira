@@ -9,6 +9,9 @@ set :branch, 'master'
 set :deploy_to, '/opt/mira'
 set :log_level, :debug
 set :keep_releases, 5
+set :resque_stderr_log, "#{shared_path}/log/resque-pool.stderr.log"
+set :resque_stdout_log, "#{shared_path}/log/resque-pool.stdout.log"
+set :resque_kill_signal, "QUIT"
 
 # Default value for :format is :pretty
 # set :format, :pretty
@@ -25,6 +28,8 @@ set :linked_dirs, %w{bin tmp/pids tmp/cache tmp/sockets vendor/bundle public/sys
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
 
+require "resque"
+
 namespace :deploy do
 
   desc 'Restart application'
@@ -36,6 +41,8 @@ namespace :deploy do
   end
 
   after :publishing, :restart
+
+  after :restart, 'resque:pool:restart'
 
   after :restart, :clear_cache do
     on roles(:web), in: :groups, limit: 3, wait: 10 do
