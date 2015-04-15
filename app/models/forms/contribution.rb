@@ -27,7 +27,7 @@ class Contribution
     now = Time.now
 
     note = "#{creator} self-deposited on #{now.strftime('%Y-%m-%d at %H:%M:%S %Z')} using the Deposit Form for the Tufts Digital Library"
-    @tufts_pdf = TuftsPdf.new(pid: Sequence.next_val(namespace: TuftsPdf.draft_namespace),
+    @tufts_pdf = TuftsPdf.new(pid: Sequence.next_val(namespace: PidUtils.draft_namespace),
                     createdby: SELFDEP,
                     steward: ['dca'], displays: ['dl'], format: ['application/pdf'],
                     publisher: ['Tufts University. Digital Collections and Archives.'],
