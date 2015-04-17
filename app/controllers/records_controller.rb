@@ -7,6 +7,19 @@ class RecordsController < ApplicationController
   # We don't even want them to see the 'choose_type' page if they can't create
   prepend_before_filter :ensure_can_create, only: :new
 
+  def edit
+    if @record.respond_to?(:draft?) && !@record.draft?
+      redirect_to hydra_editor.edit_record_path(PidUtils.to_draft(@record.pid))
+    else
+      super
+    end
+  end
+
+  def update
+    @record = @record.find_draft if @record.respond_to?(:find_draft)
+    super
+  end
+
   def new
     unless has_valid_type?
       render 'choose_type'
