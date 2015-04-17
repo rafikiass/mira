@@ -19,9 +19,7 @@
     </li>
   <% end %>
 
-  <li>
-    <%= link_to "Edit Metadata", hydra_editor.edit_record_path(@document) %>
-  </li>
+  <li> <%= link_to_edit(@document) %> </li>
 
   <%= li_manage_datastreams_link(@document) %>
 

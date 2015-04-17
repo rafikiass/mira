@@ -9,7 +9,7 @@ feature "Edit an object's rels-ext fields:" do
   let(:new_uri) { "info:fedora/#{new_pid}" }
 
   let!(:pdf) {
-    obj = FactoryGirl.create(:tufts_pdf)
+    obj = TuftsPdf.build_draft_version(FactoryGirl.attributes_for(:tufts_pdf))
     obj.add_relationship(:has_part, old_uri)
     obj.save!
     obj

@@ -139,14 +139,30 @@ describe RecordsController do
         @audio = TuftsAudio.new(title: 'My title2', displays: ['dl'])
         @audio.edit_users = [@user.email]
         @audio.save!
+
+        @draft = TuftsAudio.build_draft_version(@audio.attributes.except('id').merge(pid: @audio.pid))
+        @draft.edit_users = [@user.email]
+        @draft.save!
       end
+
       after do
         @audio.destroy
       end
-      it "should be successful" do
-        get :edit, :id=>@audio.pid
-        response.should be_successful
-        assigns[:record].title.should == 'My title2'
+
+      context 'when editing the draft version' do
+        it "should be successful" do
+          get :edit, id: @draft.pid
+          expect(response).to be_successful
+          expect(response).to render_template(:edit)
+          expect(assigns[:record]).to eq @draft
+        end
+      end
+
+      context 'when editing the non-draft version' do
+        it 'redirects to edit form for draft version' do
+          get :edit, id: @audio.pid
+          expect(response).to redirect_to(HydraEditor::Engine.routes.url_helpers.edit_record_path(@draft))
+        end
       end
     end
 
@@ -214,17 +230,25 @@ describe RecordsController do
           @audio = TuftsAudio.new(title: 'My title2', displays: ['dl'])
           @audio.edit_users = [@user.email]
           @audio.save!
+
+          @draft = TuftsAudio.build_draft_version(@audio.attributes.except('id').merge(pid: @audio.pid))
+          @draft.save!
         end
 
         after do
           @audio.destroy
+          @draft.destroy
         end
 
-        it "should be successful" do
+        it "successfully updates draft version of object" do
           put :update, :id=>@audio, :tufts_audio=>{:title=>"My title 3"}
           expect(response).to redirect_to("/catalog/#{assigns[:record].pid}")
+          expect(assigns[:record]).to eq @draft
           expect(assigns[:record].title).to eq 'My title 3'
-          expect(assigns[:record].reload.audit_log.what).to eq ['Metadata updated rightsMetadata, DCA-META, DCA-ADMIN']
+          expect(assigns[:record].reload.audit_log.what.first).to match /Metadata updated/
+          expect(assigns[:record].reload.audit_log.what.first).to match /rightsMetadata/
+          expect(assigns[:record].reload.audit_log.what.first).to match /DCA-META/
+          expect(assigns[:record].reload.audit_log.what.first).to match /DCA-ADMIN/
         end
 
         it "should update external datastream paths" do
@@ -245,10 +269,14 @@ describe RecordsController do
           @image = TuftsImage.new(title: "test image", displays: ['dl'])
           @image.edit_users = [@user.email]
           @image.save!
+
+          @draft = TuftsImage.build_draft_version(@image.attributes.except('id').merge(pid: @image.pid))
+          @draft.save!
         end
 
         after do
           @image.destroy
+          @draft.destroy
         end
 
         it "should update external datastream paths" do
