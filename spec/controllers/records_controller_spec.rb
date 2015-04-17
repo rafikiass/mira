@@ -215,24 +215,28 @@ describe RecordsController do
           @audio.edit_users = [@user.email]
           @audio.save!
         end
+
         after do
           @audio.destroy
         end
+
         it "should be successful" do
           put :update, :id=>@audio, :tufts_audio=>{:title=>"My title 3"}
-          response.should redirect_to("/catalog/#{assigns[:record].pid}")
-          assigns[:record].title.should == 'My title 3'
-          assigns[:record].reload.audit_log.what.should == ['Metadata updated rightsMetadata, DCA-META, DCA-ADMIN']
+          expect(response).to redirect_to("/catalog/#{assigns[:record].pid}")
+          expect(assigns[:record].title).to eq 'My title 3'
+          expect(assigns[:record].reload.audit_log.what).to eq ['Metadata updated rightsMetadata, DCA-META, DCA-ADMIN']
         end
+
         it "should update external datastream paths" do
           put :update, :id=>@audio, :tufts_audio=>{:datastreams=>{"ACCESS_MP3"=>"http://example.com/access.mp3", "ARCHIVAL_WAV"=>"http://example.com/archival.wav"} }
-          response.should redirect_to("/catalog/#{assigns[:record].pid}")
-          assigns[:record].datastreams['ACCESS_MP3'].dsLocation.should == 'http://example.com/access.mp3'
-          assigns[:record].datastreams['ARCHIVAL_WAV'].dsLocation.should == 'http://example.com/archival.wav'
+          expect(response).to redirect_to("/catalog/#{assigns[:record].pid}")
+          expect(assigns[:record].datastreams['ACCESS_MP3'].dsLocation).to eq 'http://example.com/access.mp3'
+          expect(assigns[:record].datastreams['ARCHIVAL_WAV'].dsLocation).to eq 'http://example.com/archival.wav'
         end
+
         it 'should update the collection id' do
           put :update, :id=>@audio, :tufts_audio=>{:stored_collection_id=>["updated_id"]}
-          assigns[:record].stored_collection_id.should == 'updated_id'
+          expect(assigns[:record].stored_collection_id).to eq 'updated_id'
         end
       end
 
@@ -242,16 +246,18 @@ describe RecordsController do
           @image.edit_users = [@user.email]
           @image.save!
         end
+
         after do
           @image.destroy
         end
+
         it "should update external datastream paths" do
           put :update, :id=>@image, :tufts_image=>{:datastreams=>{"Advanced.jpg"=>"http://example.com/advanced.jpg", "Basic.jpg"=>"http://example.com/basic.jpg", "Archival.tif"=>"http://example.com/archival.tif", "Thumbnail.png"=>"http://example.com/thumb.png"} }
-          response.should redirect_to("/catalog/#{assigns[:record].pid}")
-          assigns[:record].datastreams['Advanced.jpg'].dsLocation.should == 'http://example.com/advanced.jpg'
-          assigns[:record].datastreams['Basic.jpg'].dsLocation.should == 'http://example.com/basic.jpg'
-          assigns[:record].datastreams['Archival.tif'].dsLocation.should == 'http://example.com/archival.tif'
-          assigns[:record].datastreams['Thumbnail.png'].dsLocation.should == 'http://example.com/thumb.png'
+          expect(response).to redirect_to("/catalog/#{assigns[:record].pid}")
+          expect(assigns[:record].datastreams['Advanced.jpg'].dsLocation).to eq 'http://example.com/advanced.jpg'
+          expect(assigns[:record].datastreams['Basic.jpg'].dsLocation).to eq 'http://example.com/basic.jpg'
+          expect(assigns[:record].datastreams['Archival.tif'].dsLocation).to eq 'http://example.com/archival.tif'
+          expect(assigns[:record].datastreams['Thumbnail.png'].dsLocation).to eq 'http://example.com/thumb.png'
 
         end
       end
