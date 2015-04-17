@@ -4,7 +4,8 @@ feature 'View unpublished documents' do
   before do
     TuftsAudio.where(title: "Very unique title").destroy_all
     @production = TuftsAudio.new(title: 'Very unique title', description: ['eh?'], creator: ['Fred'], displays: ['dl'])
-    @production.push_to_production!
+    @production.save!
+    @production.publish!
 
     @not_production = TuftsAudio.new(title: 'Very unique title', description: ['eh?'], creator: ['Fred'], displays: ['dl'])
     @not_production.save!

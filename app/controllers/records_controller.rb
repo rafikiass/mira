@@ -75,7 +75,7 @@ class RecordsController < ApplicationController
     @record.save(validate: false)
     # only push to production if it's already on production.
     @record.audit(current_user, 'deleted')
-    @record.push_to_production! if @record.published_at
+    @record.purge! if @record.published_at
     if @record.is_a?(TuftsTemplate)
       flash[:notice] = "\"#{@record.template_name}\" has been purged"
       redirect_to templates_path

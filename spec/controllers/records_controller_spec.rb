@@ -297,12 +297,16 @@ describe RecordsController do
         @audio.edit_users = [@user.email]
         @audio.save!
       end
+
       after do
         @audio.destroy
       end
+
       it "should be successful" do
-        TuftsAudio.any_instance.should_receive(:push_to_production!)
-        post :publish, :id=>@audio
+        TuftsAudio.any_instance.should_receive(:publish!).once { true }
+
+        post :publish, id: @audio
+
         response.should redirect_to("/catalog/#{assigns[:record].pid}")
         flash[:notice].should == '"My title2" has been pushed to production'
       end
@@ -314,11 +318,37 @@ describe RecordsController do
         @audio.edit_users = [@user.email]
         @audio.save!
       end
-      it "should be successful with a pid" do
-        delete :destroy, :id=>@audio
-        response.should redirect_to(Tufts::Application.routes.url_helpers.root_path)
-        @audio.reload.state.should == 'D'
+
+      context "when the record has not been published" do
+
+        it "should be successful with a pid" do
+          expect(@audio).to_not be_published
+          TuftsAudio.any_instance.should_receive(:purge!).never
+
+          delete :destroy, id: @audio
+
+          response.should redirect_to(Tufts::Application.routes.url_helpers.root_path)
+          @audio.reload.state.should == 'D'
+        end
+
       end
+
+      context "when the record has been published" do
+        before do
+          @audio.publish!
+          expect(@audio).to be_published
+        end
+
+        it "should be successful with a pid" do
+          TuftsAudio.any_instance.should_receive(:purge!).once
+
+          delete :destroy, id: @audio
+
+          response.should redirect_to(Tufts::Application.routes.url_helpers.root_path)
+          @audio.reload.state.should == 'D'
+        end
+      end
+
     end
 
     describe "destroying a template" do
