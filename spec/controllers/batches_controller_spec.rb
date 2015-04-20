@@ -130,18 +130,10 @@ describe BatchesController do
           end
 
           it 'creates a batch' do
-            batch_count = Batch.count
-            post 'create', batch: FactoryGirl.attributes_for(:batch_xml_import)
-            expect(Batch.count).to eq batch_count + 1
-          end
-
-          it 'assigns @batch' do
-            post 'create', batch: FactoryGirl.attributes_for(:batch_xml_import)
+            expect {
+              post 'create', batch: FactoryGirl.attributes_for(:batch_xml_import)
+            }.to change { Batch.count }.by(1)
             expect(assigns[:batch].class).to eq BatchXmlImport
-          end
-
-          it 'redirects to the batch edit page' do
-            post 'create', batch: FactoryGirl.attributes_for(:batch_xml_import)
             expect(response).to redirect_to(edit_batch_path(assigns[:batch]))
           end
         end
