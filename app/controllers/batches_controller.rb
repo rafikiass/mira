@@ -157,37 +157,10 @@ private
       flash[:error] = "Please select some files to upload."
       render :edit
     else
-      save_status = nil
-      document_statuses = params[:documents].map do |doc|
-        record, warning, error = nil, nil, nil
-        if @batch.uploaded_files.keys.include? doc.original_filename
-          [doc, record, warning, "#{doc.original_filename} has already been uploaded"]
-        else
-          begin
-            record = MetadataXmlParser.build_record(@batch.metadata_file.read, doc.original_filename)
-            record.batch_id = [@batch.id.to_s]
-            saved = save_record_with_document(record, doc)
-            warning = collect_warning(record, doc)
-            if saved
-              Batch.transaction do
-                load_batch #reload batch within the transaction
-                @batch.uploaded_files[doc.original_filename] = record.pid
-                save_status = @batch.save
-              end
-            end
-          rescue MetadataXmlParserError => e
-            error = e.message
-          end
-          [doc, record, warning, error]
-        end
-      end
-      docs, records, warnings, errors = document_statuses.transpose
-
-      successful = save_status &&  # our batch saved
-        errors.compact.empty? &&   # we have no errors from building records
-        records.all?(&:persisted?) # all our records saved
-
-      respond_to_import(successful, @batch, document_statuses)
+      action = XmlBatchImportAction.new(@batch, current_user, params[:documents])
+      success = action.run
+      @batch = action.batch # The XmlBatchImportAction has a reloaded version of the batch. The tests expect the ivar to be the most up to date batch.
+      respond_to_import(success, @batch, action.document_statuses)
     end
   end
 
@@ -199,26 +172,8 @@ private
       flash[:error] = "Please select some files to upload."
       render :edit
     else
-      attrs = @batch.template.attributes_to_update.merge(batch_id: [@batch.id.to_s])
-      record_class = @batch.record_type.constantize
-
-      document_statuses = params[:documents].map do |doc|
-        record = if record_class.respond_to?(:build_draft_version)
-                   record_class.build_draft_version(attrs)
-                 else
-                   record_class.new(attrs)
-                 end
-        save_record_with_document(record, doc)
-        [doc, record, collect_warning(record, doc), nil]
-      end
-      docs, records, warnings, errors = document_statuses.transpose
-
-      @batch.pids = (@batch.pids || []) + records.compact.map(&:pid)
-      successful = @batch.save &&  # our batch saved
-        errors.compact.empty? &&   # we have no errors from building records
-        records.all?(&:persisted?) # all our records saved
-
-      respond_to_import(successful, @batch, document_statuses)
+      action = TemplateImportAction.new(@batch, current_user, params[:documents])
+      respond_to_import(action.run, @batch, action.document_statuses)
     end
   end
 
