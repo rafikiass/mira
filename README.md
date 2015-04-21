@@ -80,9 +80,9 @@ brew install redis
 redis-server &
 ```
 
-##Start background workers
+##Start background worker
 ```bash
-$ QUEUE=* rake resque:work
+$ QUEUE=* bundle exec rake environment resque:work
 ```
 
 ### Optional: start resque-web
