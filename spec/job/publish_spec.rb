@@ -55,9 +55,11 @@ describe Job::Publish do
     end
 
     it 'runs the job as a batch item' do
+      user = FactoryGirl.create(:user)
+
       pdf = FactoryGirl.create(:tufts_pdf)
       batch_id = '10'
-      job = Job::Publish.new('uuid', 'record_id' => pdf.id, 'user_id' => '1', 'batch_id' => batch_id)
+      job = Job::Publish.new('uuid', 'record_id' => pdf.id, 'user_id' => user.id, 'batch_id' => batch_id)
 
       job.perform
       pdf.reload
