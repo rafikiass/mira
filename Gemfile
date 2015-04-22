@@ -53,7 +53,6 @@ group :development, :test do
 end
 
 group :debug do
-  gem 'unicorn'
   gem 'launchy'
   gem 'byebug', require: false
 end
