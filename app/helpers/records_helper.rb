@@ -65,4 +65,10 @@ module RecordsHelper
     end
   end
 
+  def displays_options
+    Qa::Authorities::Local.sub_authority('displays').terms.map do |element|
+      element[:term]
+    end
+  end
+
 end

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe RecordsHelper do
   it "should have object_type_options" do
-    helper.object_type_options.should == {'Audio' => 'TuftsAudio', 
+    helper.object_type_options.should == {'Audio' => 'TuftsAudio',
        "Collection creator" => "TuftsRCR",
        "Collection guide" => "TuftsEAD",
        "Generic object" => "TuftsGenericObject",
@@ -30,5 +30,10 @@ describe RecordsHelper do
                            ["TEI", "TuftsTEI"],
                            ["Template", "TuftsTemplate"],
                            ["Voting Record", "TuftsVotingRecord"]]
+  end
+
+  describe "displays_options" do
+    subject { helper.displays_options }
+    it { is_expected.to eq %w(dl trove tisch perseus elections dark nowhere) }
   end
 end
