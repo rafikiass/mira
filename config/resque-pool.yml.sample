@@ -4,12 +4,5 @@
 # “queuename1 queuename2 queuename3”: #ofworkers
 # allocate workers to all queues with *:
 #
-development:
-  "*": 2
-
-test:
-  "*": 2
-
-production:
-  "*": 5
+*:5
 
