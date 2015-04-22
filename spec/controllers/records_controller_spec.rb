@@ -58,7 +58,7 @@ describe RecordsController do
     end
 
     describe "who goes to the new page" do
-      before { @routes = HydraEditor::Engine.routes }
+      routes { HydraEditor::Engine.routes }
 
       it "should be successful" do
         get :new
@@ -312,6 +312,27 @@ describe RecordsController do
       end
     end
 
+    describe "unpublish a record" do
+      let(:audio) do
+        TuftsAudio.build_draft_version(title: 'My title2', displays: ['dl']).tap do |audio|
+          audio.edit_users = [@user.email]
+          audio.save!
+        end
+      end
+
+      after { audio.destroy }
+
+      before { audio.publish! }
+
+      it "should be successful" do
+        TuftsAudio.any_instance.should_receive(:unpublish!).once
+
+        post :unpublish, id: audio
+        expect(response).to redirect_to catalog_path(audio)
+        expect(flash[:notice]).to eq '"My title2" has been unpublished'
+      end
+    end
+
     describe "destroying a record" do
       before do
         @audio = TuftsAudio.new(title: 'My title2', displays: ['dl'])
@@ -383,8 +404,8 @@ describe RecordsController do
     end
 
     describe "who goes to the edit page" do
+      routes { HydraEditor::Engine.routes }
       before do
-        @routes = HydraEditor::Engine.routes
         @audio = TuftsAudio.create!(title: 'My title2', displays: ['dl'])
       end
       after do
@@ -392,9 +413,8 @@ describe RecordsController do
       end
       it "should not be allowed" do
         get :edit, id: @audio
-        response.status.should == 302
-        response.should redirect_to Tufts::Application.routes.url_helpers.contributions_path
-        flash[:alert].should =~ /You do not have sufficient privileges to edit this document/i
+        expect(response).to redirect_to Tufts::Application.routes.url_helpers.contributions_path
+        expect(flash[:alert]).to match /You do not have sufficient privileges to edit this document/i
       end
     end
 

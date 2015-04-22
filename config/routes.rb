@@ -31,6 +31,7 @@ Tufts::Application.routes.draw do
   end
   mount HydraEditor::Engine => '/'
   post 'records/:id/publish', to: 'records#publish', as: 'publish_record', constraints: { id: ALLOW_DOTS }
+  post 'records/:id/unpublish', to: 'records#unpublish', as: 'unpublish_record', constraints: { id: ALLOW_DOTS }
   put 'records/:id/review', to: 'records#review', as: 'review_record', constraints: { id: ALLOW_DOTS }
   resources :records, only: [:destroy], constraints: { id: ALLOW_DOTS } do
     member do

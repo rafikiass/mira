@@ -22,7 +22,7 @@ If you install ImageMagick using homebrew, you may need to add a switch for libt
 $ brew install imagemagick --with-libtiff
 ```
 
-Or else you may get errors like this when you run the specs:  
+Or else you may get errors like this when you run the specs:
 "Magick::ImageMagickError: no decode delegate for this image format (something.tif)"
 
 ```bash

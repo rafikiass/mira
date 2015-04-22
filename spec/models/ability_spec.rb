@@ -53,6 +53,7 @@ describe Ability do
       it { should be_able_to(:update, @audio) }
       it { should be_able_to(:review, @audio) }
       it { should be_able_to(:publish, @audio) }
+      it { should be_able_to(:unpublish, @audio) }
       it { should be_able_to(:destroy, @audio) }
     end
   end

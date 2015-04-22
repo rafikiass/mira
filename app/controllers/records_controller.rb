@@ -1,8 +1,9 @@
 class RecordsController < ApplicationController
   include RecordsControllerBehavior
 
-  before_filter :load_object, only: [:review, :publish, :destroy, :cancel]
+  before_filter :load_object, only: [:review, :cancel]
   authorize_resource only: [:review]
+  load_and_authorize_resource only: [:publish, :unpublish, :destroy]
 
   # We don't even want them to see the 'choose_type' page if they can't create
   prepend_before_filter :ensure_can_create, only: :new
@@ -64,13 +65,19 @@ class RecordsController < ApplicationController
   end
 
   def publish
-    authorize! :publish, @record
     @record.publish!(current_user.id)
     redirect_to catalog_path(@record), notice: "\"#{@record.title}\" has been pushed to production"
   end
 
+  def unpublish
+    # The original id may be of the draft or production pid, but we always redirect to draft
+    @record = @record.find_published if @record.draft?
+    title = @record.title
+    @record.unpublish!(current_user.id)
+    redirect_to catalog_path(PidUtils.to_draft(@record.id)), notice: "\"#{title}\" has been unpublished"
+  end
+
   def destroy
-    authorize! :destroy, @record
     @record.state= "D"
     @record.save(validate: false)
     # only push to production if it's already on production.
