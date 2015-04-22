@@ -31,13 +31,12 @@ describe Job::Revert do
 
   describe '#perform' do
     let(:prod) { Rubydora.connect(ActiveFedora.data_production_credentials) }
-    context 'record exists on staging and production' do
-      it 'copys from production' do
-        skip "fixme"
 
+    context 'record exists on staging and production' do
+      it 'copies the published version back to the draft' do
         # exists on staging
-        record = FactoryGirl.create(:tufts_pdf, title: "orig title")
-        # exists on production
+        record = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title")
+        record.save!
         record.publish!
 
         # make sure it reverts
@@ -50,34 +49,40 @@ describe Job::Revert do
 
     context 'record exists on staging, missing on production' do
       it 'hard deletes' do
-        skip "fixme"
-
-        # exists on staging
-        record = FactoryGirl.create(:tufts_pdf, title: "orig title")
+        record = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title")
+        record.save!
         pid = record.pid
-        # missing on production
-        prod.purge_object(pid: pid) rescue RestClient::ResourceNotFound
 
-        # make sure it hard deletes
+        expect(TuftsPdf.exists?(PidUtils.to_published(pid))).to be_falsey
+
         Job::Revert.new('uuid', 'record_id' => pid).perform
-        expect(TuftsPdf.exists?(pid)).to be_falsey
+
+        expect(TuftsPdf.exists?(PidUtils.to_published(pid))).to be_falsey
+        expect(TuftsPdf.exists?(pid)).to be_truthy
       end
     end
 
     context 'record missing on staging, exists on production' do
-      it 'copys from production' do
-        skip "fixme"
+      it 'copies from production' do
 
-        # exists on production
-        record = FactoryGirl.create(:tufts_pdf, title: "orig title")
+        # published
+        record = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title")
+        record.save!
+
         pid = record.pid
         record.publish!
-        # missing on staging
+
+        # missing draft
         record.destroy
 
         # make sure it reverts
         Job::Revert.new('uuid', 'record_id' => pid).perform
-        expect(TuftsPdf.find(pid).title).to eq "orig title"
+
+        draft_pid = PidUtils.to_draft(pid)
+        published_pid = PidUtils.to_published(pid)
+
+        expect(TuftsPdf.exists?(published_pid)).to be_truthy
+        expect(TuftsPdf.exists?(draft_pid)).to be_truthy
       end
     end
 
@@ -103,10 +108,10 @@ describe Job::Revert do
     end
 
     it 'runs the job as a batch item' do
-      skip "fixme"
-
-      pdf = FactoryGirl.create(:tufts_pdf)
+      pdf = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title")
+      pdf.save!
       pdf.publish!
+
       batch_id = '10'
       job = Job::Revert.new('uuid', 'record_id' => pdf.id, 'user_id' => '1', 'batch_id' => batch_id)
 
