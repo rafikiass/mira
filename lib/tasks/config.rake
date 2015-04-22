@@ -1,7 +1,7 @@
 namespace :config do
   desc "copy sample application config files"
   task :copy do
-    %w(initializers/secret_token.rb database.yml solr.yml resque-pool.yml redis.yml fedora.yml devise.yml).each do |file|
+    %w(initializers/secret_token.rb database.yml solr.yml redis.yml fedora.yml devise.yml).each do |file|
       puts `cp -v "config/#{file}.sample" "config/#{file}"`
     end
 

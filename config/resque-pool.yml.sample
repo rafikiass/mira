@@ -1,8 +1,0 @@
-# dedicate workers to a single queue with:
-# queuename: #ofworkers 
-# share workers across named queues with:
-# “queuename1 queuename2 queuename3”: #ofworkers
-# allocate workers to all queues with *:
-#
-*:5
-

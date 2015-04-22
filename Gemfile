@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '4.1.6'
 
+gem 'sqlite3'
 gem 'mysql2'
 
 gem 'hydra-head', '~> 7.2.1'
@@ -11,6 +12,10 @@ gem 'hydra-editor', '~> 0.5.0'
 gem 'hydra-role-management', '0.2.0'
 gem 'hydra-batch-edit', '1.1.1'
 gem 'qa', '0.3.0'
+
+gem 'capistrano'
+gem 'capistrano-rails'
+gem 'capistrano-bundler'
 
 gem 'sanitize', '2.0.6'
 
@@ -22,7 +27,6 @@ gem "bootstrap-sass"
 
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 gem 'therubyracer', :platforms => :ruby
-gem 'resque-pool'
 
 gem 'uglifier', '>= 1.3.0'
 gem 'jquery-rails'
@@ -39,17 +43,12 @@ gem 'tufts_models', github: 'curationexperts/tufts_models', ref: 'fe20b493536edf
 
 group :development do
   gem 'jettywrapper'
-  gem 'capistrano'
-  gem 'capistrano-rails'
-  gem 'capistrano-bundler'
-  gem 'capistrano-passenger'
 end
 
 group :development, :test do
   gem 'rspec-rails', '~> 2.99'
   gem 'capybara'
   gem 'factory_girl_rails'
-  gem 'sqlite3'
 end
 
 group :debug do
