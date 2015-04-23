@@ -6,13 +6,13 @@ describe SolrDocument do
   end
 
   describe "#published_at" do
-    let(:doc) { SolrDocument.new("published_at_dtsi": '2015-04-27') }
+    let(:doc) { SolrDocument.new("published_at_dtsi" => '2015-04-27') }
     subject { doc.published_at }
     it { is_expected.to eq '2015-04-27' }
   end
 
   describe "#draft?" do
-    let(:doc) { SolrDocument.new("id": pid) }
+    let(:doc) { SolrDocument.new("id" => pid) }
     subject { doc.draft? }
     context "when it's a draft" do
       let(:pid) { 'draft:123' }
@@ -26,7 +26,7 @@ describe SolrDocument do
   end
 
   describe "#workflow_status" do
-    let(:doc) { SolrDocument.new("id": pid) }
+    let(:doc) { SolrDocument.new("id" => pid) }
     subject { doc.workflow_status }
 
     context "when it's a draft" do
