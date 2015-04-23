@@ -245,10 +245,6 @@ describe RecordsController do
           expect(response).to redirect_to("/catalog/#{assigns[:record].pid}")
           expect(assigns[:record]).to eq @draft
           expect(assigns[:record].title).to eq 'My title 3'
-          expect(assigns[:record].reload.audit_log.what.first).to match /Metadata updated/
-          expect(assigns[:record].reload.audit_log.what.first).to match /rightsMetadata/
-          expect(assigns[:record].reload.audit_log.what.first).to match /DCA-META/
-          expect(assigns[:record].reload.audit_log.what.first).to match /DCA-ADMIN/
         end
 
         it "should update external datastream paths" do
