@@ -5,15 +5,15 @@ feature 'Advanced Search' do
   before do
     ActiveFedora::Base.delete_all
 
-    @fiction = FactoryGirl.create(:tufts_pdf, title: 'Space Detectives', genre: ['science fiction', 'fiction'])
-    @history = FactoryGirl.create(:tufts_pdf, title: 'Scientific Discoveries', genre: ['history', 'science'])
+    @fiction = TuftsPdf.build_draft_version(title: 'Space Detectives', genre: ['science fiction', 'fiction'], displays: ['dl'])
+    @fiction.save!
+    @fiction.publish!
+
+    @history = TuftsPdf.build_draft_version(title: 'Scientific Discoveries', genre: ['history', 'science'], displays: ['dl'])
+    @history.save!
+    @history.publish!
 
     sign_in :admin
-  end
-
-  after do
-    @fiction.delete
-    @history.delete
   end
 
   scenario 'search with AND' do
@@ -53,19 +53,21 @@ feature 'Advanced Search' do
     within('#advanced_search_facets .blacklight-object_type_sim') do
       expect(page).to have_selector('li', count: 1)
       expect(page).to have_selector('li .facet_select', text: "Text")
-      expect(page).to have_selector('li .facet-count', text: 2)
+      expect(page).to have_selector('li .facet-count', text: 4)
       expect(page).to_not have_content('Template')
     end
   end
 
   scenario "purged objects don't appear in facets" do
     @history.purge!
+
     visit root_path
     click_link 'Advanced Search'
+
     within('#advanced_search_facets .blacklight-object_type_sim') do
       expect(page).to have_selector('li', count: 1)
       expect(page).to have_selector('li .facet_select', text: "Text")
-      expect(page).to have_selector('li .facet-count', text: 1)
+      expect(page).to have_selector('li .facet-count', text: 2)
     end
   end
 
