@@ -9,10 +9,6 @@ shared_examples 'an import happy path' do
     expect(response).to redirect_to(batch_path(batch))
   end
 
-  it 'adds an audit log' do
-    expect(TuftsPdf.first.audit_log.who).to include @user.user_key
-  end
-
   it 'attaches the files to the records' do
     pdf = TuftsPdf.first.datastreams['Archival.pdf']
     expect(pdf.has_content?).to be_truthy
