@@ -28,18 +28,20 @@
 
     .workflow-status {
       margin-right: 2px;
-      @extend .label;
-      &.edited {
-        @extend .label-warning;
-      }
-      &.new {
-        @extend .label-success;
-      }
-      &.published {
-        display: none;
-      }
-
     }
+  }
+}
+
+.workflow-status {
+  @extend .label;
+  &.edited {
+    @extend .label-warning;
+  }
+  &.new {
+    @extend .label-success;
+  }
+  &.published {
+    display: none;
   }
 }
 
