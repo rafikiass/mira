@@ -10,6 +10,7 @@ describe RecordsHelper do
        'PDF' => 'TuftsPdf',
        'TEI' => 'TuftsTEI',
        'Template' => 'TuftsTemplate',
+       'Video' => 'TuftsVideo',
        'Voting Record' => 'TuftsVotingRecord'}
   end
 
@@ -29,6 +30,7 @@ describe RecordsHelper do
                            ["PDF", "TuftsPdf"],
                            ["TEI", "TuftsTEI"],
                            ["Template", "TuftsTemplate"],
+                           ["Video", "TuftsVideo"],
                            ["Voting Record", "TuftsVotingRecord"]]
   end
 
