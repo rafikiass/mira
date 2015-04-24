@@ -35,7 +35,7 @@ gem 'resque-status'
 gem 'carrierwave', '~> 0.10.0'
 
 gem 'blacklight_advanced_search'
-gem 'tufts_models', github: 'curationexperts/tufts_models', ref: 'de2cb3f'
+gem 'tufts_models', github: 'curationexperts/tufts_models', ref: 'd5c5762c42a590c215ead4abe0609b8e7f2e4bae'
 
 group :development do
   gem 'jettywrapper'
