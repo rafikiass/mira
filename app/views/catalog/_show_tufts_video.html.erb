@@ -1,0 +1,8 @@
+<%= render partial: 'show_default', locals: {document: document} %>
+
+<h3>Archival Video</h3>
+<%= link_to "Download", download_path(document.id, datastream_id: 'Archival.video') %>
+<% if (document['object_type_ssim']||[]).include? 'Text' %>
+<h3>XML</h3>
+<%= link_to "Download", download_path(document.id, datastream_id: 'ARCHIVAL_XML') %>
+<% end %>
