@@ -23,6 +23,8 @@
 
   <%= li_review_link(@document) %>
 
+  <li class="nav-divider"></li>
+
   <% if @document.publishable? %>
     <li><%= link_to "Publish", publish_record_path(@document), method: :post %></li>
   <% elsif @document.published? %>
@@ -32,6 +34,12 @@
       <%= link_to "Publish", '#' %>
     </li>
   <% end %>
+
+  <li>
+    <%= link_to "Purge", record_path(@document), method: :delete, data: {confirm: "WARNING: this will permanently delete this object from all environments! Are you sure you want to proceed?"} %>
+  </li>
+
+  <li class="nav-divider"></li>
 
   <li>
     <%= link_to "View in Fedora", @document.preview_fedora_path %>
@@ -47,7 +55,4 @@
     </li>
   <% end %>
 
-  <li>
-    <%= link_to "Purge", record_path(@document), method: :delete, data: {confirm: "WARNING: this will permanently delete this object from all environments! Are you sure you want to proceed?"} %>
-  </li>
 </ul>
