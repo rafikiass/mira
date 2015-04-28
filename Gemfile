@@ -48,6 +48,7 @@ end
 group :development, :test do
   gem 'rspec-rails', '~> 2.99'
   gem 'capybara'
+  gem 'poltergeist'
   gem 'factory_girl_rails'
   gem 'sqlite3'
 end

@@ -20,8 +20,10 @@
 
   <h2 class="hide-text"><%= t('blacklight.search.search_results') %></h2>
 
-  <%= render_document_index %>
 
-  <%= render 'results_pagination' %>
+  <%= form_tag batches_path, method: :post do %>
+    <%= render_document_index %>
+    <%= render 'results_pagination' %>
+  <% end %>
 
 </div>

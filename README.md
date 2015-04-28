@@ -9,6 +9,7 @@
 * Redis
 * [ImageMagick](http://www.imagemagick.org/)
 * [ffmpeg](http://www.ffmpeg.org/)
+* [PhantomJS](https://github.com/teampoltergeist/poltergeist#installing-phantomjs)
 
 ```bash
 $ brew install mysql
