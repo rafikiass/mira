@@ -78,12 +78,12 @@ class RecordsController < ApplicationController
   end
 
   def revert
-    @record.revert!(current_user.id)
+    RevertService.new(@record, current_user.id).run
     redirect_to catalog_path(PidUtils.to_draft(@record.id)), notice: "\"#{@record.title}\" has been reverted"
   end
 
   def destroy
-    @record.state= "D"
+    @record.state = "D"
     @record.save(validate: false)
     PurgeService.new(@record, current_user.id).run if @record.published_at
     if @record.is_a?(TuftsTemplate)

@@ -343,7 +343,7 @@ describe RecordsController do
         it "should be successful with a pid" do
           expect(@audio).to_not be_published
 
-          TuftsAudio.any_instance.should_receive(:revert!).once
+          expect_any_instance_of(RevertService).to receive(:run).once
 
           post :revert, id: @draft
           response.should redirect_to(catalog_path(@draft))
@@ -353,12 +353,12 @@ describe RecordsController do
 
       context "when the record is published" do
         before do
-          @audio.publish!
-        end
-        it "should be successful with a pid" do
+          PublishService.new(@audio).run
           expect(@audio).to be_published
+        end
 
-          TuftsAudio.any_instance.should_receive(:revert!).once
+        it "should be successful with a pid" do
+          expect_any_instance_of(RevertService).to receive(:run).once
 
           post :revert, id: @draft
           response.should redirect_to(catalog_path(@draft))
