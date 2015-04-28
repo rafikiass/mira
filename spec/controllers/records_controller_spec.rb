@@ -299,7 +299,7 @@ describe RecordsController do
       end
 
       it "should be successful" do
-        TuftsAudio.any_instance.should_receive(:publish!).once { true }
+        expect_any_instance_of(PublishService).to receive(:run).once
 
         post :publish, id: @audio
 
@@ -318,10 +318,10 @@ describe RecordsController do
 
       after { audio.destroy }
 
-      before { audio.publish! }
+      before { PublishService.new(audio).run }
 
       it "should be successful" do
-        TuftsAudio.any_instance.should_receive(:unpublish!).once
+        expect_any_instance_of(UnpublishService).to receive(:run).once
 
         post :unpublish, id: audio
         expect(response).to redirect_to catalog_path(audio)
@@ -340,7 +340,7 @@ describe RecordsController do
 
         it "should be successful with a pid" do
           expect(@audio).to_not be_published
-          TuftsAudio.any_instance.should_receive(:purge!).never
+          expect_any_instance_of(PurgeService).to receive(:run).never
 
           delete :destroy, id: @audio
 
@@ -352,17 +352,17 @@ describe RecordsController do
 
       context "when the record has been published" do
         before do
-          @audio.publish!
+          PublishService.new(@audio).run
           expect(@audio).to be_published
         end
 
         it "should be successful with a pid" do
-          TuftsAudio.any_instance.should_receive(:purge!).once
+          expect_any_instance_of(PurgeService).to receive(:run).once
 
           delete :destroy, id: @audio
 
-          response.should redirect_to(Tufts::Application.routes.url_helpers.root_path)
-          @audio.reload.state.should == 'D'
+          expect(response).to redirect_to(Tufts::Application.routes.url_helpers.root_path)
+          expect(@audio.reload.state).to eq 'D'
         end
       end
 
@@ -378,7 +378,6 @@ describe RecordsController do
         response.should redirect_to(Tufts::Application.routes.url_helpers.templates_path)
       end
     end
-
   end
 
 

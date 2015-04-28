@@ -7,11 +7,11 @@ feature 'Advanced Search' do
 
     @fiction = TuftsPdf.build_draft_version(title: 'Space Detectives', genre: ['science fiction', 'fiction'], displays: ['dl'])
     @fiction.save!
-    @fiction.publish!
+    PublishService.new(@fiction).run
 
     @history = TuftsPdf.build_draft_version(title: 'Scientific Discoveries', genre: ['history', 'science'], displays: ['dl'])
     @history.save!
-    @history.publish!
+    PublishService.new(@history).run
 
     sign_in :admin
   end
@@ -59,7 +59,7 @@ feature 'Advanced Search' do
   end
 
   scenario "purged objects don't appear in facets" do
-    @history.purge!
+    PurgeService.new(@history).run
 
     visit root_path
     click_link 'Advanced Search'
