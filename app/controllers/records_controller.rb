@@ -71,7 +71,6 @@ class RecordsController < ApplicationController
 
   def unpublish
     # The original id may be of the draft or production pid, but we always redirect to draft
-    @record = @record.find_published if @record.draft?
     title = @record.title
     UnpublishService.new(@record, current_user.id).run
     redirect_to catalog_path(PidUtils.to_draft(@record.id)), notice: "\"#{title}\" has been unpublished"
