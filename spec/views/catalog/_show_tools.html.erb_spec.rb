@@ -12,6 +12,11 @@ describe 'catalog/_show_tools.html.erb' do
     expect(rendered).to have_link('Manage Datastreams', href: record_attachments_path(doc))
   end
 
+  it 'displays the revert link' do
+    render
+    expect(rendered).to have_link('Revert', href: revert_record_path(doc))
+  end
+
   context "when the document is a template" do
     let(:doc) { SolrDocument.new(id: 'pid:1', active_fedora_model_ssi: 'TuftsTemplate') }
     it 'disables link to the attached files for a template' do
@@ -62,6 +67,8 @@ describe 'catalog/_show_tools.html.erb' do
         expect(rendered).to have_link('Unpublish', href: unpublish_record_path(doc))
         expect(rendered).not_to have_link('Publish')
       end
+
     end
+
   end
 end
