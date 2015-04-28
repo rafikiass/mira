@@ -329,6 +329,43 @@ describe RecordsController do
       end
     end
 
+    describe "reverting a record" do
+      before do
+        @audio = TuftsAudio.new(title: 'My title2', displays: ['dl'])
+        @audio.edit_users = [@user.email]
+        @audio.save!
+
+        @draft = TuftsAudio.build_draft_version(@audio.attributes.except('id').merge(pid: @audio.pid))
+        @draft.save!
+      end
+
+      context "when the record has not been published" do
+        it "should be successful with a pid" do
+          expect(@audio).to_not be_published
+
+          TuftsAudio.any_instance.should_receive(:revert!).once
+
+          post :revert, id: @draft
+          response.should redirect_to(catalog_path(@draft))
+        end
+
+      end
+
+      context "when the record is published" do
+        before do
+          @audio.publish!
+        end
+        it "should be successful with a pid" do
+          expect(@audio).to be_published
+
+          TuftsAudio.any_instance.should_receive(:revert!).once
+
+          post :revert, id: @draft
+          response.should redirect_to(catalog_path(@draft))
+        end
+      end
+    end
+
     describe "destroying a record" do
       before do
         @audio = TuftsAudio.new(title: 'My title2', displays: ['dl'])

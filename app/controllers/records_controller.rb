@@ -3,7 +3,7 @@ class RecordsController < ApplicationController
 
   before_filter :load_object, only: [:review, :cancel]
   authorize_resource only: [:review]
-  load_and_authorize_resource only: [:publish, :unpublish, :destroy]
+  load_and_authorize_resource only: [:publish, :unpublish, :revert, :destroy]
 
   # We don't even want them to see the 'choose_type' page if they can't create
   prepend_before_filter :ensure_can_create, only: :new
@@ -75,6 +75,11 @@ class RecordsController < ApplicationController
     title = @record.title
     UnpublishService.new(@record, current_user.id).run
     redirect_to catalog_path(PidUtils.to_draft(@record.id)), notice: "\"#{title}\" has been unpublished"
+  end
+
+  def revert
+    @record.revert!(current_user.id)
+    redirect_to catalog_path(PidUtils.to_draft(@record.id)), notice: "\"#{@record.title}\" has been reverted"
   end
 
   def destroy
