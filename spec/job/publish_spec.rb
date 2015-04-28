@@ -30,6 +30,8 @@ describe Job::Publish do
   end
 
   describe '#perform' do
+    let(:user) { FactoryGirl.create(:user) }
+
     it 'raises an error if it fails to find the object' do
       obj_id = 'tufts:1'
       TuftsPdf.find(obj_id).destroy if TuftsPdf.exists?(obj_id)
@@ -41,8 +43,8 @@ describe Job::Publish do
     it 'publishes the record' do
       record = FactoryGirl.create(:tufts_pdf)
       expect(ActiveFedora::Base).to receive(:find).with(record.id, cast: true).and_return(record)
-      job = Job::Publish.new('uuid', 'user_id' => 1, 'record_id' => record.id)
-      expect(record).to receive(:publish!).once
+      job = Job::Publish.new('uuid', 'user_id' => user.id, 'record_id' => record.id)
+      expect_any_instance_of(PublishService).to receive(:run).once
       job.perform
       record.delete
     end
@@ -55,8 +57,6 @@ describe Job::Publish do
     end
 
     it 'runs the job as a batch item' do
-      user = FactoryGirl.create(:user)
-
       pdf = FactoryGirl.create(:tufts_pdf)
       batch_id = '10'
       job = Job::Publish.new('uuid', 'record_id' => pdf.id, 'user_id' => user.id, 'batch_id' => batch_id)

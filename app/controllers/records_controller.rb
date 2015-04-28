@@ -65,7 +65,7 @@ class RecordsController < ApplicationController
   end
 
   def publish
-    @record.publish!(current_user.id)
+    PublishService.new(@record, current_user.id).run
     redirect_to catalog_path(@record), notice: "\"#{@record.title}\" has been pushed to production"
   end
 
@@ -73,16 +73,14 @@ class RecordsController < ApplicationController
     # The original id may be of the draft or production pid, but we always redirect to draft
     @record = @record.find_published if @record.draft?
     title = @record.title
-    @record.unpublish!(current_user.id)
+    UnpublishService.new(@record, current_user.id).run
     redirect_to catalog_path(PidUtils.to_draft(@record.id)), notice: "\"#{title}\" has been unpublished"
   end
 
   def destroy
     @record.state= "D"
     @record.save(validate: false)
-    # only push to production if it's already on production.
-    @record.audit(current_user, 'deleted')
-    @record.purge! if @record.published_at
+    PurgeService.new(@record, current_user.id).run if @record.published_at
     if @record.is_a?(TuftsTemplate)
       flash[:notice] = "\"#{@record.template_name}\" has been purged"
       redirect_to templates_path
