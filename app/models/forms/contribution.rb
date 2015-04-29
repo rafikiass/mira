@@ -47,8 +47,8 @@ class Contribution
 
   def save
     return false unless valid?
-    tufts_pdf.store_archival_file('Archival.pdf', attachment)
-    tufts_pdf.save!
+    ArchivalStorageService.new(tufts_pdf, 'Archival.pdf', attachment).run
+    tufts_pdf.save! # TODO investigate moving this save into ArchivalStorageService, because the service kicks off a job that operates on the datastream, which is not saved yet.
     tufts_pdf
   end
 

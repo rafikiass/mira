@@ -19,7 +19,7 @@ class AttachmentsController < ApplicationController
       else
         warnings << "You provided a #{file.content_type} file, which is not a valid type for #{dsid}"
       end
-      @record.store_archival_file(dsid, file)
+      ArchivalStorageService.new(@record, dsid, file).run
     end
 
     respond_to do |format|
@@ -27,7 +27,7 @@ class AttachmentsController < ApplicationController
       if @record.save(validate: false)
         format.html { redirect_to catalog_path(@record), notice: 'Object was successfully updated.' }
         format.json do
-          if warnings.empty? 
+          if warnings.empty?
             render json: {message: messages.join(". "), status: 'success'}
           else
             render json: {message: warnings.join(". "), status: 'error'}

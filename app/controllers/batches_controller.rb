@@ -181,8 +181,8 @@ private
     dsid = record.class.original_file_datastreams.first
     record.working_user = current_user
     if record.save
-      record.store_archival_file(dsid, doc)
-      record.save
+      ArchivalStorageService.new(record, dsid, doc).run
+      record.save # TODO investigate moving this save into ArchivalStorageService, because the service kicks off a job that operates on the datastream, which is not saved yet.
     else
       false
     end

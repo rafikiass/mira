@@ -381,13 +381,16 @@ describe BatchesController do
 
         context "adding a file that was uploaded previously" do
           let(:record) do
-            r = FactoryGirl.create(:tufts_pdf)
-            r.store_archival_file(TuftsPdf.original_file_datastreams.first, file1)
-            r
+            FactoryGirl.create(:tufts_pdf).tap do |r|
+              ArchivalStorageService.new(r, TuftsPdf.original_file_datastreams.first, file1).run
+              r.save!
+            end
           end
+
           let(:batch) do
             FactoryGirl.create(:batch_xml_import, uploaded_files: {'hello.pdf' => record.pid})
           end
+
           before do
             TuftsPdf.delete_all
             record # force creation of existing record
@@ -428,13 +431,15 @@ describe BatchesController do
 
           context "with duplicate file upload" do
             let(:record) do
-              r = FactoryGirl.create(:tufts_pdf)
-              r.store_archival_file(TuftsPdf.original_file_datastreams.first, file1)
-              r
+              FactoryGirl.create(:tufts_pdf).tap do |r|
+                ArchivalStorageService.new(r, TuftsPdf.original_file_datastreams.first, file1).run
+              end
             end
+
             let(:batch) do
               FactoryGirl.create(:batch_xml_import, uploaded_files: {'hello.pdf' => record.pid})
             end
+
             before do
               TuftsPdf.delete_all
               record # force creation of existing record
