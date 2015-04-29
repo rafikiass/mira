@@ -131,6 +131,7 @@ GEM
     colorize (0.7.5)
     columnize (0.8.9)
     daemons (1.2.2)
+    database_cleaner (1.4.1)
     debugger-linecache (1.2.0)
     deprecation (0.2.2)
       activesupport
@@ -495,6 +496,7 @@ DEPENDENCIES
   carrierwave (~> 0.10.0)
   chronic
   coffee-rails (~> 4.0.0)
+  database_cleaner
   devise
   disable_assets_logger
   factory_girl_rails

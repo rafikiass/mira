@@ -51,6 +51,7 @@ group :development, :test do
   gem 'poltergeist'
   gem 'factory_girl_rails'
   gem 'sqlite3'
+  gem 'database_cleaner'
 end
 
 group :debug do
