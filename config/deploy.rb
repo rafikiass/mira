@@ -42,7 +42,7 @@ namespace :deploy do
 
   after :publishing, :restart
 
-  after :restart, 'resque:pool:restart'
+  before :restart, 'resque:pool:stop'
 
   after :restart, :clear_cache do
     on roles(:web), in: :groups, limit: 3, wait: 10 do
@@ -52,5 +52,7 @@ namespace :deploy do
       end
     end
   end
+
+  after :clear_cache, 'resque:pool:start'
 
 end
