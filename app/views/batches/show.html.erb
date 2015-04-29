@@ -48,7 +48,7 @@
 
       <%= button_tag "Purge Batch", type: :submit,
         name: 'batch[type]', value: "BatchPurge",
-        data: { confirm: "#{pluralize(@batch.pids.count, 'object')} will be purged on production and staging. Do you wish to proceed?" },
+        data: { confirm: "WARNING: #{pluralize(@batch.pids.count, 'object')} will be purged. Both draft and published versions will be permanently deleted. Do you wish to proceed?" },
         class: "btn btn-primary" %>
 
       <%= button_tag "Revert", type: :submit,
