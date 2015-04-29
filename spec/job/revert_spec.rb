@@ -30,7 +30,6 @@ describe Job::Revert do
   end
 
   describe '#perform' do
-    let(:prod) { Rubydora.connect(ActiveFedora.data_production_credentials) }
 
     context 'record exists on staging and production' do
       it 'copies the published version back to the draft' do
@@ -90,7 +89,10 @@ describe Job::Revert do
       it 'succeeds and does nothing' do
         pid = 'tufts:1'
         # missing on production
-        prod.purge_object(pid: pid) rescue RestClient::ResourceNotFound
+
+        published_pid = PidUtils.to_published(pid)
+        TuftsPdf.find(published_pid).destroy if TuftsPdf.exists?(pid)
+
         # missing on staging
         TuftsPdf.find(pid).destroy if TuftsPdf.exists?(pid)
 
