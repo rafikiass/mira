@@ -20,7 +20,7 @@ describe "batches/new.html.erb" do
       expect(rendered).to have_selector("input[type=hidden][name='batch[type]'][value=BatchTemplateUpdate]")
       expect(rendered).to have_selector("select[name='batch[template_id]']")
       @pids.each do |pid|
-        expect(rendered).to have_selector("input[type=hidden][name='batch[pids][]'][value='#{pid}']")
+        expect(rendered).to have_selector("input[type=hidden][name='batch[pids][]'][value='#{PidUtils.to_draft(pid)}']")
       end
       @templates.each do |t|
         rendered.should have_selector("option[value='#{t.id}']")
