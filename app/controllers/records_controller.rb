@@ -82,14 +82,17 @@ class RecordsController < ApplicationController
   end
 
   def destroy
-    @record.state = "D"
-    @record.save(validate: false)
-    PurgeService.new(@record, current_user.id).run if @record.published_at
+    # set the flash using the title, before we delete it and the title is not available.
     if @record.is_a?(TuftsTemplate)
       flash[:notice] = "\"#{@record.template_name}\" has been purged"
-      redirect_to templates_path
     else
       flash[:notice] = "\"#{@record.title}\" has been purged"
+    end
+
+    PurgeService.new(@record, current_user.id).run
+    if @record.is_a?(TuftsTemplate)
+      redirect_to templates_path
+    else
       redirect_to root_path
     end
   end
@@ -115,7 +118,6 @@ class RecordsController < ApplicationController
   end
 
   def set_attributes
-    resource.state = 'A' if resource.state == 'D'
     resource.working_user = current_user
     # set rightsMetadata access controls
     resource.apply_depositor_metadata(current_user)
@@ -145,13 +147,4 @@ class RecordsController < ApplicationController
       record_attachments_path(@record)
     end
   end
-
-  # Override method from hydra-editor to include rels-ext fields
-  # def set_attributes
-  #   puts "params #{params}"
-  #   rels_ext_fields = { relationship_attributes: params[ActiveModel::Naming.singular(resource)]['relationship_attributes'] }
-  #   puts "Rels #{rels_ext_fields}"
-  #   resource.attributes = collect_form_attributes.merge(rels_ext_fields)
-  # end
-
 end

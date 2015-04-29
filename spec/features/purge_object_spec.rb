@@ -3,10 +3,11 @@ require 'spec_helper'
 feature 'Admin user purges document' do
   before do
     TuftsAudio.where(title: "Very unique title").destroy_all
-    @audio = TuftsAudio.new(title: 'Very unique title', description: 'eh?', creator: 'Fred', displays: ['dl'])
+    @audio = TuftsAudio.build_draft_version(title: 'Very unique title', description: ['eh?'], creator: ['Fred'], displays: ['dl'])
     @audio.save!
     sign_in :admin
   end
+
   scenario 'with a TuftsAudio' do
     visit catalog_path(@audio)
     click_link 'Purge'
