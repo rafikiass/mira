@@ -35,14 +35,10 @@ RSpec.configure do |config|
   config.infer_base_class_for_anonymous_controllers = false
 
   config.before(:suite) do
-    DepositType.destroy_all
-    BatchTemplateUpdate.delete_all
-    User.destroy_all
     clean_fedora_and_solr
   end
 
   config.after(:suite) do
-    clean_fedora_and_solr
     clean_up_carrierwave_files
   end
 
