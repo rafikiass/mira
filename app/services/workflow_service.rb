@@ -9,11 +9,17 @@ class WorkflowService
   private
 
     def destroy_published_version!
-      object.class.destroy_if_exists PidUtils.to_published(object.pid)
+      destroy_if_exists PidUtils.to_published(object.pid)
     end
 
     def destroy_draft_version!
-      object.class.destroy_if_exists PidUtils.to_draft(object.pid)
+      destroy_if_exists PidUtils.to_draft(object.pid)
+    end
+
+    def destroy_if_exists(pid)
+      if object.class.exists?(pid)
+        object.class.find(pid).destroy
+      end
     end
 
     def audit(what)
