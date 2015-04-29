@@ -6,7 +6,7 @@ class DownloadsController < ApplicationController
       format.any  { send_file 'app/assets/images/nope.png', disposition: 'inline', type: 'image/png' }
     end
   end
-  
+
   def send_content
     send_file asset.local_path_for(params[:datastream_id]), content_options
   end

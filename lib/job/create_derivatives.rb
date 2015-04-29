@@ -19,7 +19,7 @@ module Job
       begin
         record.create_derivatives
       rescue StandardError => ex
-        Notifier.derivatives_failure({:pid => options['record_id'], :message => ex.message})
+        Notifier.derivatives_failure(pid: options['record_id'], message: "#{ex.message}\n\n#{ex.backtrace}")
         raise(ex)
       end
 
