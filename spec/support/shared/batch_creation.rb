@@ -27,9 +27,13 @@ end
 shared_examples 'batch creation happy path' do |batch_class|
   let(:factory_name) { batch_class.to_s.underscore.to_sym }
   let(:different_user) { FactoryGirl.create(:admin) }
+  let(:service_name) { batch_class == BatchTemplateUpdate ? BatchTemplateUpdateRunnerService : BatchRunnerService }
+
+  before do
+    allow_any_instance_of(service_name).to receive(:run) { true }
+  end
 
   it 'assigns the current user as the creator' do
-    batch_class.any_instance.stub(:run) { true }
     attrs = FactoryGirl.attributes_for(factory_name, creator_id: different_user.id)
     post 'create', batch: attrs
 
@@ -37,27 +41,24 @@ shared_examples 'batch creation happy path' do |batch_class|
   end
 
   it 'creates a batch' do
-    batch_class.any_instance.stub(:run) { true }
     batch_count = Batch.count
     post 'create', batch: FactoryGirl.attributes_for(factory_name)
     expect(Batch.count).to eq batch_count + 1
   end
 
   it 'assigns @batch' do
-    batch_class.any_instance.stub(:run) { true }
     post 'create', batch: FactoryGirl.attributes_for(factory_name)
-    expect(assigns[:batch].class).to eq batch_class
+    expect(assigns[:batch]).to be_kind_of batch_class
   end
 
   it 'runs the batch' do
     batch = Batch.new(FactoryGirl.attributes_for(factory_name))
     allow(Batch).to receive(:new) { batch }
-    expect(batch).to receive(:run) { true }
+    expect_any_instance_of(service_name).to receive(:run) { true }
     post 'create', batch: FactoryGirl.attributes_for(factory_name)
   end
 
   it 'redirects to the batch show page' do
-    batch_class.any_instance.stub(:run) { true }
     post 'create', batch: FactoryGirl.attributes_for(factory_name)
     response.should redirect_to(batch_path(assigns[:batch]))
   end
@@ -67,9 +68,9 @@ end
 shared_examples 'batch run failure recovery' do |batch_class|
   let(:factory_name) { batch_class.to_s.underscore.to_sym }
   let(:attrs) { FactoryGirl.attributes_for(factory_name) }
-
+  let(:service_name) { batch_class == BatchTemplateUpdate ? BatchTemplateUpdateRunnerService : BatchRunnerService }
   before do
-    batch_class.any_instance.stub(:run) { false }
+    allow_any_instance_of(service_name).to receive(:run) { false }
   end
 
   context 'error path - batch fails to run:' do

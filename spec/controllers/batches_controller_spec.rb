@@ -155,7 +155,7 @@ describe BatchesController do
       describe "batch publishing - error path:" do
         it "redirects to previous page" do
           BatchPublish.any_instance.stub(:save) { true }
-          BatchPublish.any_instance.stub(:run) { false }
+          allow_any_instance_of(BatchRunnerService).to receive(:run) { false }
           allow(controller.request).to receive(:referer) { catalog_index_path }
           post :create, batch: { pids: ['pid:1'], type: 'BatchPublish' }
           response.should redirect_to(request.referer)
@@ -171,7 +171,7 @@ describe BatchesController do
       describe "batch purge - error path:" do
         it "redirects to previous page" do
           BatchPurge.any_instance.stub(:save) { true }
-          BatchPurge.any_instance.stub(:run) { false }
+          allow_any_instance_of(BatchRunnerService).to receive(:run) { false }
           allow(controller.request).to receive(:referer) { catalog_index_path }
           post :create, batch: { pids: ['pid:1'], type: 'BatchPurge' }
           response.should redirect_to(request.referer)
@@ -187,7 +187,7 @@ describe BatchesController do
       describe "batch revert - error path:" do
         it "redirects to previous page" do
           BatchRevert.any_instance.stub(:save) { true }
-          BatchRevert.any_instance.stub(:run) { false }
+          allow_any_instance_of(BatchRunnerService).to receive(:run) { false }
           allow(controller.request).to receive(:referer) { catalog_index_path }
           post :create, batch: { pids: ['pid:1'], type: 'BatchRevert' }
           response.should redirect_to(request.referer)
@@ -200,7 +200,7 @@ describe BatchesController do
         it_should_behave_like 'batch run failure recovery', BatchTemplateUpdate
 
         def post_create(overrides={})
-          BatchTemplateUpdate.any_instance.stub(:run) { true }
+          allow_any_instance_of(BatchTemplateUpdateRunnerService).to receive(:run) { true }
           post 'create', batch: FactoryGirl.attributes_for(:batch_template_update).merge(overrides)
         end
 
@@ -220,7 +220,7 @@ describe BatchesController do
 
         it 'renders new when batch fails to run' do
           BatchTemplateUpdate.any_instance.stub(:save) { true }
-          BatchTemplateUpdate.any_instance.stub(:run) { false }
+          allow_any_instance_of(BatchTemplateUpdateRunnerService).to receive(:run) { false }
           post 'create', batch: {type: "BatchTemplateUpdate", pids: ['pid:1']}
           response.should render_template(:new)
         end
