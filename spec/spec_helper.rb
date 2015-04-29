@@ -36,6 +36,7 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     DepositType.destroy_all
+    BatchTemplateUpdate.delete_all
     User.destroy_all
     clean_fedora_and_solr
   end

@@ -88,7 +88,7 @@ private
     @batch.creator = current_user
 
     if @batch.save
-      if @batch.run
+      if run_batch
         redirect_to batch_path(@batch)
       else
         flash[:error] = "Unable to run batch, please try again later."
@@ -98,6 +98,14 @@ private
       end
     else
       render_new_or_redirect  # form errors
+    end
+  end
+
+  def run_batch
+    if @batch.type == 'BatchTemplateUpdate'
+      BatchTemplateUpdateRunnerService.new(@batch).run
+    else
+      BatchRunnerService.new(@batch).run
     end
   end
 
