@@ -1,4 +1,4 @@
-class ArchivalStorageService < DatastreamGeneratingService
+class ArchivalStorageService
   attr_reader :object, :dsid, :file
 
   def initialize(object, dsid, file)
