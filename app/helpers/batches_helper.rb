@@ -1,8 +1,7 @@
 module BatchesHelper
   def make_dl(title, value, css_class)
     content_tag(:dl, class: "dl-horizontal " + css_class) do
-      content_tag(:dt) { title } + 
-      content_tag(:dd) { value.to_s }
+      content_tag(:dt) { title } + content_tag(:dd) { value.to_s }
     end
   end
 
@@ -35,13 +34,7 @@ module BatchesHelper
   end
 
   def item_count(batch)
-    if batch.job_ids
-      batch.job_ids.count
-    elsif batch.pids
-      batch.pids.count
-    else
-      0
-    end
+    batch.job_ids.present? ?  batch.job_ids.count : batch.pids.count
   end
 
 end

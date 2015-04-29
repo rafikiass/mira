@@ -40,8 +40,6 @@ describe BatchesHelper do
   describe "for batch types that don't run jobs" do
     let(:batch) { FactoryGirl.create(:batch_template_import, pids: [@record.pid]) }
 
-    after { batch.delete }
-
     describe '#line_item_status' do
       it 'displays the record status' do
         status = helper.line_item_status(batch, nil, @record.pid)
@@ -63,13 +61,12 @@ describe BatchesHelper do
     end
 
     describe '#item_count' do
-      it 'displays the number of pids' do
-        expect(helper.item_count(batch)).to eq 1
-      end
+      subject { helper.item_count(batch) }
+      it { is_expected.to eq 1 }
 
-      it 'handles the case where pids is nil' do
-        batch.pids = nil
-        expect(helper.item_count(batch)).to eq 0
+      context "when pids is empty" do
+        let(:batch) { BatchTemplateUpdate.new }
+        it { is_expected.to eq 0 }
       end
     end
   end
