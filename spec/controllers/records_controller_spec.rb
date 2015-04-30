@@ -98,11 +98,11 @@ describe RecordsController do
         end
 
         it "should assign a draft pid" do
-          get :new, :type=>'TuftsAudio', :pid=>pid
-          assigns[:record].should be_kind_of TuftsAudio
-          assigns[:record].should_not be_new_record
-          response.should redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record])
-          assigns[:record].pid.should == draft_pid
+          get :new, type: 'TuftsAudio', pid: pid
+          expect(assigns[:record]).to be_kind_of TuftsAudio
+          expect(assigns[:record]).not_to be_new_record
+          expect(response).to redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record])
+          expect(assigns[:record].pid).to eq draft_pid
         end
       end
 
@@ -124,7 +124,7 @@ describe RecordsController do
     end
 
     describe "creating a new record" do
-      before { @routes = HydraEditor::Engine.routes }
+      routes { HydraEditor::Engine.routes }
 
       it "should be successful" do
         post :create, :type=>'TuftsAudio', :tufts_audio=>{:title=>"My title", displays: ['dl']}
@@ -134,34 +134,32 @@ describe RecordsController do
     end
 
     describe "editing a record" do
-      before do
-        @routes = HydraEditor::Engine.routes
-        @audio = TuftsAudio.new(title: 'My title2', displays: ['dl'])
-        @audio.edit_users = [@user.email]
-        @audio.save!
+      routes { HydraEditor::Engine.routes }
 
-        @draft = TuftsAudio.build_draft_version(@audio.attributes.except('id').merge(pid: @audio.pid))
-        @draft.edit_users = [@user.email]
-        @draft.save!
+      let(:draft) do
+        TuftsAudio.build_draft_version(title: 'My title2', displays: ['dl']).tap do |d|
+          d.edit_users = [@user.email]
+          d.save!
+        end
       end
 
-      after do
-        @audio.destroy
-      end
+      before { PublishService.new(draft).run }
+
+      let(:audio) { draft.find_published }
 
       context 'when editing the draft version' do
         it "should be successful" do
-          get :edit, id: @draft.pid
+          get :edit, id: draft
           expect(response).to be_successful
           expect(response).to render_template(:edit)
-          expect(assigns[:record]).to eq @draft
+          expect(assigns[:record]).to eq draft
         end
       end
 
       context 'when editing the non-draft version' do
         it 'redirects to edit form for draft version' do
-          get :edit, id: @audio.pid
-          expect(response).to redirect_to(HydraEditor::Engine.routes.url_helpers.edit_record_path(@draft))
+          get :edit, id: audio
+          expect(response).to redirect_to(HydraEditor::Engine.routes.url_helpers.edit_record_path(draft))
         end
       end
     end
@@ -208,7 +206,7 @@ describe RecordsController do
     end
 
     describe "updating a record" do
-      before { @routes = HydraEditor::Engine.routes }
+      routes { HydraEditor::Engine.routes }
 
       describe "for a template" do
         before do
@@ -226,57 +224,56 @@ describe RecordsController do
       end
 
       describe "with an audio" do
-        before do
-          @audio = TuftsAudio.new(title: 'My title2', displays: ['dl'])
-          @audio.edit_users = [@user.email]
-          @audio.save!
-
-          @draft = TuftsAudio.build_draft_version(@audio.attributes.except('id').merge(pid: @audio.pid))
-          @draft.save!
+        let(:draft) do
+          TuftsAudio.build_draft_version(title: 'My title2', displays: ['dl']).tap do |d|
+            d.edit_users = [@user.email]
+            d.save!
+          end
         end
 
-        after do
-          @audio.destroy
-          @draft.destroy
-        end
+        before { PublishService.new(draft).run }
+
+        let(:audio) { draft.find_published }
 
         it "successfully updates draft version of object" do
-          put :update, :id=>@audio, :tufts_audio=>{:title=>"My title 3"}
+          put :update, id: audio, tufts_audio: { title: "My title 3" }
           expect(response).to redirect_to("/catalog/#{assigns[:record].pid}")
-          expect(assigns[:record]).to eq @draft
+          expect(assigns[:record]).to eq draft
           expect(assigns[:record].title).to eq 'My title 3'
         end
 
         it "should update external datastream paths" do
-          put :update, :id=>@audio, :tufts_audio=>{:datastreams=>{"ACCESS_MP3"=>"http://example.com/access.mp3", "ARCHIVAL_WAV"=>"http://example.com/archival.wav"} }
+          put :update, id: audio, :tufts_audio=>{:datastreams=>{"ACCESS_MP3"=>"http://example.com/access.mp3", "ARCHIVAL_WAV"=>"http://example.com/archival.wav"} }
           expect(response).to redirect_to("/catalog/#{assigns[:record].pid}")
           expect(assigns[:record].datastreams['ACCESS_MP3'].dsLocation).to eq 'http://example.com/access.mp3'
           expect(assigns[:record].datastreams['ARCHIVAL_WAV'].dsLocation).to eq 'http://example.com/archival.wav'
         end
 
         it 'should update the collection id' do
-          put :update, :id=>@audio, :tufts_audio=>{:stored_collection_id=>["updated_id"]}
+          put :update, id: audio, :tufts_audio=>{:stored_collection_id=>["updated_id"]}
           expect(assigns[:record].stored_collection_id).to eq 'updated_id'
         end
       end
 
       describe "with an image" do
-        before do
-          @image = TuftsImage.new(title: "test image", displays: ['dl'])
-          @image.edit_users = [@user.email]
-          @image.save!
-
-          @draft = TuftsImage.build_draft_version(@image.attributes.except('id').merge(pid: @image.pid))
-          @draft.save!
+        let(:draft) do
+          TuftsImage.build_draft_version(title: 'test image', displays: ['dl']).tap do |d|
+            d.edit_users = [@user.email]
+            d.save!
+          end
         end
 
-        after do
-          @image.destroy
-          @draft.destroy
-        end
+        before { PublishService.new(draft).run }
+
+        let(:image) { draft.find_published }
 
         it "should update external datastream paths" do
-          put :update, :id=>@image, :tufts_image=>{:datastreams=>{"Advanced.jpg"=>"http://example.com/advanced.jpg", "Basic.jpg"=>"http://example.com/basic.jpg", "Archival.tif"=>"http://example.com/archival.tif", "Thumbnail.png"=>"http://example.com/thumb.png"} }
+          put :update, id: image, tufts_image: { datastreams: {
+            "Advanced.jpg"=>"http://example.com/advanced.jpg",
+            "Basic.jpg"=>"http://example.com/basic.jpg",
+            "Archival.tif"=>"http://example.com/archival.tif",
+            "Thumbnail.png"=>"http://example.com/thumb.png" } }
+
           expect(response).to redirect_to("/catalog/#{assigns[:record].pid}")
           expect(assigns[:record].datastreams['Advanced.jpg'].dsLocation).to eq 'http://example.com/advanced.jpg'
           expect(assigns[:record].datastreams['Basic.jpg'].dsLocation).to eq 'http://example.com/basic.jpg'
@@ -292,10 +289,6 @@ describe RecordsController do
         @audio = TuftsAudio.new(title: 'My title2', displays: ['dl'])
         @audio.edit_users = [@user.email]
         @audio.save!
-      end
-
-      after do
-        @audio.destroy
       end
 
       it "should be successful" do
@@ -316,8 +309,6 @@ describe RecordsController do
         end
       end
 
-      after { audio.destroy }
-
       before { PublishService.new(audio).run }
 
       it "should be successful" do
@@ -330,38 +321,43 @@ describe RecordsController do
     end
 
     describe "reverting a record" do
-      before do
-        @audio = TuftsAudio.new(title: 'My title2', displays: ['dl'])
-        @audio.edit_users = [@user.email]
-        @audio.save!
-
-        @draft = TuftsAudio.build_draft_version(@audio.attributes.except('id').merge(pid: @audio.pid))
-        @draft.save!
-      end
-
       context "when the record has not been published" do
+        let(:draft) do
+          TuftsAudio.build_draft_version(title: 'My title2', displays: ['dl']).tap do |d|
+            d.edit_users = [@user.email]
+            d.save!
+          end
+        end
+
         it "should be successful with a pid" do
-          expect(@audio).to_not be_published
+          expect(draft).to_not be_published
 
           expect_any_instance_of(RevertService).to receive(:run).once
 
-          post :revert, id: @draft
-          response.should redirect_to(catalog_path(@draft))
+          post :revert, id: draft
+          response.should redirect_to(catalog_path(draft))
         end
 
       end
 
       context "when the record is published" do
-        before do
-          PublishService.new(@audio).run
-          expect(@audio).to be_published
+        let(:draft) do
+          TuftsAudio.build_draft_version(title: 'My title2', displays: ['dl']).tap do |d|
+            d.edit_users = [@user.email]
+            d.save!
+          end
         end
 
-        it "should be successful with a pid" do
+        before { PublishService.new(draft).run }
+
+        let(:audio) { draft.find_published }
+
+
+        it "should be successful" do
           expect_any_instance_of(RevertService).to receive(:run).once
 
-          post :revert, id: @draft
-          response.should redirect_to(catalog_path(@draft))
+          post :revert, id: audio
+          response.should redirect_to(catalog_path(draft))
         end
       end
     end
@@ -393,7 +389,7 @@ describe RecordsController do
         @template.save!
       end
       it "routes back to the template index" do
-        delete :destroy, :id=>@template
+        delete :destroy, id: @template
         response.should redirect_to(Tufts::Application.routes.url_helpers.templates_path)
       end
     end
@@ -417,29 +413,21 @@ describe RecordsController do
 
     describe "who goes to the edit page" do
       routes { HydraEditor::Engine.routes }
-      before do
-        @audio = TuftsAudio.create!(title: 'My title2', displays: ['dl'])
-      end
-      after do
-        @audio.destroy
-      end
+      let(:audio) { TuftsAudio.create!(title: 'My title2', displays: ['dl']) }
+
       it "should not be allowed" do
-        get :edit, id: @audio
+        get :edit, id: audio
         expect(response).to redirect_to Tufts::Application.routes.url_helpers.contributions_path
         expect(flash[:alert]).to match /You do not have sufficient privileges to edit this document/i
       end
     end
 
     describe 'reviews a record' do
-      before do
-        @record = FactoryGirl.create(:tufts_pdf)
-        put :review, id: @record
-      end
-      after { @record.delete }
+      let(:record) { FactoryGirl.create(:tufts_pdf) }
 
-      it 'should not be allowed' do
-        response.status.should == 302
-        response.should redirect_to Tufts::Application.routes.url_helpers.root_path
+      it 'is not allowed' do
+        put :review, id: record
+        expect(response).to redirect_to Tufts::Application.routes.url_helpers.root_path
         flash[:alert].should =~ /You are not authorized to access this page/i
       end
     end

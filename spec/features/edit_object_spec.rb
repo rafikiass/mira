@@ -1,13 +1,17 @@
 require 'spec_helper'
 
 feature 'Admin user edits document' do
-  before do
-    @audio = TuftsAudio.build_draft_version(title: 'Test title', description: 'eh?', creator: 'Fred', displays: ['dl'])
-    @audio.save!
-    sign_in :admin
+  let(:audio) do
+    TuftsAudio.build_draft_version(title: 'Test title', description: ['eh?'],
+                                   creator: ['Fred'], displays: ['dl']).tap do |a|
+      a.save!
+    end
   end
+
+  before { sign_in :admin }
+
   scenario 'with a TuftsAudio' do
-    visit catalog_path(@audio)
+    visit catalog_path(audio)
     click_link 'Edit Metadata'
 
     fill_in '*Title',      with: 'My title'
@@ -15,8 +19,6 @@ feature 'Admin user edits document' do
     fill_in 'Creator',     with: 'Gillian'
     click_button 'Save'
 
-    page.should have_selector('h1', text: 'My title')
+    expect(page).to have_selector('h1', text: 'My title')
   end
-
 end
-

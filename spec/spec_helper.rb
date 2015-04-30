@@ -36,6 +36,7 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     clean_fedora_and_solr
+    DatabaseCleaner.clean_with(:truncation)
   end
 
   config.after(:suite) do

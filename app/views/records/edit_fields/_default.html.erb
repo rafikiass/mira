@@ -1,0 +1,13 @@
+<div class="<%= 'input-group' if f.object.class.multiple?(key) %>" <%  if index == 0 %> id="additional_<%= key.to_s %>_clone" <% end %>>
+        <% required = render_req && index == 0 && f.object.required?(key) %>
+        <% if f.object.class.multiple?(key) %>
+          <%= text_field_tag "#{ActiveModel::Naming.singular(f.object)}[#{key.to_s}][]", v, id: "#{ActiveModel::Naming.singular(f.object)}_#{key.to_s}", class: "form-control", required: required  %>
+          <%= render "records/edit_fields/suffix", {key: key, index: index} %>
+        <% else %>
+          <%= text_field_tag "#{ActiveModel::Naming.singular(f.object)}[#{key.to_s}]", v, id: "#{ActiveModel::Naming.singular(f.object)}_#{key.to_s}", class: "form-control", required: required  %>
+        <% end %>
+      </div>
+      <div id="additional_<%= key %>_elements"></div>
+
+
+
