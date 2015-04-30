@@ -20,8 +20,12 @@ class PublishService < WorkflowService
   private
 
     def register_handle
-      return if has_handle?
+      return if has_handle? || !displays_in_dl?
       Job::RegisterHandle.create(record_id: object.id)
+    end
+
+    def displays_in_dl?
+      object.displays.include?('dl')
     end
 
     def has_handle?
