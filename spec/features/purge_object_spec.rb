@@ -1,21 +1,26 @@
 require 'spec_helper'
 
 feature 'Admin user purges document' do
+  let(:audio) do
+    TuftsAudio.build_draft_version(title: 'Very unique title', description: ['eh?'],
+                                  creator: ['Fred'], displays: ['dl']).tap do |d|
+      d.save!
+    end
+  end
+
   before do
     TuftsAudio.where(title: "Very unique title").destroy_all
-    @audio = TuftsAudio.build_draft_version(title: 'Very unique title', description: ['eh?'], creator: ['Fred'], displays: ['dl'])
-    @audio.save!
     sign_in :admin
   end
 
   scenario 'with a TuftsAudio' do
-    visit catalog_path(@audio)
+    visit catalog_path(audio)
     click_link 'Purge'
-    page.should have_selector('div.alert', text: '"Very unique title" has been purged')
+    expect(page).to have_selector('div.alert', text: '"Very unique title" has been purged')
 
     fill_in 'q', with: 'Very unique title'
     click_button 'search'
-    page.should have_text('No entries found')
+    expect(page).to have_text('No entries found')
   end
 
 end

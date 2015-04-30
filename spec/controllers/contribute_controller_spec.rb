@@ -2,10 +2,6 @@ require 'spec_helper'
 
 describe ContributeController do
 
-  before do
-    TuftsPdf.destroy_all
-  end
-
   describe "for a not-signed in user" do
     describe "new" do
       it "should redirect to sign in" do
@@ -51,9 +47,6 @@ describe ContributeController do
           @deposit_type = FactoryGirl.create(:deposit_type, :display_name => 'Test Option', :deposit_view => 'generic_deposit')
         end
 
-        after :all do
-          @deposit_type.destroy
-        end
         render_views
 
         it 'should render the correct template' do
@@ -88,12 +81,13 @@ describe ContributeController do
       end
 
       describe 'with valid deposit_type' do
+        before { TuftsPdf.destroy_all }
         let(:deposit_type) { FactoryGirl.create(:deposit_type) }
         let(:file) { fixture_file_upload('/local_object_store/data01/tufts/central/dca/MISS/archival_pdf/MISS.ISS.IPPI.archival.pdf','application/pdf') }
 
         it 'succeeds and stores file attachments' do
           expect {
-            post :create, contribution: {title: 'Sample', description: 'Description goes here', 
+            post :create, contribution: { title: 'Sample', description: 'Description goes here',
                                          creator: user.display_name, attachment: file},
                           deposit_type: deposit_type
             response.should redirect_to contributions_path
