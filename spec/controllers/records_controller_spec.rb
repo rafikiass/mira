@@ -367,40 +367,22 @@ describe RecordsController do
     end
 
     describe "destroying a record" do
-      before do
-        @audio = TuftsAudio.new(title: 'My title2', displays: ['dl'])
-        @audio.edit_users = [@user.email]
-        @audio.save!
+      let(:audio) do
+        TuftsAudio.build_draft_version(title: 'My title2', displays: ['dl']).tap do |a|
+          a.edit_users = [@user.email]
+          a.save!
+        end
       end
 
-      context "when the record has not been published" do
+      before { PublishService.new(audio).run }
 
-        it "should be successful with a pid" do
-          expect(@audio).to_not be_published
-          expect_any_instance_of(PurgeService).to receive(:run).never
+      it "should be successful with a pid" do
+        expect_any_instance_of(PurgeService).to receive(:run).once
 
-          delete :destroy, id: @audio
+        delete :destroy, id: audio
 
-          response.should redirect_to(Tufts::Application.routes.url_helpers.root_path)
-          @audio.reload.state.should == 'D'
-        end
-
-      end
-
-      context "when the record has been published" do
-        before do
-          PublishService.new(@audio).run
-          expect(@audio).to be_published
-        end
-
-        it "should be successful with a pid" do
-          expect_any_instance_of(PurgeService).to receive(:run).once
-
-          delete :destroy, id: @audio
-
-          expect(response).to redirect_to(Tufts::Application.routes.url_helpers.root_path)
-          expect(@audio.reload.state).to eq 'D'
-        end
+        expect(response).to redirect_to(Tufts::Application.routes.url_helpers.root_path)
+        expect(flash[:notice]).to eq '"My title2" has been purged'
       end
 
     end
@@ -416,8 +398,6 @@ describe RecordsController do
       end
     end
   end
-
-
 
   describe "a non-admin" do
     before do
