@@ -47,17 +47,25 @@ describe Job::Revert do
     end
 
     context 'record exists on staging, missing on production' do
+      let(:record) do
+        TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title").tap do |r|
+          r.save!
+        end
+      end
+      let(:pid) { record.pid }
+      let(:published_pid) { PidUtils.to_published(pid) }
+
+      before do
+        begin
+          TuftsPdf.find(published_pid).destroy
+        rescue ActiveFedora::ObjectNotFoundError
+        end
+      end
+
       it 'hard deletes' do
-        record = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title")
-        record.save!
-        pid = record.pid
-
-        expect(TuftsPdf.exists?(PidUtils.to_published(pid))).to be_falsey
-
         Job::Revert.new('uuid', 'record_id' => pid).perform
-
-        expect(TuftsPdf.exists?(PidUtils.to_published(pid))).to be_falsey
-        expect(TuftsPdf.exists?(pid)).to be_truthy
+        expect(TuftsPdf).not_to exist(published_pid)
+        expect(TuftsPdf).to exist(pid)
       end
     end
 
