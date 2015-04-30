@@ -89,9 +89,11 @@ describe PublishService do
 
     context "with a user" do
       subject { PublishService.new(obj, user.id) }
+
       it 'adds an entry to the audit log' do
-        expect(AuditLogService).to receive(:log).with(user.user_key, obj.id, 'Pushed to production').once
-        subject.run
+        expect(AuditLogService).to receive(:log).with(user.user_key, obj.id, 'Published').once
+
+        PublishService.new(obj, user.id).run
       end
     end
 
