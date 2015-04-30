@@ -1,8 +1,47 @@
 require 'spec_helper'
 
 describe PublishService do
+
+  let(:service) { described_class.new(obj) }
+
+  describe "#register_handle" do
+    let(:attributes) { { title: 'My title', displays: displays, identifier: identifier } }
+    let(:obj) { TuftsImage.build_draft_version(attributes) }
+    let(:identifier) { [] }
+
+    subject { service.send(:register_handle) }
+
+    context "when he object displays in DL" do
+      let(:displays) { ['dl'] }
+
+      context "and the identifier is blank" do
+        it "registers a handle" do
+          expect(Job::RegisterHandle).to receive(:create)
+          subject
+        end
+      end
+
+      context "and the identifier exists" do
+        let(:identifier) { ['http://handle.net/13/123'] }
+        it "doesn't register a handle" do
+          expect(Job::RegisterHandle).to receive(:create).never
+          subject
+        end
+      end
+    end
+
+    context "when he object does not display in DL" do
+      let(:displays) { ['dark'] }
+      it "doesn't register a handle" do
+        expect(Job::RegisterHandle).to receive(:create).never
+        subject
+      end
+    end
+  end
+
   describe '#run' do
     let(:user) { FactoryGirl.create(:user) }
+    subject { service }
 
     let(:obj) do
       TuftsImage.create(title: 'My title', displays: ['dl']).tap do |image|
@@ -15,7 +54,7 @@ describe PublishService do
       let(:obj) { TuftsTemplate.create!(template_name: 'test template') }
 
       it "raises an error" do
-        expect { PublishService.new(obj).run }.to raise_error UnpublishableModelError
+        expect { subject.run }.to raise_error UnpublishableModelError
       end
     end
 
@@ -23,9 +62,9 @@ describe PublishService do
       let(:published_pid) { PidUtils.to_published(obj.pid) }
 
       it "results in a published copy of the draft" do
-        expect {
-          PublishService.new(obj).run
-        }.to change { TuftsImage.exists?(published_pid) }.from(false).to(true)
+        expect(subject).to receive(:register_handle)
+        expect { subject.run }.to change { TuftsImage.exists?(published_pid) }.
+          from(false).to(true)
 
         published_obj = obj.find_published
         expect(published_obj).to be_published
@@ -37,7 +76,7 @@ describe PublishService do
 
     context "when a published version already exists" do
       let(:published_pid) { PidUtils.to_published(obj.pid) }
-      before { PublishService.new(obj).run }
+      before { subject.run }
 
       it "replaces the existing published copy" do
         obj.update_attributes title: 'Edited title'
@@ -48,27 +87,25 @@ describe PublishService do
 
     end
 
-
-    it 'adds an entry to the audit log' do
-      expect(AuditLogService).to receive(:log).with(user.user_key, obj.id, 'Pushed to production').once
-
-      PublishService.new(obj, user.id).run
+    context "with a user" do
+      subject { PublishService.new(obj, user.id) }
+      it 'adds an entry to the audit log' do
+        expect(AuditLogService).to receive(:log).with(user.user_key, obj.id, 'Pushed to production').once
+        subject.run
+      end
     end
 
     it 'results in the image being published' do
-      expect(obj.published_at).to eq(nil)
-
+      expect(obj.published_at).to be_nil
       expect(obj).to_not be_published
-      PublishService.new(obj).run
+      subject.run
       obj.reload
       expect(obj).to be_published
     end
 
     it 'only updates the published_at time when actually published' do
-      expect(obj.published_at).to eq nil
-
-      PublishService.new(obj, user.id).run
-
+      expect(obj.published_at).to be_nil
+      subject.run
       expect(obj.published_at).to_not be_nil
     end
   end

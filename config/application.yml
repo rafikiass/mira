@@ -3,16 +3,19 @@ defaults: &defaults
   derivatives_failure_address: "brian.goodmon@tufts.edu"
   tdl_feedback_address: "brian.goodmon@tufts.edu"
   tdl_feedback_subject: "TDL Content Feedback"
-  trim_bucket_url: "http://bucket01.lib.tufts.edu"
-  processing_url: "http://processing01.lib.tufts.edu:8080"
-  repository_url: "http://repository01.lib.tufts.edu:8080"
+  trim_bucket_url:      "http://bucket01.lib.tufts.edu"
+  processing_url:       "http://processing01.lib.tufts.edu:8080"
+  repository_url:       "http://repository01.lib.tufts.edu:8080"
     #/tdr/dcadata02/tufts/central/dca/
-  object_store_root: '/tdr/dcadata02/tufts/central/dca/fake_bucket'
-  object_store_base: 'data01/tufts'
-  object_store_dca: 'central/dca'
-  object_store_tisch: 'sas'
-  preview_fedora_url: 'http://hydraadmin-dev.uit.tufts.edu:8080/fedora'
-  preview_dl_url: 'http://dev-dl.lib.tufts.edu'
+  object_store_root:    '/tdr/dcadata02/tufts/central/dca/fake_bucket'
+  object_store_base:    'data01/tufts'
+  object_store_dca:     'central/dca'
+  object_store_tisch:   'sas'
+  preview_fedora_url:   'http://hydraadmin-dev.uit.tufts.edu:8080/fedora'
+  preview_dl_url:       'http://dev-dl.lib.tufts.edu'
+  handle_batch_tool:    /hs/hsj-7.3.1/bin/hdl-genericbatch
+  handle_private_key:   /hs/srv_2/admpriv.bin
+  handle_namespace:     10427.TEST
 development:
   <<: *defaults
   neat_setting: 800

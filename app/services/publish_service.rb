@@ -14,9 +14,23 @@ class PublishService < WorkflowService
     published!(published, user)
     published!(object, user)
     audit('Pushed to production')
+    register_handle
   end
 
   private
+
+    def register_handle
+      return if has_handle? || !displays_in_dl?
+      Job::RegisterHandle.create(record_id: object.id)
+    end
+
+    def displays_in_dl?
+      object.displays.include?('dl')
+    end
+
+    def has_handle?
+      object.identifier.present?
+    end
 
     # Mark that this object has been published
     def published!(obj, user)

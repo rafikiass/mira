@@ -1,7 +1,7 @@
 language: ruby
 rvm:
   - 2.1
-  
+
 sudo: false
 cache: bundler
 
@@ -16,7 +16,7 @@ before_script:
   - cp config/redis.yml.sample config/redis.yml
   - cp config/devise.yml.sample config/devise.yml
   - cp config/jetty.yml.sample config/jetty.yml
-  - cp config/initializers/secret_token.rb.sample config/initializers/secret_token.rb
+  - cp config/secrets.yml.sample config/secrets.yml
   - mysql -e 'create database mira_test'
   - bundle exec rake db:setup
 
