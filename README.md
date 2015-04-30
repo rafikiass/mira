@@ -32,7 +32,7 @@ $ bundle install
 $ rake config:copy
 ```
 
-!!! Important. Open config/initializer/secret_token.rb and generate a new id
+!!! Important. Open config/secrets.yml and generate a new id
 !!! Important. Open config/devise.yml and generate a new id
 
 You can do this by using:

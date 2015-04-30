@@ -22,13 +22,13 @@
 jetty
 
 # Don't send system specific config files
-config/initializers/secret_token.rb
 config/database.yml
 config/devise.yml
 config/fedora.yml
 config/jetty.yml
 config/redis.yml
 config/resque-pool.yml
+config/secrets.yml
 config/solr.yml
 
 # Ignore RubyMine config files
