@@ -1,7 +1,7 @@
 GIT
   remote: git://github.com/curationexperts/tufts_models.git
-  revision: 827e99d9c93c4802ca878c40f23778803659f96c
-  ref: 827e99d9c93c4802ca878c40f23778803659f96c
+  revision: eb58bf4668c6168513299da4efddab49cfadcdd4
+  ref: eb58bf4668c6168513299da4efddab49cfadcdd4
   specs:
     tufts_models (0.0.1)
       active-fedora (~> 7.1)

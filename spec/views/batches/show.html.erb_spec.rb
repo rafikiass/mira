@@ -143,11 +143,12 @@ describe "batches/show.html.erb" do
           render
         end
 
-        it 'displays the form to publish the batch' do
+        it 'displays the form to operate on the batch' do
           expect(rendered).to have_selector("form[method=post][action='#{batches_path}']")
           expect(rendered).to have_selector("input[type=hidden][name='batch[pids][]'][value='#{subject.pids.first}']")
           expect(rendered).to have_link('Review Batch', href: catalog_index_path(search_field: 'batch', q: subject.id.to_s))
           expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchPublish]")
+          expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchUnpublish]")
           expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchPurge]")
         end
       end
@@ -155,9 +156,10 @@ describe "batches/show.html.erb" do
       context 'a batch status that is anything but "completed"' do
         before { render }
 
-        it 'disables the button to publish the batch' do
+        it 'disables the batch operation buttons' do
           expect(subject.status).to eq :queued
           expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchPublish][disabled=disabled]")
+          expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchUnpublish][disabled=disabled]")
           expect(rendered).to have_selector("a[href='#{catalog_index_path(search_field: 'batch', q: subject.id.to_s)}'][disabled]", text: 'Review Batch')
         end
       end

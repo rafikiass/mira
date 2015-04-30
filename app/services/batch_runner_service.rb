@@ -23,6 +23,8 @@ class BatchRunnerService
         Job::Revert
       when BatchPublish
         Job::Publish
+      when BatchUnpublish
+        Job::Unpublish
       when BatchPurge
         Job::Purge
       else

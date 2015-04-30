@@ -162,6 +162,12 @@ describe BatchesController do
         end
       end
 
+      describe "batch unpublish" do
+        it_should_behave_like 'requires a list of pids', :batch_publish
+        it_should_behave_like 'batch creation happy path', BatchPublish
+        it_should_behave_like 'batch run failure recovery', BatchPublish
+      end
+
       describe "batch purge" do
         it_should_behave_like 'requires a list of pids', :batch_purge
         it_should_behave_like 'batch creation happy path', BatchPurge

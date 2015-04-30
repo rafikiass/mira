@@ -46,6 +46,12 @@
         data: { confirm: "#{pluralize(@batch.pids.count, 'object')} will be published. Do you wish to proceed?" },
         class: "btn btn-primary" %>
 
+      <%= button_tag "Unpublish Batch", type: :submit,
+        name: 'batch[type]', value: "BatchUnpublish",
+        disabled: @batch.status != :completed,
+        data: { confirm: "#{pluralize(@batch.pids.count, 'object')} will be unpublished. Do you wish to proceed?" },
+        class: "btn btn-primary" %>
+
       <%= button_tag "Purge Batch", type: :submit,
         name: 'batch[type]', value: "BatchPurge",
         data: { confirm: "WARNING: #{pluralize(@batch.pids.count, 'object')} will be purged. Both draft and published versions will be permanently deleted. Do you wish to proceed?" },

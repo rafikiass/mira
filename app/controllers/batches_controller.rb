@@ -23,6 +23,8 @@ class BatchesController < ApplicationController
     case params['batch']['type']
     when 'BatchPublish'
       require_pids_and_run_batch
+    when 'BatchUnpublish'
+      require_pids_and_run_batch
     when 'BatchPurge'
       require_pids_and_run_batch
     when 'BatchRevert'

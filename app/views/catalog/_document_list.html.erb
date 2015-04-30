@@ -6,6 +6,13 @@
 
   <%= button_tag "Publish", type: :submit, name: 'batch[type]', value: "BatchPublish", class: "btn btn-primary", 'data-behavior'=>'batch-create'%>
 
+  <% unless controller.is_a?(UnpublishedController) %>
+    <%= button_tag "Unpublish", type: :submit,
+      name: 'batch[type]', value: "BatchUnpublish",
+      class: "btn btn-primary",
+      'data-behavior'=>'batch-create'%>
+  <% end %>
+
   <div id='selected_documents_count'> <br /> </div>
 
   <%= render documents, as: :document %>
