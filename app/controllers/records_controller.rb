@@ -66,11 +66,11 @@ class RecordsController < ApplicationController
 
   def publish
     PublishService.new(@record, current_user.id).run
-    redirect_to catalog_path(@record), notice: "\"#{@record.title}\" has been pushed to production"
+    redirect_to catalog_path(@record), notice: "\"#{@record.title}\" has been published"
   end
 
   def unpublish
-    # The original id may be of the draft or production pid, but we always redirect to draft
+    # The original id may be of the draft or published pid, but we always redirect to draft
     title = @record.title
     UnpublishService.new(@record, current_user.id).run
     redirect_to catalog_path(PidUtils.to_draft(@record.id)), notice: "\"#{title}\" has been unpublished"

@@ -304,7 +304,7 @@ describe RecordsController do
         post :publish, id: @audio
 
         response.should redirect_to("/catalog/#{assigns[:record].pid}")
-        flash[:notice].should == '"My title2" has been pushed to production'
+        flash[:notice].should == '"My title2" has been published'
       end
     end
 

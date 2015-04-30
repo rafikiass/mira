@@ -13,7 +13,7 @@ class PublishService < WorkflowService
     published = object.class.find(published_pid)
     published!(published, user)
     published!(object, user)
-    audit('Pushed to production')
+    audit('Published')
     register_handle
   end
 
@@ -43,7 +43,7 @@ end
 
 class UnpublishableModelError < StandardError
   def message
-    'Templates cannot be pushed to production'
+    'Templates cannot be published'
   end
 end
 
