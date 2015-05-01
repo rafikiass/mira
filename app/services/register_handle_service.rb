@@ -11,7 +11,9 @@ class RegisterHandleService
     if register_handle(file_name)
       record_handle(handle)
     else
-      raise HandleServiceError, "Unable to register handle #{handle} for #{object.pid}\n#{messages}"
+      message = "Unable to register handle #{handle} for #{object.pid}\n#{messages}"
+      HandleLogService.log(nil, object.pid, message)
+      raise HandleServiceError, message
     end
   end
 
