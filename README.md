@@ -10,6 +10,7 @@
 * [ImageMagick](http://www.imagemagick.org/)
 * [ffmpeg](http://www.ffmpeg.org/)
 * [PhantomJS](https://github.com/teampoltergeist/poltergeist#installing-phantomjs)
+* Handle.net installation
 
 ```bash
 $ brew install mysql
@@ -56,11 +57,11 @@ $ rake jetty:start
 ```
 
 ##Configure Authentication services
-The application includes a basic devise implementation for user management and authentication.  Integrating the 
-application with your local authentication system is beyone the scope of this document; please consult the 
+The application includes a basic devise implementation for user management and authentication.  Integrating the
+application with your local authentication system is beyone the scope of this document; please consult the
 relevant devise documentation.
 
-If you wish to supply a specific format for the text used in displaying user names, please modify the display_name 
+If you wish to supply a specific format for the text used in displaying user names, please modify the display_name
 method on the user model:
 ```
 # app/models/user.rb
@@ -68,7 +69,7 @@ method on the user model:
 class User < ActiveRecord::Base
 ...
   def display_name   #update this method to return the string you would like used for the user name stored in fedora objects.
-    self.user_key 
+    self.user_key
   end
 ....
 end
@@ -124,4 +125,12 @@ $ rake export:deposit_types['/absolute/path/to/export/dir']
 ```
 
 You can also export the deposit types data through the UI if you log into the app as an admin user.
+
+### Handle.net
+
+Handles should register automatically when first publishing an object that displays in DL. You can manually publish a handle for an object by running:
+
+```bash
+$ rake handle:register[tufts:123]
+```
 
