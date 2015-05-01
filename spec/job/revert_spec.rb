@@ -31,9 +31,8 @@ describe Job::Revert do
 
   describe '#perform' do
 
-    context 'record exists on staging and production' do
+    context 'both draft and published versions of the record exist' do
       it 'copies the published version back to the draft' do
-        # exists on staging
         record = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title")
         record.save!
         PublishService.new(record).run
@@ -46,7 +45,7 @@ describe Job::Revert do
       end
     end
 
-    context 'record exists on staging, missing on production' do
+    context 'draft record exists, missing published record' do
       let(:record) do
         TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title").tap do |r|
           r.save!
@@ -69,10 +68,8 @@ describe Job::Revert do
       end
     end
 
-    context 'record missing on staging, exists on production' do
-      it 'copies from production' do
-
-        # published
+    context 'draft record missing, published record exists' do
+      it 'copies from published' do
         record = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title")
         record.save!
 
@@ -93,15 +90,15 @@ describe Job::Revert do
       end
     end
 
-    context 'record missing on staging and production' do
+    context 'both draft and published record missing' do
       it 'succeeds and does nothing' do
-        pid = 'tufts:1'
-        # missing on production
+        pid = 'draft:1'
 
+        # published record missing
         published_pid = PidUtils.to_published(pid)
-        TuftsPdf.find(published_pid).destroy if TuftsPdf.exists?(pid)
+        TuftsPdf.find(published_pid).destroy if TuftsPdf.exists?(published_pid)
 
-        # missing on staging
+        # draft record missing
         TuftsPdf.find(pid).destroy if TuftsPdf.exists?(pid)
 
         # make sure it does nothing
