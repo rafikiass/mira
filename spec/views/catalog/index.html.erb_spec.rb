@@ -63,6 +63,11 @@ describe 'catalog/index.html.erb' do
         expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchUnpublish][data-behavior=batch-create]")
       end
 
+      it 'displays the button to revert' do
+        render
+        expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchRevert][data-behavior=batch-create]")
+      end
+
       it 'has the div needed by javascript to display the number of documents that are currently selected' do
         render
         expect(rendered).to have_selector("#selected_documents_count")
