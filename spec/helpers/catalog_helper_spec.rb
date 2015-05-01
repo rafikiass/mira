@@ -24,21 +24,22 @@ describe CatalogHelper do
   end
 
   describe '#dl_link_text' do
-    subject { double('fake-document', published?: true) }
+    let(:document) {  double('fake-document', published?: true)  }
+    subject { dl_link_text(document) }
 
     context "when the document is published" do
       it "says 'Show in DL'" do
-        expect(dl_link_text(subject)).to eq("Show in DL")
+        expect(subject).to eq("Show in DL")
       end
     end
 
     context "when the document is not published" do
       before do
-        allow(subject).to receive(:published?) { false }
+        allow(document).to receive(:published?) { false }
       end
 
       it "says 'Preview in DL'" do
-        expect(dl_link_text(subject)).to eq("Preview in DL")
+        expect(subject).to eq("Preview in DL")
       end
     end
 
