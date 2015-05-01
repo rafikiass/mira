@@ -46,6 +46,9 @@ Tufts::Application.routes.draw do
     get :new_xml_import, on: :collection
   end
 
+  namespace :handle do
+    resources :logs, only: :index
+  end
 
   mount Qa::Engine => '/qa'
 
