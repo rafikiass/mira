@@ -6,4 +6,9 @@ module CatalogHelper
     link_to "Edit Metadata", hydra_editor.edit_record_path(pid)
   end
 
+  def dl_link_text(document)
+    return "Show in DL" if document.published?
+    "Preview in DL"
+  end
+
 end
