@@ -30,10 +30,10 @@ describe 'Batch routes:' do
     )
   end
 
-  it 'routes to new_xml_import' do
-    expect(get: 'batches/new_xml_import').to route_to(
-      controller: 'batches',
-      action: 'new_xml_import'
+  it 'routes to xml_import#new' do
+    expect(get: 'batches/xml_import/new').to route_to(
+      controller: 'batches/xml_import',
+      action: 'new'
     )
   end
 

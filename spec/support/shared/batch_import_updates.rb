@@ -6,7 +6,11 @@ shared_examples 'an import happy path' do
   end
 
   it 'HTML response redirects to batch show page' do
-    expect(response).to redirect_to(batch_path(batch))
+    if batch.kind_of? BatchXmlImport
+      expect(response).to redirect_to(batches_xml_import_path(batch))
+    else
+      expect(response).to redirect_to(batch_path(batch))
+    end
   end
 
   it 'attaches the files to the records' do

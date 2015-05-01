@@ -15,10 +15,6 @@ class BatchesController < ApplicationController
     @batch = BatchTemplateImport.new
   end
 
-  def new_xml_import
-    @batch = BatchXmlImport.new
-  end
-
   def create
     case params['batch']['type']
     when 'BatchPublish'
@@ -33,8 +29,6 @@ class BatchesController < ApplicationController
       handle_apply_template
     when 'BatchTemplateImport'
       handle_import(:new_template_import)
-    when 'BatchXmlImport'
-      handle_import(:new_xml_import)
     else
       flash[:error] = 'Unable to handle batch request.'
       redirect_to (request.referer || root_path)
@@ -63,8 +57,6 @@ class BatchesController < ApplicationController
     case @batch.type
     when 'BatchTemplateImport'
       handle_update_for_template_import
-    when 'BatchXmlImport'
-     handle_update_for_xml_import
     else
       flash[:error] = 'Unable to handle batch request.'
       redirect_to (request.referer || root_path)
@@ -159,21 +151,6 @@ private
     end
   end
 
-  # TODO: Take a look at the handle_update_for_template_import method, handle_update_for_xml_import method and attachments_controller update method, and see if we can pull out any common code.
-
-  def handle_update_for_xml_import
-    if params[:documents].blank?
-      # no documents have been passed in
-      flash[:error] = "Please select some files to upload."
-      render :edit
-    else
-      action = XmlBatchImportAction.new(@batch, current_user, params[:documents])
-      success = action.run
-      @batch = action.batch # The XmlBatchImportAction has a reloaded version of the batch. The tests expect the ivar to be the most up to date batch.
-      respond_to_import(success, @batch, action.document_statuses)
-    end
-  end
-
   #TODO add transaction around batch. Is this needed?
   #TODO add transaction around everything? Is this possible?
   def handle_update_for_template_import
@@ -184,17 +161,6 @@ private
     else
       action = TemplateImportAction.new(@batch, current_user, params[:documents])
       respond_to_import(action.run, @batch, action.document_statuses)
-    end
-  end
-
-  def save_record_with_document(record, doc)
-    dsid = record.class.original_file_datastreams.first
-    record.working_user = current_user
-    if record.save
-      ArchivalStorageService.new(record, dsid, doc).run
-      record.save # TODO investigate moving this save into ArchivalStorageService, because the service kicks off a job that operates on the datastream, which is not saved yet.
-    else
-      false
     end
   end
 
