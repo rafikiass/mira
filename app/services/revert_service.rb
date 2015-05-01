@@ -12,7 +12,7 @@ class RevertService < WorkflowService
     end
 
     # ensure the solr index is up to date
-    object.update_index
+    object.find_draft.update_index
 
     audit('Reverted to published version')
   end

@@ -20,7 +20,10 @@ module Job
 
       begin
         run_as_batch_item(published_pid, options['batch_id']) do |record|
+          record.reverting = true
           record.save! # batch_id gets set on the object here, so we need to save it first
+          record.reverting = false
+
           RevertService.new(record).run
         end
       rescue ActiveFedora::ObjectNotFoundError => ex

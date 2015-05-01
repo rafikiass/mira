@@ -60,7 +60,7 @@
       <%= button_tag "Revert", type: :submit,
         name: 'batch[type]', value: "BatchRevert",
         disabled: @batch.status != :completed,
-        data: { confirm: "#{pluralize(@batch.pids.count, 'object')} will be reverted to match the published version. This action cannot be undone, are you sure?" },
+        data: { confirm: "All pending edits will be reverted to match the published version for #{pluralize(@batch.pids.count, 'object')}.  This action cannot be undone. Do you wish to proceed?" },
         class: "btn btn-primary" %>
     <% end %>
   </div>
