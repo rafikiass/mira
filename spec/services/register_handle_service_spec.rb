@@ -7,13 +7,12 @@ describe RegisterHandleService do
 
   before { File.unlink(file_name) if File.exists?(file_name) }
 
-  # TODO It must record the identifier on the draft and production versions of the object.
   describe "#run" do
 
     subject { service.run }
     before { allow_any_instance_of(RegisterHandleService::BatchFileGenerator).to receive(:file_name).and_return(file_name) }
     before do
-      allow(service).to receive(:run_command).and_return(message)
+      allow(service).to receive(:run_command).with(instance_of(String)).and_return(message)
     end
 
     context "when there is an error registering the handle" do
@@ -49,5 +48,7 @@ describe RegisterHandleService do
         expect(published_version).to be_published # ensure we haven't changed the status
       end
     end
+
+    
   end
 end

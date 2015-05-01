@@ -36,7 +36,7 @@ class RegisterHandleService
 
     # Return true on success, false on failure
     def register_handle(file_name)
-      @messages = run_command
+      @messages = run_command(file_name)
       !/FAILURE/.match(@messages)
     end
 
@@ -52,7 +52,7 @@ class RegisterHandleService
     #   This batch took 0 seconds to complete at an average speed of 3.4843205574912894 operations/second
     #   Batch process finished
 
-    def run_command
+    def run_command(file_name)
       command = "#{batch_tool_path} #{file_name}"
       out = `#{command}`
       raise HandleServiceError, "'#{command}' couldn't be run" unless $?.success?
