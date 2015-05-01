@@ -2,202 +2,153 @@ require 'spec_helper'
 require "cancan/matchers"
 
 describe Ability do
-  before :all do
-    User.delete_all
-    @user = FactoryGirl.create(:user)
-    @admin = FactoryGirl.create(:admin)
-  end
+  subject { Ability.new(user) }
 
   describe "an admin user" do
-    subject { Ability.new(@admin) }
+    let(:user) { FactoryGirl.create(:admin) }
+    let(:audio) { TuftsAudio.create!(title: 'test audio', displays: ['dl']) }
 
-    describe "using the catalog" do
-      it { should be_able_to(:read, SolrDocument) }
-    end
+    it "has abilities" do
+      expect(subject).to be_able_to(:read, SolrDocument)
 
-    describe "working on Roles" do
-      it { should be_able_to(:index, Role) }
-      it { should be_able_to(:create, Role) }
-      it { should be_able_to(:show, Role) }
-      it { should be_able_to(:add_user, Role) }
-      it { should be_able_to(:remove_user, Role) }
-    end
+      expect(subject).to be_able_to(:index, Role)
+      expect(subject).to be_able_to(:create, Role)
+      expect(subject).to be_able_to(:show, Role)
+      expect(subject).to be_able_to(:add_user, Role)
+      expect(subject).to be_able_to(:remove_user, Role)
 
-    describe "batch operations" do
-      it { should be_able_to(:index, Batch) }
-      it { should be_able_to(:new_template_import, Batch) }
-      it { should be_able_to(:new_xml_import, Batch) }
-      it { should be_able_to(:create, Batch) }
-      it { should be_able_to(:show, Batch) }
-      it { should be_able_to(:edit, Batch) }
-      it { should be_able_to(:update, Batch) }
-    end
+      expect(subject).to be_able_to(:index, Batch)
+      expect(subject).to be_able_to(:new_template_import, Batch)
+      expect(subject).to be_able_to(:new_xml_import, Batch)
+      expect(subject).to be_able_to(:create, Batch)
+      expect(subject).to be_able_to(:show, Batch)
+      expect(subject).to be_able_to(:edit, Batch)
+      expect(subject).to be_able_to(:update, Batch)
 
-    describe "working on Deposit Type" do
-      it { should be_able_to(:create, DepositType) }
-      it { should be_able_to(:read, DepositType) }
-      it { should be_able_to(:update, DepositType) }
-      it { should be_able_to(:destroy, DepositType) }
-      it { should be_able_to(:export, DepositType) }
-    end
+      expect(subject).to be_able_to(:create, DepositType)
+      expect(subject).to be_able_to(:read, DepositType)
+      expect(subject).to be_able_to(:update, DepositType)
+      expect(subject).to be_able_to(:destroy, DepositType)
+      expect(subject).to be_able_to(:export, DepositType)
 
-    describe "working on TuftsAudio" do
-      before :all do
-        @audio = TuftsAudio.create!(title: 'test audio', displays: ['dl'])
-      end
-      after :all do
-        @audio.destroy
-      end
-      it { should be_able_to(:create, TuftsAudio) }
-      it { should be_able_to(:edit, @audio) }
-      it { should be_able_to(:update, @audio) }
-      it { should be_able_to(:review, @audio) }
-      it { should be_able_to(:publish, @audio) }
-      it { should be_able_to(:unpublish, @audio) }
-      it { should be_able_to(:destroy, @audio) }
+      expect(subject).to be_able_to(:create, TuftsAudio)
+      expect(subject).to be_able_to(:edit, audio)
+      expect(subject).to be_able_to(:update, audio)
+      expect(subject).to be_able_to(:review, audio)
+      expect(subject).to be_able_to(:publish, audio)
+      expect(subject).to be_able_to(:unpublish, audio)
+      expect(subject).to be_able_to(:destroy, audio)
     end
   end
 
   describe "a non-admin user" do
-    subject { Ability.new(@user) }
+    let(:user) { FactoryGirl.create(:user) }
 
-    describe "working on Roles" do
-      it { should_not be_able_to(:index, Role) }
-      it { should_not be_able_to(:create, Role) }
-      it { should_not be_able_to(:show, Role) }
-      it { should_not be_able_to(:add_user, Role) }
-      it { should_not be_able_to(:remove_user, Role) }
+    it "has certain rights" do
+      expect(subject).to_not be_able_to(:index, Role)
+      expect(subject).to_not be_able_to(:create, Role)
+      expect(subject).to_not be_able_to(:show, Role)
+      expect(subject).to_not be_able_to(:add_user, Role)
+      expect(subject).to_not be_able_to(:remove_user, Role)
+
+      expect(subject).to_not be_able_to(:index, Batch)
+      expect(subject).to_not be_able_to(:new_template_import, Batch)
+      expect(subject).to_not be_able_to(:new_xml_import, Batch)
+      expect(subject).to_not be_able_to(:create, Batch)
+      expect(subject).to_not be_able_to(:show, Batch)
+      expect(subject).to_not be_able_to(:edit, Batch)
+      expect(subject).to_not be_able_to(:update, Batch)
+
+      expect(subject).to_not be_able_to(:create, DepositType)
+      expect(subject).to_not be_able_to(:read, DepositType)
+      expect(subject).to_not be_able_to(:update, DepositType)
+      expect(subject).to_not be_able_to(:destroy, DepositType)
+      expect(subject).to_not be_able_to(:export, DepositType)
+
+      expect(subject).to be_able_to(:create, Contribution)
     end
 
-    describe "batch operations" do
-      it { should_not be_able_to(:index, Batch) }
-      it { should_not be_able_to(:new_template_import, Batch) }
-      it { should_not be_able_to(:new_xml_import, Batch) }
-      it { should_not be_able_to(:create, Batch) }
-      it { should_not be_able_to(:show, Batch) }
-      it { should_not be_able_to(:edit, Batch) }
-      it { should_not be_able_to(:update, Batch) }
-    end
+    context "working on TuftsPdf" do
+      context "that they own" do
+        let(:self_deposit) { FactoryGirl.create(:tufts_pdf, user: user) }
 
-    describe "working on Deposit Type" do
-      it { should_not be_able_to(:create, DepositType) }
-      it { should_not be_able_to(:read, DepositType) }
-      it { should_not be_able_to(:update, DepositType) }
-      it { should_not be_able_to(:destroy, DepositType) }
-      it { should_not be_able_to(:export, DepositType) }
-    end
-
-    describe "working on a self-deposit" do
-      it { should be_able_to(:create, Contribution) }
-    end
-
-    describe "working on TuftsPdf" do
-      describe "that they own" do
-        before :all do
-          @self_deposit = FactoryGirl.create(:tufts_pdf, user: @user)
+        it "should grant access" do
+          expect(subject).to     be_able_to(:read, self_deposit)
+          expect(subject).to     be_able_to(:update, self_deposit)
+          expect(subject).to     be_able_to(:destroy, self_deposit)
+          expect(subject).to_not be_able_to(:publish, self_deposit)
+          expect(subject).to_not be_able_to(:review, self_deposit)
         end
-        after :all do
-          @self_deposit.destroy
-        end
-
-        it { should     be_able_to(:read, @self_deposit) }
-        it { should     be_able_to(:update, @self_deposit) }
-        it { should     be_able_to(:destroy, @self_deposit) }
-        it { should_not be_able_to(:publish, @self_deposit) }
-        it { should_not be_able_to(:review, @self_deposit) }
       end
 
       describe "that they don't own" do
-        before :all do
-          @another_deposit = FactoryGirl.create(:tufts_pdf)
-        end
-        after :all do
-          @another_deposit.destroy
-        end
+        let(:self_deposit) { FactoryGirl.create(:tufts_pdf) }
 
-        it { should_not be_able_to(:read, @another_deposit) }
-        it { should_not be_able_to(:update, @another_deposit) }
-        it { should_not be_able_to(:destroy, @another_deposit) }
-        it { should_not be_able_to(:publish, @another_deposit) }
-        it { should_not be_able_to(:review, @another_deposit) }
+        it "should not grant access" do
+          expect(subject).to_not be_able_to(:read, self_deposit)
+          expect(subject).to_not be_able_to(:update, self_deposit)
+          expect(subject).to_not be_able_to(:destroy, self_deposit)
+          expect(subject).to_not be_able_to(:publish, self_deposit)
+          expect(subject).to_not be_able_to(:review, self_deposit)
+        end
       end
     end
 
     describe "working on TuftsAudio" do
-      it { should_not be_able_to(:create, TuftsAudio) }
+      it { is_expected.not_to be_able_to(:create, TuftsAudio) }
 
-      describe "that they own" do
-        before :all do
-          @audio = FactoryGirl.create(:tufts_audio, user: @user)
+      context "that they own" do
+        let(:audio) { FactoryGirl.create(:tufts_audio, user: user) }
+        it "should grant access" do
+          expect(subject).to     be_able_to(:edit, audio)
+          expect(subject).to     be_able_to(:update, audio)
+          expect(subject).to_not be_able_to(:review, audio)
+          expect(subject).to_not be_able_to(:publish, audio)
+          expect(subject).to     be_able_to(:destroy, audio)
         end
-        after :all do
-          @audio.destroy
-        end
-        it { should     be_able_to(:edit, @audio) }
-        it { should     be_able_to(:update, @audio) }
-        it { should_not be_able_to(:review, @audio) }
-        it { should_not be_able_to(:publish, @audio) }
-        it { should     be_able_to(:destroy, @audio) }
       end
 
-      describe "that they don't own" do
-        before :all do
-          @audio = FactoryGirl.create(:tufts_audio)
+      context "that they don't own" do
+        let(:audio) { FactoryGirl.create(:tufts_audio) }
+        it "shouldn't grant access" do
+          expect(subject).to_not be_able_to(:edit, audio)
+          expect(subject).to_not be_able_to(:update, audio)
+          expect(subject).to_not be_able_to(:review, audio)
+          expect(subject).to_not be_able_to(:publish, audio)
+          expect(subject).to_not be_able_to(:destroy, audio)
         end
-        after :all do
-          @audio.destroy
-        end
-        it { should_not be_able_to(:edit, @audio) }
-        it { should_not be_able_to(:update, @audio) }
-        it { should_not be_able_to(:review, @audio) }
-        it { should_not be_able_to(:publish, @audio) }
-        it { should_not be_able_to(:destroy, @audio) }
       end
     end
   end
 
   describe "a non-authenticated user" do
-    let(:not_logged_in) { User.new }
-    subject { Ability.new(not_logged_in) }
-
-    describe "working on Roles" do
-      it { should_not be_able_to(:index, Role) }
-      it { should_not be_able_to(:create, Role) }
-      it { should_not be_able_to(:show, Role) }
-      it { should_not be_able_to(:add_user, Role) }
-      it { should_not be_able_to(:remove_user, Role) }
-    end
-
-    describe "working on Deposit Type" do
-      it { should_not be_able_to(:create, DepositType) }
-      it { should_not be_able_to(:read, DepositType) }
-      it { should_not be_able_to(:update, DepositType) }
-      it { should_not be_able_to(:destroy, DepositType) }
-      it { should_not be_able_to(:export, DepositType) }
-    end
-    
-    describe "working on a PDF" do
-      let(:pdf) { TuftsPdf.create!(title: 'test pdf', read_groups: ['public'], displays: ['dl'])}
-      after { pdf.destroy }
-
-      it "should be visible to a not-signed-in user" do
-        subject.should be_able_to(:read, pdf.pid)
-      end
-    end
-
-    describe "working on a self-deposit" do
-      it { should_not be_able_to(:create, Contribution) }
-    end
-
-    describe "viewing a public audio file" do
-      let(:audio) do
-        audio = TuftsAudio.new(title: 'foo', displays: ['dl'])
+    let(:user) { User.new }
+    let(:pdf) { TuftsPdf.create!(title: 'test pdf', read_groups: ['public'], displays: ['dl']) }
+    let(:audio) do
+      TuftsAudio.new(title: 'foo', displays: ['dl']).tap do |audio|
         audio.read_groups = ['public']
         audio.save!
-        audio
       end
+    end
 
-      it { should be_able_to(:read, audio) }
+    it "should give some access" do
+      expect(subject).to_not be_able_to(:index, Role)
+      expect(subject).to_not be_able_to(:create, Role)
+      expect(subject).to_not be_able_to(:show, Role)
+      expect(subject).to_not be_able_to(:add_user, Role)
+      expect(subject).to_not be_able_to(:remove_user, Role)
+
+      expect(subject).to_not be_able_to(:create, DepositType)
+      expect(subject).to_not be_able_to(:read, DepositType)
+      expect(subject).to_not be_able_to(:update, DepositType)
+      expect(subject).to_not be_able_to(:destroy, DepositType)
+      expect(subject).to_not be_able_to(:export, DepositType)
+
+      expect(subject).to be_able_to(:read, pdf.pid)
+
+      expect(subject).to_not be_able_to(:create, Contribution)
+
+      expect(subject).to be_able_to(:read, audio)
     end
   end
 end
