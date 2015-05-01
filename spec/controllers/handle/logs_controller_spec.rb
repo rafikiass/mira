@@ -3,7 +3,12 @@ require 'spec_helper'
 describe Handle::LogsController do
 
   context "as an admin" do
-    before { sign_in FactoryGirl.create(:admin) }
+    before do
+      sign_in FactoryGirl.create(:admin)
+      # Ensure a log file exists
+      FileUtils.touch HandleLogService.instance.filename
+    end
+
 
     it "returns html" do
       get :index
