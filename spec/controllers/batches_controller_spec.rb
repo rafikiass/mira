@@ -5,7 +5,7 @@ describe BatchesController do
                                                    pids: records.map(&:id)) }
   let(:records) { [FactoryGirl.create(:tufts_pdf)] }
 
-  describe "non admin" do
+  context "non admin" do
     it 'denies access to create' do
       post :create
       response.should redirect_to(new_user_session_path)
@@ -20,10 +20,6 @@ describe BatchesController do
     end
     it 'denies access to new_template_import' do
       get :new_template_import
-      response.should redirect_to(new_user_session_path)
-    end
-    it 'denies access to new_xml_import' do
-      get :new_xml_import
       response.should redirect_to(new_user_session_path)
     end
   end
@@ -47,22 +43,6 @@ describe BatchesController do
 
       it 'assigns @batch' do
         expect(assigns[:batch].class).to eq BatchTemplateImport
-      end
-    end
-
-    describe "GET 'new_xml_import'" do
-      before { get :new_xml_import }
-
-      it "returns http success" do
-        response.should be_success
-      end
-
-      it 'should render the form' do
-        response.should render_template(:new_xml_import)
-      end
-
-      it 'assigns @batch' do
-        expect(assigns[:batch].class).to eq BatchXmlImport
       end
     end
 
@@ -116,32 +96,6 @@ describe BatchesController do
           it 'renders :new_template_import form' do
             post 'create', batch: { type: 'BatchTemplateImport'}
             expect(response).to render_template :new_template_import
-          end
-        end
-      end
-
-      describe 'xml import' do
-        describe 'happy path' do
-          it 'assigns the current user as the creator' do
-            different_user = FactoryGirl.create(:admin)
-            attrs = FactoryGirl.attributes_for(:batch_xml_import, creator_id: different_user.id)
-            post 'create', batch: attrs
-            expect(assigns[:batch].creator).to eq controller.current_user
-          end
-
-          it 'creates a batch' do
-            expect {
-              post 'create', batch: FactoryGirl.attributes_for(:batch_xml_import)
-            }.to change { Batch.count }.by(1)
-            expect(assigns[:batch].class).to eq BatchXmlImport
-            expect(response).to redirect_to(edit_batch_path(assigns[:batch]))
-          end
-        end
-
-        describe 'error path' do
-          it 'renders :new_xml_import form' do
-            post 'create', batch: { type: 'BatchXmlImport'}
-            expect(response).to render_template :new_xml_import
           end
         end
       end
@@ -254,20 +208,6 @@ describe BatchesController do
           response.should be_success
         end
       end
-
-      context "xml import" do
-        let(:batch) { FactoryGirl.create(:batch_xml_import) }
-
-        before do
-          ActiveFedora::Base.delete_all
-          TuftsPdf.create(FactoryGirl.attributes_for(:tufts_pdf, pid: 'tufts:1'))
-          get :edit, id: batch.id
-        end
-
-        it 'assigns @pids_that_already_exist' do
-          expect(assigns[:pids_that_already_exist]).to eq ['tufts:1']
-        end
-      end
     end
 
 
@@ -337,165 +277,6 @@ describe BatchesController do
               expect(json['error']).to eq [@batch_error]
             end
           end
-        end  # JSON request
-      end  # template import section
-
-      describe 'for xml import' do
-        let(:batch) { FactoryGirl.create(:batch_xml_import, uploaded_files: {'file.jpg' => 'oldpid:123'}) }
-        let(:file1) { Rack::Test::UploadedFile.new(File.join(Rails.root, 'spec', 'fixtures', 'hello.pdf'), "application/pdf") }
-        let(:file2) { Rack::Test::UploadedFile.new(File.join(Rails.root, 'spec', 'fixtures', 'hello2.pdf'), "application/pdf") }
-
-        describe 'happy path' do
-          before do
-            TuftsPdf.delete_all
-            patch :update, id: batch.id, documents: [file1, file2], batch: {}
-          end
-
-          it_behaves_like 'an import happy path'
-
-          it "remembers what uploaded files map to what pids" do
-            expected_filenames = ['file.jpg'] + [file1, file2].map(&:original_filename)
-            expect(assigns[:batch].reload.uploaded_files.keys.sort).to eq expected_filenames.sort
-            specified_pid = "draft:1"
-            generated_pid = (TuftsPdf.all.map(&:pid) - [specified_pid]).first
-            expect(generated_pid).to match /^#{PidUtils.draft_namespace}:.*$/
-            expect(assigns[:batch].uploaded_files[file1.original_filename]).to eq "draft:1"
-            expect(assigns[:batch].uploaded_files[file2.original_filename]).to eq generated_pid
-          end
-
-        end
-
-        it_behaves_like 'an import error path (no documents uploaded)'
-        it_behaves_like 'an import error path (wrong file format)'
-        it_behaves_like 'an import error path (failed to save batch)'
-
-        context "uploading two of the same file" do
-          let(:file3) { file1 }
-          before do
-            TuftsPdf.delete_all
-            patch :update, id: batch.id, documents: [file1, file2, file3], batch: {}
-          end
-
-          it "displays a warning" do
-            expect(flash[:alert]).to match "#{file3.original_filename} has already been uploaded"
-          end
-
-          it "doesn't save the duplicate file" do
-            expect(TuftsPdf.count).to eq 2
-          end
-        end
-
-        context "adding a file that was uploaded previously" do
-          let(:record) do
-            FactoryGirl.create(:tufts_pdf).tap do |r|
-              ArchivalStorageService.new(r, TuftsPdf.original_file_datastreams.first, file1).run
-              r.save!
-            end
-          end
-
-          let(:batch) do
-            FactoryGirl.create(:batch_xml_import, uploaded_files: {'hello.pdf' => record.pid})
-          end
-
-          before do
-            TuftsPdf.delete_all
-            record # force creation of existing record
-            @pdf_count = TuftsPdf.count
-            patch :update, id: batch.id, documents: [file1], batch: {}
-          end
-
-          it "displays a warning" do
-            expect(flash[:alert]).to match "#{file1.original_filename} has already been uploaded"
-          end
-
-          it "doesn't save the duplicate file" do
-            expect(TuftsPdf.count).to eq @pdf_count
-          end
-        end
-
-        context "with a file that isn't in the metadata" do
-          let(:file1) { Rack::Test::UploadedFile.new(File.join(Rails.root, 'spec', 'fixtures', 'tufts_RCR00728.foxml.xml')) }
-          before do
-            TuftsPdf.delete_all
-            patch :update, id: batch.id, documents: [file1], batch: {}
-          end
-
-          it "displays a warning" do
-            expect(flash[:alert]).to match "#{file1.original_filename} doesn't exist in the metadata file"
-          end
-
-          it "doesn't save the file" do
-            expect(TuftsPdf.count).to eq 0
-          end
-        end
-
-        describe 'JSON request' do
-          before { TuftsPdf.delete_all }
-          after { TuftsPdf.delete_all }
-
-          it_behaves_like 'a JSON import'
-
-          context "with duplicate file upload" do
-            let(:record) do
-              FactoryGirl.create(:tufts_pdf).tap do |r|
-                ArchivalStorageService.new(r, TuftsPdf.original_file_datastreams.first, file1).run
-              end
-            end
-
-            let(:batch) do
-              FactoryGirl.create(:batch_xml_import, uploaded_files: {'hello.pdf' => record.pid})
-            end
-
-            before do
-              TuftsPdf.delete_all
-              record # force creation of existing record
-              patch :update, id: batch.id, documents: [file1], batch: {}, format: :json
-            end
-
-            it "displays a warning" do
-              json = JSON.parse(response.body)['files'].first
-              expect(json['error']).to eq ["#{file1.original_filename} has already been uploaded"]
-            end
-          end
-
-          context "with a file that isn't in the metadata" do
-          let(:file1) { Rack::Test::UploadedFile.new(File.join(Rails.root, 'spec', 'fixtures', 'tufts_RCR00728.foxml.xml')) }
-            before do
-              TuftsPdf.delete_all
-              patch :update, id: batch.id, documents: [file1], batch: {}, format: :json
-            end
-
-            it "displays a warning" do
-              json = JSON.parse(response.body)['files'].first
-              expect(json['error']).to eq ["#{file1.original_filename} doesn't exist in the metadata file"]
-            end
-
-            it "displays the filename" do
-              json = JSON.parse(response.body)['files'].first
-              expect(json['name']).to eq file1.original_filename
-            end
-          end
-
-          describe 'error path (failed to save batch)' do
-            before do
-              allow_any_instance_of(ActiveRecord::Relation).to receive(:find) { batch }
-              allow(batch).to receive(:save) { false }
-              @batch_error = 'Batch Error 1'
-              batch.errors.add(:base, @batch_error)
-              patch :update, id: batch.id, documents: [file1], format: :json
-            end
-
-            it 'returns JSON data needed by the view template' do
-              json = JSON.parse(response.body)['files'].first
-              expect(json['pid']).to eq TuftsPdf.first.pid
-              doc = Nokogiri::XML(batch.metadata_file.read)
-              title = doc.at_xpath("//digitalObject[child::file/text()='#{file1.original_filename}']/*[local-name()='title']").content
-              expect(json['title']).to eq title
-              expect(json['name']).to eq file1.original_filename
-              expect(json['error']).to eq [@batch_error]
-            end
-          end
-
         end  # JSON request
       end  # template import section
     end

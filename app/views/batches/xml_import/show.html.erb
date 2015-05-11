@@ -5,6 +5,19 @@
 
   <%= link_to "All batches", batches_path %>
 
+  <% missing = @batch.missing_files %>
+  <% unless missing.blank? %>
+    <div class="alert alert-warning">
+      <strong>Warning:</strong> Metadata exists for the following files that have not been updated:<br/>
+      <ul>
+        <% missing.each do |file| %>
+          <li><%= file %></li>
+        <% end %>
+      </ul>
+      <%= link_to "add additional files to this batch", edit_batch_path(@batch) %>
+    </div>
+  <% end %>
+
   <div class="batch_info">
     <%= make_dl "Batch Type", @batch.display_name, "type" %>
     <%= make_dl "Batch id", @batch.id, "batch_id" %>
@@ -42,10 +55,10 @@
         data: { confirm: "WARNING: #{pluralize(@batch.pids.count, 'object')} will be purged. Both draft and published versions will be permanently deleted. Do you wish to proceed?" },
         class: "btn btn-primary" %>
 
-      <%= button_tag "Revert Batch", type: :submit,
+      <%= button_tag "Revert", type: :submit,
         name: 'batch[type]', value: "BatchRevert",
         disabled: @batch.status != :completed,
-        data: { confirm: "All pending edits will be reverted to match the published version for #{pluralize(@batch.pids.count, 'object')}.  This action cannot be undone. Do you wish to proceed?" },
+        data: { confirm: "#{pluralize(@batch.pids.count, 'object')} will be reverted to match the published version. This action cannot be undone, are you sure?" },
         class: "btn btn-primary" %>
     <% end %>
   </div>
@@ -75,3 +88,4 @@
   </div>
 
 </div>
+
