@@ -14,6 +14,7 @@ describe Job::CreateDerivatives do
   end
 
   describe '#perform for video' do
+
     subject { FactoryGirl.create(:tufts_video) }
 
     before(:all) do
@@ -53,11 +54,12 @@ describe Job::CreateDerivatives do
       webm_path = LocalPathService.new(subject, 'Access.webm').local_path
       mp4_path = LocalPathService.new(subject, 'Access.mp4').local_path
       thumb_path = LocalPathService.new(subject, 'Thumbnail.png').local_path
+
       # remove previously generated derivatives, if any
-      
-      FileUtils.remove_dir(webm_path, true)
-      FileUtils.remove_dir(mp4_path, true)
-      FileUtils.remove_dir(thumb_path, true)
+        
+      FileUtils.rm_r(webm_path, force: true)
+      FileUtils.rm_r(mp4_path, force: true)
+      FileUtils.rm_r(thumb_path, force: true)
 
       job.perform
 
