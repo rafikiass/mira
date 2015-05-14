@@ -6,3 +6,10 @@
 <h3>XML</h3>
 <%= link_to "Download", download_path(document.id, datastream_id: 'ARCHIVAL_XML') %>
 <% end %>
+<h3>Access Video</h3>
+<video controls>
+  <source src="<%= download_path(document.id, datastream_id: 'Access.webm') %>"
+   type='video/webm;codecs="vp8, vorbis"'/>
+  <source src="<%= download_path(document.id, datastream_id: 'Access.mp4') %>"
+   type='video/mp4;codecs="avc1.42E01E, mp4a.40.2"'/>
+</video>

@@ -13,7 +13,62 @@ describe Job::CreateDerivatives do
     end
   end
 
-  describe '#perform' do
+  describe '#perform for video' do
+    subject { FactoryGirl.create(:tufts_video) }
+
+    before(:all) do
+      TuftsVideo.find('tufts:v1').destroy if TuftsVideo.exists?('tufts:v1')
+    end
+
+    before(:each) do
+      subject.datastreams["Archival.video"].dsLocation = "http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/archival_video/sample.mp4"
+      subject.datastreams["Archival.video"].mimeType = "video/mp4"
+      subject.save
+    end
+
+
+      it 'raises an error if it the archival video doesn' 't exist' do
+        job = Job::CreateDerivatives.new('uuid', 'record_id' => subject.id)
+        subject.datastreams['Archival.video'].dsLocation = 'http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/archival_video/non-existant.mp4'
+        subject.save
+        expect { job.perform }.to raise_error(Errno::ENOENT)
+      end
+
+
+    it 'raises an error if it doesn''t have write permission to the derivatives folder' do
+      job = Job::CreateDerivatives.new('uuid', 'record_id' => subject.id)
+      webm_path = LocalPathService.new(subject, 'Access.webm').local_path
+      FileUtils.mkdir_p(File.dirname(webm_path))  # in case the derivatives folder doesn't already exist
+      FileUtils.chmod(0444, File.dirname(webm_path))
+
+      expect{job.perform}.to raise_error(Errno::EACCES)
+
+      FileUtils.chmod(0755, File.dirname(webm_path))
+    end
+
+    it 'creates derivatives' do
+
+      job = Job::CreateDerivatives.new('uuid', 'record_id' => subject.id)
+
+      webm_path = LocalPathService.new(subject, 'Access.webm').local_path
+      mp4_path = LocalPathService.new(subject, 'Access.mp4').local_path
+      thumb_path = LocalPathService.new(subject, 'Thumbnail.png').local_path
+      # remove previously generated derivatives, if any
+
+      FileUtils.remove_dir(webm_path, true)
+      FileUtils.remove_dir(mp4_path, true)
+      FileUtils.remove_dir(thumb_path, true)
+
+      job.perform
+
+      expect(File.exists?(webm_path)).to be_truthy
+      expect(File.exists?(mp4_path)).to be_truthy
+      expect(File.exists?(thumb_path)).to be_truthy
+    end
+
+  end
+
+  describe '#perform for pdf' do
     subject { FactoryGirl.create(:tufts_pdf) }
 
     before(:all) do
