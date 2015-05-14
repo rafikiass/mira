@@ -28,6 +28,10 @@ Or else you may get errors like this when you run the specs:
 "Magick::ImageMagickError: no decode delegate for this image format (something.tif)"
 
 ```bash
+$ brew install ffmpeg --with-libvpx --with-libvorbis
+```
+
+```bash
 $ brew install ghostscript
 $ bundle install
 $ rake config:copy

@@ -16,14 +16,11 @@ describe Job::CreateDerivatives do
   describe '#perform for video' do
     subject { FactoryGirl.create(:tufts_video) }
 
-
     before(:all) do
       TuftsVideo.find('tufts:v1').destroy if TuftsVideo.exists?('tufts:v1')
     end
 
     before(:each) do
-      skip "these specs seem to fail due to not being able to access the files on bucket01.lib.tufts.edu when no VPN present"
-
       subject.datastreams["Archival.video"].dsLocation = "http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/archival_video/sample.mp4"
       subject.datastreams["Archival.video"].mimeType = "video/mp4"
       subject.save
@@ -42,8 +39,6 @@ describe Job::CreateDerivatives do
       webm_path = LocalPathService.new(subject, 'Access.webm').local_path
       webm_dirname = File.dirname(webm_path)
 
-      puts "mkdir -p #{webm_dirname}"
-
       FileUtils.mkdir_p(webm_dirname)  # in case the derivatives folder doesn't already exist
       FileUtils.chmod(0444, webm_dirname)
 
@@ -59,7 +54,7 @@ describe Job::CreateDerivatives do
       mp4_path = LocalPathService.new(subject, 'Access.mp4').local_path
       thumb_path = LocalPathService.new(subject, 'Thumbnail.png').local_path
       # remove previously generated derivatives, if any
-
+      
       FileUtils.remove_dir(webm_path, true)
       FileUtils.remove_dir(mp4_path, true)
       FileUtils.remove_dir(thumb_path, true)
@@ -110,7 +105,6 @@ describe Job::CreateDerivatives do
     end
 
     it 'creates derivatives' do
-
       job = Job::CreateDerivatives.new('uuid', 'record_id' => subject.id)
 
       # remove previously generated derivatives, if any
