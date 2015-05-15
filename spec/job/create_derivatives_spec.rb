@@ -26,27 +26,6 @@ describe Job::CreateDerivatives do
       subject.save
     end
 
-    it "raises an error if it the archival video doesn't exist" do
-      job = Job::CreateDerivatives.new('uuid', 'record_id' => subject.id)
-      subject.datastreams['Archival.video'].dsLocation = 'http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/archival_video/non-existant.mp4'
-      subject.save
-      expect { job.perform }.to raise_error(Errno::ENOENT)
-    end
-
-    it "raises an error if it doesn't have write permission to the derivatives folder" do
-      job = Job::CreateDerivatives.new('uuid', 'record_id' => subject.id)
-
-      webm_path = LocalPathService.new(subject, 'Access.webm').local_path
-      webm_dirname = File.dirname(webm_path)
-
-      FileUtils.mkdir_p(webm_dirname)  # in case the derivatives folder doesn't already exist
-      FileUtils.chmod(0444, webm_dirname)
-
-      expect { job.perform }.to raise_error(Errno::EACCES)
-
-      FileUtils.chmod(0755, File.dirname(webm_path))
-    end
-
     it 'creates derivatives' do
       mock_video = double('tufts-video').as_null_object
       expect(mock_video).to receive(:create_derivatives).once { true }
@@ -54,6 +33,28 @@ describe Job::CreateDerivatives do
       allow(ActiveFedora::Base).to receive(:find).with(subject.id, cast: true) { mock_video }
 
       Job::CreateDerivatives.new('uuid', 'record_id' => subject.id).perform
+    end
+
+    context "errors" do
+      it "raises EACCES when the video's derivative generation raises it" do
+        mock_video = double('tufts-video').as_null_object
+        expect(mock_video).to receive(:create_derivatives).once.and_raise(Errno::EACCES)
+
+        allow(ActiveFedora::Base).to receive(:find).with(subject.id, cast: true) { mock_video }
+
+        expect { Job::CreateDerivatives.new('uuid', 'record_id' => subject.id).perform }.to raise_error(Errno::EACCES)
+
+      end
+
+      it "raises Errno::ENOENT when the video's derivative generation raises it" do
+        mock_video = double('tufts-video').as_null_object
+        expect(mock_video).to receive(:create_derivatives).once.and_raise(Errno::ENOENT)
+
+        allow(ActiveFedora::Base).to receive(:find).with(subject.id, cast: true) { mock_video }
+
+        expect { Job::CreateDerivatives.new('uuid', 'record_id' => subject.id).perform }.to raise_error(Errno::ENOENT)
+
+      end
     end
 
   end
