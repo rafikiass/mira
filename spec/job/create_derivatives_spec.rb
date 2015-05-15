@@ -6,7 +6,6 @@ describe Job::CreateDerivatives do
     Job::CreateDerivatives.queue.should == :derivatives
   end
 
-
   describe '::create' do
     it 'requires the record id' do
       expect{Job::CreateDerivatives.create({})}.to raise_exception(ArgumentError)
@@ -49,23 +48,12 @@ describe Job::CreateDerivatives do
     end
 
     it 'creates derivatives' do
-      job = Job::CreateDerivatives.new('uuid', 'record_id' => subject.id)
+      mock_video = double('tufts-video').as_null_object
+      expect(mock_video).to receive(:create_derivatives).once { true }
 
-      webm_path = LocalPathService.new(subject, 'Access.webm').local_path
-      mp4_path = LocalPathService.new(subject, 'Access.mp4').local_path
-      thumb_path = LocalPathService.new(subject, 'Thumbnail.png').local_path
+      allow(ActiveFedora::Base).to receive(:find).with(subject.id, cast: true) { mock_video }
 
-      # remove previously generated derivatives, if any
-        
-      FileUtils.rm_r(webm_path, force: true)
-      FileUtils.rm_r(mp4_path, force: true)
-      FileUtils.rm_r(thumb_path, force: true)
-
-      job.perform
-
-      expect(File.exists?(webm_path)).to be_truthy
-      expect(File.exists?(mp4_path)).to be_truthy
-      expect(File.exists?(thumb_path)).to be_truthy
+      Job::CreateDerivatives.new('uuid', 'record_id' => subject.id).perform
     end
 
   end
