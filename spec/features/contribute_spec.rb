@@ -30,6 +30,9 @@ describe 'Contribute' do
         expect(page).to have_link 'Login'
       end
       describe "with a deposit type" do
+        before do
+          DepositType.delete_all
+        end
         let!(:deposit_type) { FactoryGirl.create(:deposit_type, :display_name => 'Test Option', :deposit_view => 'generic_deposit') }
         it 'should show configured deposit type options' do
           visit '/contribute'

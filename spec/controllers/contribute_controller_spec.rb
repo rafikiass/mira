@@ -44,6 +44,7 @@ describe ContributeController do
 
       describe 'with valid deposit_type' do
         before :all do
+          DepositType.delete_all
           @deposit_type = FactoryGirl.create(:deposit_type, :display_name => 'Test Option', :deposit_view => 'generic_deposit')
         end
 
