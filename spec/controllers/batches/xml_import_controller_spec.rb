@@ -69,7 +69,8 @@ describe Batches::XmlImportController do
     end
 
     describe "PATCH 'update'" do
-      let(:batch) { FactoryGirl.create(:batch_xml_import, uploaded_files: {'file.jpg' => 'oldpid:123'}) }
+      let(:uploaded_files) { [UploadedFile.new(filename: "file.jpg", pid: "oldpid:123")] }
+      let(:batch) { FactoryGirl.create(:batch_xml_import, uploaded_files: uploaded_files) }
       let(:file1) { Rack::Test::UploadedFile.new(File.join(Rails.root, 'spec', 'fixtures', 'hello.pdf'), "application/pdf") }
       let(:file2) { Rack::Test::UploadedFile.new(File.join(Rails.root, 'spec', 'fixtures', 'hello2.pdf'), "application/pdf") }
 
@@ -82,20 +83,19 @@ describe Batches::XmlImportController do
         it_behaves_like 'an import happy path'
 
         it "remembers what uploaded files map to what pids" do
-          expected_filenames = ['file.jpg'] + [file1, file2].map(&:original_filename)
-          expect(assigns[:batch].reload.uploaded_files.keys.sort).to eq expected_filenames.sort
+          expected_filenames = ['file.jpg', 'hello.pdf', 'hello2.pdf']
+          expect(assigns[:batch].reload.uploaded_files.map(&:filename)).to match_array expected_filenames
           specified_pid = "draft:1"
           generated_pid = (TuftsPdf.all.map(&:pid) - [specified_pid]).first
           expect(generated_pid).to match /^#{PidUtils.draft_namespace}:.*$/
-          expect(assigns[:batch].uploaded_files[file1.original_filename]).to eq "draft:1"
-          expect(assigns[:batch].uploaded_files[file2.original_filename]).to eq generated_pid
+          expect(assigns[:batch].uploaded_files.find { |f| f.filename == file1.original_filename }.pid).to eq "draft:1"
+          expect(assigns[:batch].uploaded_files.find { |f| f.filename == file2.original_filename }.pid).to eq generated_pid
         end
 
       end
 
       it_behaves_like 'an import error path (no documents uploaded)'
       it_behaves_like 'an import error path (wrong file format)'
-      it_behaves_like 'an import error path (failed to save batch)'
 
       context "uploading two of the same file" do
         let(:file3) { file1 }
@@ -121,8 +121,9 @@ describe Batches::XmlImportController do
           end
         end
 
+        let(:uploaded_files) { [UploadedFile.new(filename: "hello.pdf", pid: record.pid)] }
         let(:batch) do
-          FactoryGirl.create(:batch_xml_import, uploaded_files: {'hello.pdf' => record.pid})
+          FactoryGirl.create(:batch_xml_import, uploaded_files: uploaded_files)
         end
 
         before do
@@ -170,8 +171,9 @@ describe Batches::XmlImportController do
             end
           end
 
+          let(:uploaded_files) { [UploadedFile.new(filename: "hello.pdf", pid: record.pid)] }
           let(:batch) do
-            FactoryGirl.create(:batch_xml_import, uploaded_files: {'hello.pdf' => record.pid})
+            FactoryGirl.create(:batch_xml_import, uploaded_files: uploaded_files)
           end
 
           before do
@@ -227,11 +229,13 @@ describe Batches::XmlImportController do
     end
 
     describe "GET 'show'" do
+      let(:batch_xml_import) { FactoryGirl.create(:batch_xml_import, uploaded_files: uploaded_files) }
+
       context 'happy path' do
-        let(:batch_xml_import) { FactoryGirl.create(:batch_xml_import, uploaded_files: {'one' => 'tufts:my-pid'} ) }
+        let(:uploaded_files) { [UploadedFile.new(filename: "one", pid: 'tufts:my-pid')] }
         let(:records) { [double(pid: 'tufts:my-pid')] }
         before do
-          allow(ActiveFedora::Base).to receive(:find).with('tufts:my-pid', {:cast=>true}).and_return(records.first)
+          allow(ActiveFedora::Base).to receive(:find).with('tufts:my-pid', { cast: true }).and_return(records.first)
         end
 
         it "returns http success" do
@@ -245,7 +249,7 @@ describe Batches::XmlImportController do
       end
 
       context 'with no pids (yet)' do
-        let(:batch_xml_import) { FactoryGirl.create(:batch_xml_import, uploaded_files: nil ) }
+        let(:uploaded_files) { [] }
         it 'gracefully sets @records_by_pid empty' do
           get :show, id: batch_xml_import
           expect(assigns[:records_by_pid]).to eq({})
@@ -253,7 +257,7 @@ describe Batches::XmlImportController do
       end
 
       context 'with pids that have been deleted' do
-        let(:batch_xml_import) { FactoryGirl.create(:batch_xml_import, uploaded_files: {'one' => 'tufts:never-existed'} ) }
+        let(:uploaded_files) { [UploadedFile.new(filename: "one", pid: 'tufts:never-existed')] }
         it 'returns http success' do
           get :show, id: batch_xml_import
           expect(response).to be_success

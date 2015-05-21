@@ -28,7 +28,6 @@ class Batches::XmlImportController < ApplicationController
     end
     action = XmlBatchImportAction.new(@batch, current_user, params[:documents])
     success = action.run
-    @batch = action.batch # The XmlBatchImportAction has a reloaded version of the batch. The tests expect the ivar to be the most up to date batch.
     docs, records, warnings, errors = action.document_statuses.transpose.map(&:compact)
     respond_to do |format|
       format.html do

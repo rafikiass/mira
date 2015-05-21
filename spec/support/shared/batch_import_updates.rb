@@ -64,20 +64,6 @@ shared_examples 'an import error path (wrong file format)' do
   end
 end
 
-shared_examples 'an import error path (failed to save batch)' do
-  before do
-    allow_any_instance_of(ActiveRecord::Relation).to receive(:find) { batch }
-    allow(batch).to receive(:save) { false }
-    @batch_error = 'Batch Error 1'
-    batch.errors.add(:base, @batch_error)
-    patch :update, id: batch.id, documents: [file1]
-  end
-
-  it 'returns to the edit page' do
-    expect(response).to render_template(:edit)
-  end
-end
-
 shared_examples 'a JSON import' do
   describe 'happy path' do
     it 'returns JSON data needed by the view template' do
