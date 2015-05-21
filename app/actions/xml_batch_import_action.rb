@@ -3,11 +3,12 @@ class XmlBatchImportAction < BatchImportAction
     save_status = nil
     @document_statuses = @documents.map do |doc|
       record, warning, error = nil, nil, nil
+      metadata_xml = @batch.metadata_file.read
       if @batch.uploaded_files.map(&:filename).include? doc.original_filename
         [doc, record, warning, "#{doc.original_filename} has already been uploaded"]
       else
         begin
-          record = MetadataXmlParser.build_record(@batch.metadata_file.read, doc.original_filename)
+          record = MetadataXmlParser.build_record(metadata_xml, doc.original_filename)
           record.batch_id = [@batch.id.to_s]
           # TODO we need to know which datastream it should go to.
           saved = save_record_with_document(record, doc)

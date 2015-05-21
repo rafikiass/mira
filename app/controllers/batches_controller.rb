@@ -1,5 +1,3 @@
-require 'import_export/metadata_xml_parser'
-
 class BatchesController < ApplicationController
   before_filter :build_batch, only: :create
   load_resource only: [:index, :show, :edit]
