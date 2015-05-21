@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150429192808) do
+ActiveRecord::Schema.define(version: 20150521145848) do
 
   create_table "batches", force: true do |t|
     t.integer  "creator_id"
@@ -23,7 +23,6 @@ ActiveRecord::Schema.define(version: 20150429192808) do
     t.string   "record_type"
     t.string   "metadata_file"
     t.string   "behavior"
-    t.text     "uploaded_files"
   end
 
   create_table "bookmarks", force: true do |t|
@@ -71,6 +70,15 @@ ActiveRecord::Schema.define(version: 20150429192808) do
     t.string  "name"
     t.string  "scope"
   end
+
+  create_table "uploaded_files", force: true do |t|
+    t.integer "batch_id"
+    t.string  "pid"
+    t.string  "dsid"
+    t.string  "filename"
+  end
+
+  add_index "uploaded_files", ["batch_id"], name: "index_uploaded_files_on_batch_id"
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: "",    null: false

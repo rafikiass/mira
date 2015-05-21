@@ -252,7 +252,20 @@ describe BatchesController do
 
         it_behaves_like 'an import error path (no documents uploaded)'
         it_behaves_like 'an import error path (wrong file format)'
-        it_behaves_like 'an import error path (failed to save batch)'
+
+        describe 'an import error path (failed to save batch)' do
+          before do
+            allow_any_instance_of(ActiveRecord::Relation).to receive(:find) { batch }
+            allow(batch).to receive(:save) { false }
+            @batch_error = 'Batch Error 1'
+            batch.errors.add(:base, @batch_error)
+            patch :update, id: batch.id, documents: [file1]
+          end
+
+          it 'returns to the edit page' do
+            expect(response).to render_template(:edit)
+          end
+        end
 
         describe 'JSON request' do
           before { TuftsPdf.delete_all }
