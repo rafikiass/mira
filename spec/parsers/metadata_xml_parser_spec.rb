@@ -4,58 +4,78 @@ describe MetadataXmlParser do
   before do
     allow(HydraEditor).to receive(:models).and_return(['TuftsPdf'])
   end
+  let(:parser) { MetadataXmlParser.new(xml) }
 
   describe "::validate" do
-    it "returns an empty array when there are no errors" do
-      expect(MetadataXmlParser.validate(build_node.to_xml)).to eq []
+    let(:errors) { parser.validate.map(&:message) }
+
+    context "when there are no errors" do
+      let(:xml) { build_node.to_xml }
+
+      it "returns an empty array" do
+        expect(parser.validate).to eq []
+      end
     end
 
-    it "finds ActiveFedora errors for each record" do
-      xml = build_node('dc:title' => [], 'admin:displays' => []).to_xml
-      errors = MetadataXmlParser.validate(xml).map(&:message)
-      expect(errors.sort.first).to match("Displays can't be blank for record beginning at line 1.*")
-      expect(errors.sort.second).to match("Title can't be blank for record beginning at line 1.*")
+    context "with missing fields" do
+      let(:xml) { build_node('dc:title' => [], 'admin:displays' => []).to_xml }
+      it "finds ActiveFedora errors for each record" do
+        expect(errors.sort.first).to match("Displays can't be blank for record beginning at line 1.*")
+        expect(errors.sort.second).to match("Title can't be blank for record beginning at line 1.*")
+      end
     end
 
-    it "requires valid xml" do
-      errors = MetadataXmlParser.validate('<foo></bar').map(&:message)
-      expect(errors).to eq ["expected '>'", "Opening and ending tag mismatch: foo line 1 and bar"]
+    context "with invalid xml" do
+      let(:xml) { '<foo></bar' }
+      it "has errors" do
+        expect(errors).to eq ["expected '>'", "Opening and ending tag mismatch: foo line 1 and bar"]
+      end
     end
 
-    it "requires a model type (hasModel)" do
-      errors = MetadataXmlParser.validate(build_node('rel:hasModel' => []).to_xml).map(&:message)
-      expect(errors.first).to match "Could not find <rel:hasModel> .* line 1 .*"
+    context "without a model type (hasModel)" do
+      let(:xml) { build_node('rel:hasModel' => []).to_xml }
+      it "has errors" do
+        expect(errors.first).to match /Could not find <rel:hasModel> .* line 1 .*/
+      end
     end
 
-    it "requires a filename" do
-      errors = MetadataXmlParser.validate(build_node('file' => []).to_xml).map(&:message)
-      expect(errors.first).to match "Could not find <file> .* line 1"
+    context "without a filename" do
+      let(:xml) { build_node('file' => []).to_xml }
+      it "has errors" do
+        expect(errors.first).to match /Could not find <file> .* line 1/
+      end
     end
 
-    it "doesn't allow duplicate file names" do
-      xml = "<input>" +
+    context "with duplicate filename" do
+      let(:xml) { "<input>" +
         build_node('file' => ['foo.pdf']).to_xml +
         build_node('file' => ['foo.pdf']).to_xml +
-        "</input>"
-      errors = MetadataXmlParser.validate(xml).map(&:message)
-      expect(errors.first).to match /Duplicate filename found at line \d+/
+        "</input>" }
+
+      it "has errors" do
+        expect(errors.first).to match /Duplicate filename found at line \d+/
+      end
     end
 
-    it "doesn't allow duplicate pids" do
-      xml = "<input>" +
+    context "with duplicate pids" do
+      let(:xml) { "<input>" +
         build_node('pid' => ['tufts:2'], 'file' => ['foo1.pdf']).to_xml +
         build_node('pid' => ['tufts:2'], 'file' => ['foo2.pdf']).to_xml +
-        "</input>"
-      errors = MetadataXmlParser.validate(xml).map(&:message)
-      expect(errors.first).to match /Multiple PIDs defined for record beginning at line \d+/
+        "</input>" }
+
+      it "has errors" do
+        expect(errors.first).to match /Multiple PIDs defined for record beginning at line \d+/
+      end
     end
 
-    it "doesn't allow invalid pids" do
-      xml = "<input>" +
+    context "with invalid pids" do
+      let(:xml) { "<input>" +
         build_node('pid' => ['demo:FLORA:01.01'], 'file' => ['foo1.pdf']).to_xml +
-        "</input>"
-      errors = MetadataXmlParser.validate(xml).map(&:message)
-      expect(errors.first).to match /Invalid PID defined for record beginning at line \d+/
+        "</input>" }
+
+      it "has errors" do
+        expect(errors.first).to match /Invalid PID defined for record beginning at line \d+/
+      end
     end
   end
 
@@ -66,12 +86,16 @@ describe MetadataXmlParser do
                         'dc:description' => ['desc 1', 'desc 2']
     }}
 
-    it "builds a draft record that has the given filename" do
-      m = MetadataXmlParser.build_record(build_node(attributes).to_xml, attributes['file'].first)
+    context "happy path" do
+      let(:xml) { build_node(attributes).to_xml }
 
-      expect(m.pid).to eq 'draft:1' # draft version of given pid
-      expect(m.title).to eq attributes['dc:title'].first
-      expect(m.description).to eq attributes['dc:description']
+      it "builds a draft record that has the given filename" do
+        m = parser.build_record(attributes['file'].first)
+
+        expect(m.pid).to eq 'draft:1' # draft version of given pid
+        expect(m.title).to eq attributes['dc:title'].first
+        expect(m.description).to eq attributes['dc:description']
+      end
     end
 
     context "with a model that doesn't support draft versions" do
@@ -80,53 +104,58 @@ describe MetadataXmlParser do
         expect(TuftsPdf).to receive(:respond_to?).with(:build_draft_version).and_return(false)
       end
 
+      let(:xml) { build_node(attributes).to_xml }
+
       it 'raises an error' do
         expect {
-          MetadataXmlParser.build_record(build_node(attributes).to_xml, attributes['file'].first)
+          parser.build_record(attributes['file'].first)
         }.to raise_error("TuftsPdf doesn't implement build_draft_version")
       end
     end
 
     context "with a filename that's not in the metadata" do
       let(:attributes) {{ 'file' => ['somefile.pdf'] }}
+      let(:xml) { build_node(attributes).to_xml }
 
       it "raises an error" do
-        expect{MetadataXmlParser.build_record(build_node(attributes).to_xml, "fail")}.to raise_exception(FileNotFoundError)
+        expect { parser.build_record("fail") }.to raise_exception(FileNotFoundError)
       end
     end
   end
 
-  describe "::get_filenames" do
-    it "finds all the filenames" do
-      xml = "<input>" +
+  describe "#filenames" do
+    let(:xml) { "<input>" +
         build_node('file' => ['foo.pdf']).to_xml +
         build_node('file' => ['bar.pdf']).to_xml +
         "</input>"
-      expect(MetadataXmlParser.get_filenames(xml)).to eq ['foo.pdf', 'bar.pdf']
+    }
+
+    it "finds all the filenames" do
+      expect(parser.filenames).to eq ['foo.pdf', 'bar.pdf']
     end
   end
 
-  describe "::get_pids" do
-    it "finds all the pids" do
-      xml = "<input>" +
+  describe "#pids" do
+    let(:xml) { "<input>" +
         build_node('pid' => ['tufts:1']).to_xml +
         build_node('pid' => ['tufts:2']).to_xml +
-        "</input>"
-      expect(MetadataXmlParser.get_pids(xml)).to eq ['tufts:1', 'tufts:2']
+        "</input>" }
+    it "finds all the pids" do
+      expect(parser.pids).to eq ['tufts:1', 'tufts:2']
     end
   end
 
-  describe "::get_namespaces" do
+  describe "::namespaces" do
     it "converts datastream namespaces to the format Nokogiri wants" do
-      ns = MetadataXmlParser.get_namespaces(TuftsDcaMeta)
+      ns = MetadataXmlParser.namespaces(TuftsDcaMeta)
       expect(ns["dca_dc"]).to eq TuftsDcaMeta.ox_namespaces["xmlns:dca_dc"]
       expect(ns["dcatech"]).to eq TuftsDcaMeta.ox_namespaces["xmlns:dcatech"]
     end
 
     # if the typos in the namespaces get fixed, we can remove this test and
-    # the corresponding code in MetadataXmlParser#get_namespaces
+    # the corresponding code in MetadataXmlParser#namespaces
     it "doesn't modify namespaces if they have been fixed in the project" do
-      ns = MetadataXmlParser.get_namespaces(TuftsDcDetailed)
+      ns = MetadataXmlParser.namespaces(TuftsDcDetailed)
       expect(ns["dcterms"]).to eq "http://purl.org/dc/terms/"
     end
   end
@@ -154,13 +183,13 @@ describe MetadataXmlParser do
     end
   end
 
-  describe "::get_node_content" do
+  describe ".node_content" do
     it "gets the content for a multi-value attribute from the given node" do
       d1 = 'Title page printed in red.'
       d2 = 'Several woodcuts signed by the monogrammist "b" appeared first in the Bible of 1490 translated into Italian by Niccol Malermi.'
       namespaces = {"oxns"=>"http://purl.org/dc/elements/1.1/"}
       xpath = ".//oxns:description"
-      desc = MetadataXmlParser.get_node_content(build_node, xpath, namespaces, true)
+      desc = MetadataXmlParser.node_content(build_node, xpath, namespaces, true)
       expect(desc).to eq [d1, d2]
     end
 
@@ -168,64 +197,8 @@ describe MetadataXmlParser do
       expected_title = 'Anatomical tables of the human body.'
       namespaces = {"oxns"=>"http://purl.org/dc/elements/1.1/"}
       xpath = ".//oxns:title"
-      title = MetadataXmlParser.get_node_content(build_node, xpath, namespaces)
+      title = MetadataXmlParser.node_content(build_node, xpath, namespaces)
       expect(title).to eq expected_title
-    end
-  end
-
-  describe "::get_pid" do
-    let(:pid) { 'tufts:1' }
-    let(:draft_pid) { 'draft:1' }
-
-    it "gets the pid" do
-      ActiveFedora::Base.find(pid).destroy if ActiveFedora::Base.exists?(pid)
-      new_pid = MetadataXmlParser.get_pid(node_with_only_pid)
-      expect(new_pid).to eq 'tufts:1'
-    end
-
-    it "raises if the pid already exists" do
-      unless ActiveFedora::Base.exists?(pid)
-        attrs = FactoryGirl.attributes_for(:tufts_pdf)
-        TuftsPdf.create(attrs.merge(pid: pid))
-      end
-      expect(ActiveFedora::Base.exists?(pid)).to be_truthy
-
-      expect{
-        MetadataXmlParser.get_pid(node_with_only_pid)
-      }.to raise_error(ExistingPidError, /The PID .* already exists in the repository/)
-    end
-
-    context 'when draft version of the object already exists' do
-      before do
-        unless ActiveFedora::Base.exists?(draft_pid)
-          attrs = FactoryGirl.attributes_for(:tufts_pdf)
-          TuftsPdf.create(attrs.merge(pid: draft_pid))
-        end
-        if ActiveFedora::Base.exists?(pid)
-          obj = ActiveFedora::Base.find(pid)
-          obj.delete
-        end
-      end
-
-      it 'raises an exception' do
-        expect(ActiveFedora::Base.exists?(draft_pid)).to be_truthy
-        expect(ActiveFedora::Base.exists?(pid)).to be_falsey
-        expect{
-          MetadataXmlParser.get_pid(node_with_only_pid)
-        }.to raise_error(ExistingPidError, /The PID .* already exists in the repository/)
-      end
-    end
-  end
-
-  describe "::get_file" do
-    it "gets the filename" do
-      expect(MetadataXmlParser.get_file(build_node)).to eq 'anatomicaltables00ches.pdf'
-    end
-
-    it "raises if <file> doesn't exist" do
-      expect{
-        MetadataXmlParser.get_file(node_with_only_pid)
-      }.to raise_error(NodeNotFoundError, /Could not find <file> .* line \d+/)
     end
   end
 
@@ -248,13 +221,13 @@ describe MetadataXmlParser do
     end
   end
 
-  describe "::get_rels_ext" do
+  describe "::rels_ext" do
     let(:eq_pid_1) { "eq:1" }
     let(:eq_pid_2) { "eq:2" }
 
     it 'returns rels_ext in a format to build the record' do
       node = build_node("rel:hasEquivalent" => [eq_pid_1, eq_pid_2])
-      rels_ext = MetadataXmlParser.get_rels_ext(node)
+      rels_ext = MetadataXmlParser.rels_ext(node)
       eq_pids = rels_ext['relationship_attributes'].select{|x| x['relationship_name'] == :has_equivalent}.map{|x| x['relationship_value']}
       expect(eq_pids.sort).to eq [eq_pid_1, eq_pid_2].sort
     end

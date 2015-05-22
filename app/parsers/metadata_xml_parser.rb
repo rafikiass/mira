@@ -32,12 +32,6 @@ class HasModelNodeInvalidError < MetadataXmlParserError
   end
 end
 
-class ExistingPidError < MetadataXmlParserError
-  def message
-    "The PID for the record beginning at line #{@line} already exists in the repository" + append_details
-  end
-end
-
 class DuplicateFilenameError < MetadataXmlParserError
   def message
     "Duplicate filename found at line #{@line}" + append_details
@@ -78,46 +72,78 @@ class FileNotFoundError < MetadataXmlParserError
   end
 end
 
-module MetadataXmlParser
-  class << self
-    def validate(xml)
-      doc = Nokogiri::XML(xml)
-      errors = doc.errors
+class MetadataXmlParser
+  def initialize(xml)
+    @xml = xml
+  end
 
-      # check for duplicate filenames
-      files = doc.xpath("//digitalObject/file/text()")
-      files.group_by(&:content).values.map{|nodes| nodes.drop(1)}.flatten.each do |duplicate|
-        errors << DuplicateFilenameError.new(duplicate.line, error_details(duplicate))
-      end
+  def doc
+    @doc ||= Nokogiri::XML(@xml)
+  end
 
-      pids = doc.xpath("//digitalObject/pid/text()")
-      # check for duplicate pids
-      pids.group_by(&:content).values.map{|nodes| nodes.drop(1)}.flatten.each do |duplicate|
-        errors << DuplicatePidError.new(duplicate.line, error_details(duplicate))
-      end
-      # check for invalid pids
-      pids.reject{|pid| TuftsBase.valid_pid?(pid.content)}.each do |invalid|
-        errors << InvalidPidError.new(invalid.line, error_details(invalid))
-      end
+  def filenames
+    doc.xpath('//digitalObject/file').map(&:content)
+  end
 
-      doc.xpath('//digitalObject').map do |digital_object|
-        if get_node_content(digital_object, "./file").nil?
-          errors << NodeNotFoundError.new(digital_object.line, '<file>', error_details(digital_object))
-        end
-        begin
-          record_class = valid_record_class(digital_object)
-          m = record_class.new(record_attributes(digital_object, record_class))
-          m.valid?
-          m.errors.full_messages.each do |message|
-            errors << ModelValidationError.new(digital_object.line, message, error_details(digital_object))
-          end
-        rescue MetadataXmlParserError => e
-          errors << e
-        end
-      end
-      errors
+  def validate
+    errors = doc.errors
+
+    # check for duplicate filenames
+    files = doc.xpath("//digitalObject/file/text()")
+    files.group_by(&:content).values.map{|nodes| nodes.drop(1)}.flatten.each do |duplicate|
+      errors << DuplicateFilenameError.new(duplicate.line, self.class.error_details(duplicate))
     end
 
+    pids = doc.xpath("//digitalObject/pid/text()")
+    # check for duplicate pids
+    pids.group_by(&:content).values.map{|nodes| nodes.drop(1)}.flatten.each do |duplicate|
+      errors << DuplicatePidError.new(duplicate.line, self.class.error_details(duplicate))
+    end
+    # check for invalid pids
+    pids.reject{|pid| TuftsBase.valid_pid?(pid.content)}.each do |invalid|
+      errors << InvalidPidError.new(invalid.line, self.class.error_details(invalid))
+    end
+
+    doc.xpath('//digitalObject').map do |digital_object|
+      if self.class.node_content(digital_object, "./file").nil?
+        errors << NodeNotFoundError.new(digital_object.line, '<file>', self.class.error_details(digital_object))
+      end
+      begin
+        record_class = self.class.valid_record_class(digital_object)
+        # TODO Record builder
+        m = record_class.new(self.class.record_attributes(digital_object, record_class))
+        m.valid?
+        m.errors.full_messages.each do |message|
+          errors << ModelValidationError.new(digital_object.line, message, self.class.error_details(digital_object))
+        end
+      rescue MetadataXmlParserError => e
+        errors << e
+      end
+    end
+    errors
+  end
+
+  def build_record(document_filename)
+    node = doc.at_xpath("//digitalObject[child::file/text()='#{document_filename}']")
+    raise FileNotFoundError.new(document_filename) if node.nil?
+
+    # TODO service
+    record_class = self.class.valid_record_class(node)
+    attrs = self.class.record_attributes(node, record_class)
+
+    if record_class.respond_to?(:build_draft_version)
+      record_class.build_draft_version(attrs)
+    else
+      raise "#{record_class} doesn't implement build_draft_version"
+    end
+  end
+
+  def pids
+    doc.xpath('//digitalObject/pid').map(&:content)
+  end
+
+
+  class << self
     def error_details(node)
       record = node.at_xpath('ancestor-or-self::digitalObject')
       details = {}
@@ -126,30 +152,7 @@ module MetadataXmlParser
       details
     end
 
-    def build_record(metadata, document_filename)
-      doc = Nokogiri::XML(metadata)
-      node = doc.at_xpath("//digitalObject[child::file/text()='#{document_filename}']")
-      raise FileNotFoundError.new(document_filename) if node.nil?
-
-      record_class = valid_record_class(node)
-      attrs = record_attributes(node, record_class)
-
-      if record_class.respond_to?(:build_draft_version)
-        record_class.build_draft_version(attrs)
-      else
-        raise "#{record_class} doesn't implement build_draft_version"
-      end
-    end
-
-    def get_filenames(xml)
-      Nokogiri::XML(xml).xpath('//digitalObject/file').map(&:content)
-    end
-
-    def get_pids(xml)
-      Nokogiri::XML(xml).xpath('//digitalObject/pid').map(&:content)
-    end
-
-    def get_namespaces(datastream_class)
+    def namespaces(datastream_class)
       namespaces = datastream_class.ox_namespaces.reduce({}) do |result, pair|
         k,v = pair
         result[k.gsub('xmlns:', '')] = v unless k == 'xmlns'
@@ -166,14 +169,14 @@ module MetadataXmlParser
       namespaces
     end
 
-    def get_attribute_path(record_class, attribute_name)
+    def attribute_path(record_class, attribute_name)
       ds_class = record_class.defined_attributes[attribute_name].datastream_class
-      {namespaces: get_namespaces(ds_class),
+      {namespaces: namespaces(ds_class),
         xpath: ds_class.new.public_send(attribute_name).xpath}
     end
 
     def record_attributes(node, record_class)
-      pid = get_node_content(node, "./pid")
+      pid = node_content(node, "./pid")
       result = pid.present? ? {:pid => pid} : {}
       # remove attributes that are relationships
       attribute_definitions = record_class.defined_attributes.select do |name, definition|
@@ -182,40 +185,25 @@ module MetadataXmlParser
       attributes = attribute_definitions.reduce(result) do |result, attribute|
         attribute_name, definition = attribute
 
-        path_info = get_attribute_path(record_class, attribute_name)
+        path_info = attribute_path(record_class, attribute_name)
         namespaces = path_info[:namespaces]
         xpath = "." + path_info[:xpath]
 
         # query the node for this attribute
-        content = get_node_content(node, xpath, namespaces, record_class.multiple?(attribute_name))
+        content = node_content(node, xpath, namespaces, record_class.multiple?(attribute_name))
 
         content.blank? ? result : result.merge(attribute_name => content)
       end
-      attributes.merge(get_rels_ext(node))
+      attributes.merge(rels_ext(node))
     end
 
-    def get_node_content(node, xpath, namespaces={}, multiple=false)
+    def node_content(node, xpath, namespaces={}, multiple=false)
       content = node.xpath(xpath, namespaces).map(&:content)
       multiple ? content : content.first
     end
 
-    def get_pid(node)
-      pid = get_node_content(node, "./pid")
-      if pid
-        draft_pid = PidUtils.to_draft(pid)
-        raise ExistingPidError.new(node.line, error_details(node)) if ActiveFedora::Base.exists?(pid) || ActiveFedora::Base.exists?(draft_pid)
-      end
-      pid
-    end
-
-    def get_file(node)
-      filename = get_node_content(node, "./file")
-      raise NodeNotFoundError.new(node.line, '<file>', error_details(node)) unless filename
-      filename
-    end
-
     def valid_record_class(node)
-      class_uri = get_node_content(node, "./rel:hasModel", "rel" => "info:fedora/fedora-system:def/relations-external#")
+      class_uri = node_content(node, "./rel:hasModel", "rel" => "info:fedora/fedora-system:def/relations-external#")
       raise NodeNotFoundError.new(node.line, '<rel:hasModel>', error_details(node)) unless class_uri
       record_class = ActiveFedora::Model.from_class_uri(class_uri)
       raise HasModelNodeInvalidError.new(node.line, "'#{record_class}' was not amongst the allowed types: #{valid_record_types.inspect}.", error_details(node) ) unless valid_record_types.include?(record_class.to_s)
@@ -226,7 +214,7 @@ module MetadataXmlParser
       HydraEditor.models - ['TuftsTemplate']
     end
 
-    def get_rels_ext(node)
+    def rels_ext(node)
       rels_ext = node.xpath("./rel:*", {"rel" => "info:fedora/fedora-system:def/relations-external#"}).map do |element|
         { 'relationship_name' => element.name.underscore.to_sym,
           'relationship_value' => element.content }

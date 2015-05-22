@@ -45,10 +45,6 @@ class BatchesController < ApplicationController
   end
 
   def edit
-    if @batch.metadata_file.present?
-      pids_in_file = MetadataXmlParser.get_pids(@batch.metadata_file.read)
-      @pids_that_already_exist = pids_in_file.select {|pid| ActiveFedora::Base.exists?(pid)}
-    end
   end
 
   def update
@@ -65,7 +61,7 @@ class BatchesController < ApplicationController
 private
 
   def build_batch
-    @batch = Batch.new(params.require(:batch).permit(:template_id, {pids: []}, :type, :record_type, :metadata_file, :behavior))
+    @batch = Batch.new(params.require(:batch).permit(:template_id, {pids: []}, :type, :record_type, :behavior))
   end
 
   def load_batch

@@ -57,8 +57,8 @@ class Batches::XmlImportController < ApplicationController
 
   def edit
     if @batch.metadata_file.present?
-      pids_in_file = MetadataXmlParser.get_pids(@batch.metadata_file.read)
-      @pids_that_already_exist = pids_in_file.select {|pid| ActiveFedora::Base.exists?(pid)}
+      parser = MetadataXmlParser.new(@batch.metadata_file.read)
+      @pids_that_already_exist = parser.pids.select {|pid| ActiveFedora::Base.exists?(pid)}
     end
   end
 
