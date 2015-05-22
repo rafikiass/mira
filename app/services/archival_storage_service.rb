@@ -18,7 +18,7 @@ class ArchivalStorageService
     ds = object.datastreams[dsid]
     ds.dsLocation = path_service.remote_url
     ds.mimeType = file.content_type
-    # TODO seems like there ought to be a save here if we're going to kick of a derivatives job.
+    object.save
     Job::CreateDerivatives.create(record_id: object.pid)
   end
 
