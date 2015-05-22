@@ -24,8 +24,8 @@ class XmlBatchImportAction < BatchImportAction
     end
     docs, records, warnings, errors = @document_statuses.transpose
 
-    @successful = errors.compact.empty? &&   # we have no errors from building records
-      records.all?(&:persisted?) # all our records saved
+    # we have no errors from building records and all our records saved
+    errors.compact.empty? && records.all?(&:persisted?)
   end
 
   def save_attached_files(record, doc)

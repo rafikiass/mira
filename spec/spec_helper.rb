@@ -14,6 +14,8 @@ def clean_up_carrierwave_files
   FileUtils.rm_rf(CarrierWave::Uploader::Base.root)
 end
 
+require 'byebug' unless ENV['CI']
+
 # Checks for pending migrations before tests are run.
 ActiveRecord::Migration.maintain_test_schema!
 
