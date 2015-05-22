@@ -1,5 +1,6 @@
 class BatchRunnerService
   attr_reader :batch
+
   def initialize(batch)
     @batch = batch
   end
@@ -27,6 +28,8 @@ class BatchRunnerService
         Job::Unpublish
       when BatchPurge
         Job::Purge
+      when BatchExport
+        Job::Export
       else
         raise "Unknown job type for #{batch.class}"
       end

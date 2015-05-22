@@ -50,3 +50,22 @@
 }
 
 
+.exportButtonWrapper {
+  ul.dropdown-menu {
+    width: 15em;
+    margin-top: 0.7em;
+    padding: 0.5em;
+
+    .btn.btn-primary {
+      margin-top: 1em;
+    }
+
+    li label {
+      font-weight: normal;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+}
