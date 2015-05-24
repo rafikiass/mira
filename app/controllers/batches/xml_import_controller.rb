@@ -75,13 +75,13 @@ class Batches::XmlImportController < ApplicationController
   # TODO this is common with BatchesController
   def json_response(document_statuses, records)
     {
-      files: document_statuses.map do |doc, record, warning, error|
+      files: document_statuses.map do |filename, record, warning, error|
         msg = {}
         if record.present?
           msg[:pid] = record.id
           msg[:title] = record.title
         end
-        msg[:name] = doc.original_filename
+        msg[:name] = filename
         msg[:warning] = warning if warning.present?
         errors = collect_errors(@batch, records)
         errors << error if error.present?

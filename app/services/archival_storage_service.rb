@@ -13,8 +13,6 @@ class ArchivalStorageService
       ds.mimeType = file.content_type
     end
     object.content_will_update = dsid
-    object.save
-    Job::CreateDerivatives.create(record_id: object.pid)
   end
 
   private

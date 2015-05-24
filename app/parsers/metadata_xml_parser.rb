@@ -124,7 +124,6 @@ class MetadataXmlParser
   def build_record(document_filename)
     node = find_node_for_file(document_filename)
 
-    # TODO service
     CreateRecordService.new(node).run
   end
 
@@ -137,6 +136,10 @@ class MetadataXmlParser
 
   def pids
     doc.xpath('//digitalObject/pid').map(&:content)
+  end
+
+  def records
+    @records ||= doc.xpath('//digitalObject').map { |elem| ImportRecord.new(elem) }
   end
 
 

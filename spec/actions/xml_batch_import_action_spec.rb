@@ -28,12 +28,12 @@ describe XmlBatchImportAction do
       before { TuftsPdf.destroy_all }
 
       it "attaches one file per datastream" do
-        expect(UploadedFile).to receive(:create!).twice
+        expect(uploaded_files).to receive(:build).twice
+        expect(batch).to receive(:save)
         expect { action.run }.to change { TuftsPdf.count }.by(1)
         new_datastreams = TuftsPdf.first.datastreams
         expect(new_datastreams['Archival.pdf']).not_to be_new
-        # TODO support multiple datastreams
-        # expect(new_datastreams['Transfer.binary']).not_to be_new
+        expect(new_datastreams['Transfer.binary']).not_to be_new
       end
     end
   end

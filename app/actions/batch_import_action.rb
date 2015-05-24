@@ -14,6 +14,8 @@ class BatchImportAction
     record.working_user = current_user
     if record.save
       ArchivalStorageService.new(record, dsid, doc).run
+      record.save
+      Job::CreateDerivatives.create(record_id: record.pid)
     else
       false
     end
