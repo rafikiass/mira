@@ -48,7 +48,8 @@ class Contribution
   def save
     return false unless valid?
     ArchivalStorageService.new(tufts_pdf, 'Archival.pdf', attachment).run
-    tufts_pdf.save! # TODO investigate moving this save into ArchivalStorageService, because the service kicks off a job that operates on the datastream, which is not saved yet.
+    tufts_pdf.save!
+    Job::CreateDerivatives.create(record_id: tufts_pdf.pid)
     tufts_pdf
   end
 

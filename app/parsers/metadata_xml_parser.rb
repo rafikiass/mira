@@ -91,30 +91,28 @@ class MetadataXmlParser
     # check for duplicate filenames
     files = doc.xpath("//digitalObject/file/text()")
     files.group_by(&:content).values.map{|nodes| nodes.drop(1)}.flatten.each do |duplicate|
-      errors << DuplicateFilenameError.new(duplicate.line, self.class.error_details(duplicate))
+      errors << DuplicateFilenameError.new(duplicate.line, ParsingError.for(duplicate))
     end
 
     pids = doc.xpath("//digitalObject/pid/text()")
     # check for duplicate pids
     pids.group_by(&:content).values.map{|nodes| nodes.drop(1)}.flatten.each do |duplicate|
-      errors << DuplicatePidError.new(duplicate.line, self.class.error_details(duplicate))
+      errors << DuplicatePidError.new(duplicate.line, ParsingError.for(duplicate))
     end
     # check for invalid pids
     pids.reject{|pid| TuftsBase.valid_pid?(pid.content)}.each do |invalid|
-      errors << InvalidPidError.new(invalid.line, self.class.error_details(invalid))
+      errors << InvalidPidError.new(invalid.line, ParsingError.for(invalid))
     end
 
     doc.xpath('//digitalObject').map do |digital_object|
-      if self.class.node_content(digital_object, "./file").nil?
-        errors << NodeNotFoundError.new(digital_object.line, '<file>', self.class.error_details(digital_object))
+      if self.class.file(digital_object).nil?
+        errors << NodeNotFoundError.new(digital_object.line, '<file>', ParsingError.for(digital_object))
       end
       begin
-        record_class = self.class.valid_record_class(digital_object)
-        # TODO Record builder
-        m = record_class.new(self.class.record_attributes(digital_object, record_class))
+        m = CreateRecordService.new(digital_object).run
         m.valid?
         m.errors.full_messages.each do |message|
-          errors << ModelValidationError.new(digital_object.line, message, self.class.error_details(digital_object))
+          errors << ModelValidationError.new(digital_object.line, message, ParsingError.for(digital_object))
         end
       rescue MetadataXmlParserError => e
         errors << e
@@ -124,102 +122,31 @@ class MetadataXmlParser
   end
 
   def build_record(document_filename)
-    node = doc.at_xpath("//digitalObject[child::file/text()='#{document_filename}']")
-    raise FileNotFoundError.new(document_filename) if node.nil?
+    node = find_node_for_file(document_filename)
 
-    # TODO service
-    record_class = self.class.valid_record_class(node)
-    attrs = self.class.record_attributes(node, record_class)
-
-    if record_class.respond_to?(:build_draft_version)
-      record_class.build_draft_version(attrs)
-    else
-      raise "#{record_class} doesn't implement build_draft_version"
-    end
+    CreateRecordService.new(node).run
   end
+
+  def find_node_for_file(document_filename)
+    node = doc.at_xpath("//digitalObject[child::file/text()='#{document_filename}']")
+    return node unless node.nil?
+    raise FileNotFoundError.new(document_filename)
+  end
+
 
   def pids
     doc.xpath('//digitalObject/pid').map(&:content)
   end
 
+  def records
+    @records ||= doc.xpath('//digitalObject').map { |elem| ImportRecord.new(elem) }
+  end
+
 
   class << self
-    def error_details(node)
-      record = node.at_xpath('ancestor-or-self::digitalObject')
-      details = {}
-      details[:file] = record.at_xpath('file').content if record.at_xpath('file').present?
-      details[:pid] = record.at_xpath('pid').content if record.at_xpath('pid').present?
-      details
+    def file(node)
+      node.xpath("./file").map(&:content).first
     end
 
-    def namespaces(datastream_class)
-      namespaces = datastream_class.ox_namespaces.reduce({}) do |result, pair|
-        k,v = pair
-        result[k.gsub('xmlns:', '')] = v unless k == 'xmlns'
-        result
-      end
-
-      # Hack to fix potential bug in datastream definitions.
-      # See https://github.com/curationexperts/mira/issues/227#issuecomment-40148086
-      # and https://github.com/curationexperts/tufts_models/issues/11
-      if datastream_class == TuftsDcDetailed
-        namespaces['dcterms'] = namespaces['dcterms'].gsub("http://purl.org/d/terms/", "http://purl.org/dc/terms/")
-      end
-
-      namespaces
-    end
-
-    def attribute_path(record_class, attribute_name)
-      ds_class = record_class.defined_attributes[attribute_name].datastream_class
-      {namespaces: namespaces(ds_class),
-        xpath: ds_class.new.public_send(attribute_name).xpath}
-    end
-
-    def record_attributes(node, record_class)
-      pid = node_content(node, "./pid")
-      result = pid.present? ? {:pid => pid} : {}
-      # remove attributes that are relationships
-      attribute_definitions = record_class.defined_attributes.select do |name, definition|
-        definition.dsid != "RELS-EXT"
-      end
-      attributes = attribute_definitions.reduce(result) do |result, attribute|
-        attribute_name, definition = attribute
-
-        path_info = attribute_path(record_class, attribute_name)
-        namespaces = path_info[:namespaces]
-        xpath = "." + path_info[:xpath]
-
-        # query the node for this attribute
-        content = node_content(node, xpath, namespaces, record_class.multiple?(attribute_name))
-
-        content.blank? ? result : result.merge(attribute_name => content)
-      end
-      attributes.merge(rels_ext(node))
-    end
-
-    def node_content(node, xpath, namespaces={}, multiple=false)
-      content = node.xpath(xpath, namespaces).map(&:content)
-      multiple ? content : content.first
-    end
-
-    def valid_record_class(node)
-      class_uri = node_content(node, "./rel:hasModel", "rel" => "info:fedora/fedora-system:def/relations-external#")
-      raise NodeNotFoundError.new(node.line, '<rel:hasModel>', error_details(node)) unless class_uri
-      record_class = ActiveFedora::Model.from_class_uri(class_uri)
-      raise HasModelNodeInvalidError.new(node.line, "'#{record_class}' was not amongst the allowed types: #{valid_record_types.inspect}.", error_details(node) ) unless valid_record_types.include?(record_class.to_s)
-      record_class
-    end
-
-    def valid_record_types
-      HydraEditor.models - ['TuftsTemplate']
-    end
-
-    def rels_ext(node)
-      rels_ext = node.xpath("./rel:*", {"rel" => "info:fedora/fedora-system:def/relations-external#"}).map do |element|
-        { 'relationship_name' => element.name.underscore.to_sym,
-          'relationship_value' => element.content }
-      end
-      { 'relationship_attributes' => rels_ext }
-    end
   end
 end
