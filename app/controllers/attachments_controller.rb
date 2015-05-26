@@ -8,6 +8,13 @@ class AttachmentsController < ApplicationController
     end
   end
 
+  def destroy
+    @record = ActiveFedora::Base.find(params[:record_id], cast: true)
+    authorize! :update, @record
+    @record.datastreams[params[:id]].delete
+    redirect_to catalog_path(@record), notice: "Removed #{params[:id]}"
+  end
+
   def update
     @record = ActiveFedora::Base.find(params[:record_id], cast: true)
     authorize! :update, @record

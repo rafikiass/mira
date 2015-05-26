@@ -22,5 +22,6 @@
 //= require hydra-editor/hydra-editor
 //= require jquery-fileupload
 //= require batch_edit
+//= require attachments
 //= require_tree .
 //

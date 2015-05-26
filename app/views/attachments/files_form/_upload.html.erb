@@ -1,0 +1,14 @@
+  <div class="row">
+    <div class="col-md-6">
+      <div id="progress" class="progress progress-striped hidden">
+        <div class="bar" style="width: 0%;"></div>
+      </div>
+      <input class="fileupload" type="file" name="files[<%= dsid %>]" data-exists="<%=!record.datastreams[dsid].new?%>">
+      <div class="file btn btn-primary" style="display: inline-block">
+        <%= record.datastreams[dsid].new? ? "Upload #{dsid}" : "Replace #{dsid}" %>
+        <i class="icon-upload"></i>
+      </div>
+      <%= yield %>
+    </div>
+  </div>
+
