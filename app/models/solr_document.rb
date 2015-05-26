@@ -5,11 +5,10 @@ class SolrDocument
   include Tufts::SolrDocument
 
   def workflow_status
-    return unless draft? # Production objects don't have a workflow
     if published?
       :published
     elsif published_at.blank?
-      :new
+      :unpublished
     else
       :edited
     end
