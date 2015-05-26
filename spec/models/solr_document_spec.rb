@@ -43,14 +43,14 @@ describe SolrDocument do
           it { is_expected.to eq :edited }
         end
         context "and published_at is not set" do
-          it { is_expected.to eq :new }
+          it { is_expected.to eq :unpublished } # you can reach this state from the unpublish method, so 'new' is misleading
         end
       end
     end
 
     context "when it is a production object" do
       let(:pid) { 'tufts:123' }
-      it { is_expected.to be_nil }
+      it { is_expected.to eq :published } # all production objects must have been published / should have 'published' as their workflow state
     end
   end
 

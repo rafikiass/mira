@@ -44,4 +44,26 @@ describe CatalogHelper do
     end
 
   end
+
+  describe 'workflow_status_indicator' do
+    let(:document) { double('fake-document', workflow_status: "some-workflow-status") }
+    let(:options) { {} }
+
+    subject { workflow_status_indicator(document, options) }
+
+    it 'has the documents workflow status as the class and content'  do
+      expect(subject).to eq('<span class="workflow-status some-workflow-status">some-workflow-status</span>')
+    end
+
+    context 'with a :class option' do
+      let(:options) {
+        { class: "extra-markup" }
+      }
+
+      it "should include the extra class in the wrapper span" do
+        expect(subject).to eq('<span class="workflow-status some-workflow-status extra-markup">some-workflow-status</span>')
+      end
+    end
+  end
+
 end

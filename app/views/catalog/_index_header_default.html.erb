@@ -17,6 +17,6 @@
   </h5>
 
   <div class="index-document-functions col-sm-3 col-lg-2">
-    <span class="<%= document.workflow_status %> workflow-status"><%= document.workflow_status %></span>
+    <%= workflow_status_indicator(document, class: "col-md-12") %>
   </div>
 </div>

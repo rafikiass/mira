@@ -37,11 +37,11 @@
   &.edited {
     @extend .label-warning;
   }
-  &.new {
-    @extend .label-success;
+  &.unpublished {
+    @extend .label-info;
   }
   &.published {
-    display: none;
+    @extend .label-success;
   }
 }
 

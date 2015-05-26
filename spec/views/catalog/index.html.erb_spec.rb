@@ -79,10 +79,47 @@ describe 'catalog/index.html.erb' do
         @document_list = [SolrDocument.new(id: 'id2', has_model_ssim: ['fedora/cm:Image.4DS'])]
         render
       end
+
       it 'displays thumbnails' do
         src = download_path(@document_list.first.id, datastream_id: 'Thumbnail.png')
         expect(rendered).to have_selector("#documents .document-thumbnail img[src='#{src}']")
       end
     end
   end
+
+  context 'workflow_status' do
+    before do
+      allow(view).to receive(:has_search_parameters?) { true }
+    end
+
+    describe 'for drafts' do
+      before do
+        @earlier = "2015-01-01 12:00:00"
+        @later =  "2015-01-01 13:00:00"
+        @document_list = [SolrDocument.new(id: 'pub', active_fedora_model_ssi: 'TuftsImage', edited_at_dtsi: @earlier, published_at_dtsi: @earlier),
+                          SolrDocument.new(id: 'unpub', active_fedora_model_ssi: 'TuftsImage', edited_at_dtsi: @earlier, published_at_dtsi: nil),
+                          SolrDocument.new(id: 'ed', active_fedora_model_ssi: 'TuftsImage', edited_at_dtsi: @later, published_at_dtsi: @earlier)
+                          ]
+        render
+      end
+
+      it 'displays unpublished tags' do
+        expect(rendered).to have_selector(".unpublished", count: 1)
+      end
+      it 'displays published tags' do
+        expect(rendered).to have_selector(".published", count: 1)
+      end
+      it 'displays edited tags' do
+        expect(rendered).to have_selector(".edited", count: 1)
+      end
+    end
+
+    it 'handles production objects gracefully' do
+      @document_list = [SolrDocument.new(id: 'tufts:prod', has_model_ssim: ['fedora/cm:Image.4DS'])]
+      # These shouldn't end up in the document list from the catalog controller, but make sure the applications behaves reasonable if they do
+      render
+      expect(rendered).to have_selector(".published")
+    end
+  end
+
 end
