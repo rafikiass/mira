@@ -36,15 +36,12 @@
   @extend .label;
   &.edited {
     @extend .label-warning;
-    &:after { content: 'edited';}
   }
   &.unpublished {
     @extend .label-info;
-    &:after { content: 'unpublished';}
   }
   &.published {
     @extend .label-success;
-    &:after { content: 'published';}
   }
 }
 

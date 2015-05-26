@@ -1,7 +1,7 @@
 <h1 itemprop="name"><%= presenter(document).document_heading %> </h1>
 <dl class="dl-horizontal  dl-invert">
   <dt class="blacklight-id">Status:</dt>
-  <dd class="blacklight-id"><span class="workflow-status <%= document.workflow_status %>"> <%# need the space here %> </span></dd>
+  <dd class="blacklight-id"><%= workflow_status_indicator(document) %></dd>
 </dl>
 
 

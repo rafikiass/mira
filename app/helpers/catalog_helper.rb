@@ -11,4 +11,11 @@ module CatalogHelper
     "Preview in DL"
   end
 
+  def workflow_status_indicator(document, options = {})
+    css_classes = ['workflow-status', document.workflow_status]
+    css_classes << options[:class] if options[:class].present?
+
+    content_tag(:span, document.workflow_status, class: css_classes.join(' '))
+  end
+
 end
