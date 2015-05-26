@@ -1,24 +1,15 @@
 <%= form_for @record, url: record_attachment_path(@record, 'Archival.pdf') do |f| %>
   <h4>Archival PDF</h4>
-  <input class="fileupload" type="file" name="files[Archival.pdf]" data-exists="<%=!@record.datastreams['Archival.pdf'].new?%>">
-  <div class="file btn">
-    <%= @record.datastreams['Archival.pdf'].new? ? 'Upload Archival.pdf' : 'Replace Archival.pdf' %>
-    <i class="icon-upload"></i>
-  </div>
-  <div id="progress" class="progress progress-striped">
-    <div class="bar" style="width: 0%;"></div>
-  </div>
+  <%= render 'attachments/files_form/upload', dsid: 'Archival.pdf', record: @record %>
 <% end %>
 
 <%= form_for @record, url: record_attachment_path(@record, 'Transfer.binary') do |f| %>
   <h4>Transfer Binary</h4>
-  <input class="fileupload" type="file" name="files[Transfer.binary]" data-exists="<%=!@record.datastreams['Transfer.binary'].new?%>">
-  <div class="file btn">
-    <%= @record.datastreams['Transfer.binary'].new? ? 'Upload Transfer.binary' : 'Replace Transfer.binary' %>
-    <i class="icon-upload"></i>
-  </div>
-  <div id="progress" class="progress progress-striped">
-    <div class="bar" style="width: 0%;"></div>
-  </div>
+  <%= render layout: 'attachments/files_form/upload',
+      locals: { dsid: 'Transfer.binary', record: @record } do %>
+      <% unless @record.datastreams['Transfer.binary'].new? %>
+        <%= link_to 'Remove', record_attachment_path(@record, 'Transfer.binary'), class: 'btn btn-danger remove-attachment', data: { confirm: 'Are you sure you want to delete Transfer.binary?', method: :delete } %>
+      <% end %>
+  <% end %>
 <% end %>
 

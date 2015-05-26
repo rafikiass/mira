@@ -72,4 +72,5 @@ $(function () {
         $form = $(this).closest('form');
         $(':file', $form).click();
     }).show();
+
 });

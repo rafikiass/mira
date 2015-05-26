@@ -6,6 +6,7 @@ describe AttachmentsController do
     before do
       sign_in user
     end
+
     describe "editing a record" do
       let(:audio) { TuftsAudio.create!(title: 'My title2', edit_users: [user.display_name], displays: ['dl']) }
       after do
@@ -17,6 +18,7 @@ describe AttachmentsController do
         assigns[:record].title.should == 'My title2'
       end
     end
+
     describe "editing generic object" do
       let(:generic) { TuftsGenericObject.create!(title: 'My title2', edit_users: [user.display_name], displays: ['dl']) }
       after do
@@ -28,11 +30,25 @@ describe AttachmentsController do
       end
     end
 
+    describe "destroying" do
+      let(:pdf) { TuftsPdf.new(title: 'My title2', edit_users: [user.display_name], displays: ['dl']) }
+      before do
+        pdf.datastreams['Transfer.binary'].content = 'foo'
+        pdf.save!
+      end
+
+      it "should remove the conent" do
+        delete :destroy, record_id: pdf, id: 'Transfer.binary'
+        expect(pdf.reload.datastreams['Transfer.binary']).to be_new
+      end
+    end
+
     describe "uploading" do
       let(:pdf) { TuftsPdf.create!(title: 'My title2', edit_users: [user.display_name], displays: ['dl']) }
       after do
         pdf.destroy
       end
+
       describe "a pdf file to a pdf object" do
         it "should be successful" do
           file = fixture_file_upload('/local_object_store/data01/tufts/central/dca/MISS/archival_pdf/MISS.ISS.IPPI.archival.pdf','application/pdf')
@@ -42,6 +58,7 @@ describe AttachmentsController do
           json["status"].should == "success"
         end
       end
+
       describe "a wav file to a pdf object" do
         it "should give an error saying this is the incorrect type" do
           file = fixture_file_upload('/local_object_store/data01/tufts/central/dca/MISS/archival_sound/MISS.ISS.IPPI.archival.wav','audio/wav')
