@@ -53,7 +53,8 @@ Load the database, and seed data:
 $ rake db:setup
 ```
 
-Install & configure hydra-jetty:
+### Install and start background services
+Install & configure hydra-jetty to get a running copy of Fedora and Solr on your system:
 ```bash
 $ rails g hydra:jetty
 $ rake jetty:config
@@ -76,7 +77,7 @@ $ bundle exec resque-pool
 resque-web config/resque_conf.rb
 ```
 
-Start the MIRA application
+### Run the application!
 ```bash
 $ rails s
 ```
