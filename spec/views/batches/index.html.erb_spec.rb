@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 describe "batches/index.html.erb" do
-  let(:batches) do
-    [FactoryGirl.create(:batch_template_update, job_ids: [1, 2]),
-      FactoryGirl.create(:batch_template_import, job_ids: nil, pids: nil)]
-  end
+  let(:creator) { mock_model(User, display_name: 'bob') }
+  let(:batch1) { mock_model(BatchTemplateUpdate, pids: [], missing_files:[], display_name: 'foo', creator: creator, status: :completed, created_at: 2.days.ago, job_ids: [1, 2]) }
+  let(:batch2) { mock_model(BatchTemplateImport, pids: [], missing_files:[], display_name: 'foo', creator: creator, status: :completed, created_at: 4.days.ago) }
+  let(:batches) { [batch1, batch2] }
 
   before do
     assign :batches, batches

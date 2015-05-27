@@ -2,12 +2,21 @@ require 'spec_helper'
 
 describe "batches/show.html.erb" do
 
+  let(:batch) { mock_model BatchTemplateImport, pids: pids, creator: creator,
+                jobs: jobs, display_name: 'This is a batch', status: batch_status }
+  let(:batch_status) { :queued }
+  let(:creator) { mock_model User, display_name: 'Mike K.' }
+
+  before do
+    assign :batch, batch
+    assign :records_by_pid, records_by_pid
+  end
+
   describe 'a batch with no pids' do
-    subject { FactoryGirl.create(:batch_template_import, pids: nil) }
-    before do
-      assign :batch, subject
-      assign :records_by_pid, {}
-    end
+    # subject { build(:batch_template_import, pids: nil) }
+    let(:pids) { [] }
+    let(:records_by_pid) { {} }
+    let(:jobs) { [] }
 
     it "displays gracefully" do
       expect { render }.to_not raise_error
@@ -15,49 +24,41 @@ describe "batches/show.html.erb" do
   end
 
   describe 'apply_template' do
-    subject { FactoryGirl.create(:batch_template_update,
-                                 pids: records.map(&:id),
-                                 job_ids: jobs.map(&:uuid)) }
-    let(:records) { [FactoryGirl.create(:tufts_pdf)] }
-    let(:records_by_pid) { records.reduce({}){|acc,r| acc.merge(r.pid => r)} }
+    # subject { FactoryGirl.create(:batch_template_update,
+    #                              pids: records.map(&:id),
+    #                              job_ids: jobs.map(&:uuid)) }
+    let(:pids) { records.map(&:pid) }
+    let(:pdf) { mock_model TuftsPdf, pid: 'tufts:234', title: "A PDF doc" }
+    let(:records) { [pdf] }
+    let(:records_by_pid) { { records[0].pid => records[0] } }
+
     let(:jobs) do
       records.zip(0.upto(records.length)).map do |r, uuid|
         double('uuid' => uuid,
              'status' => 'queued',
-             'options' => {'record_id' => r.id})
+             'options' => {'record_id' => r.pid})
       end
     end
+    let(:line_item_status) { 'Queued' }
 
     before do
       allow(Resque::Plugins::Status::Hash).to receive(:get) do |uuid|
-        jobs.find{|j| j.uuid == uuid}
+        jobs.find { |j| j.uuid == uuid }
       end
-      assign :batch, subject
-      assign :records_by_pid, records_by_pid
+      allow(view).to receive(:line_item_status).and_return(line_item_status)
+      render
     end
 
     it "shows batch information" do
-      render
-      expect(rendered).to have_selector(".type", text: subject.display_name)
-      expect(rendered).to have_selector(".batch_id", text: subject.id)
-      expect(rendered).to have_selector(".record_count", text: records.count)
-      expect(rendered).to have_selector(".creator", text: subject.creator.display_name)
-      expect(rendered).to have_selector(".created_at", text: subject.created_at)
+      expect(rendered).to have_selector(".type", text: "This is a batch")
+      expect(rendered).to have_selector(".batch_id", text: batch.id)
+      expect(rendered).to have_selector(".record_count", text: 1)
+      expect(rendered).to have_selector(".creator", text: "Mike K.")
+      expect(rendered).to have_selector(".created_at", text: batch.created_at)
       expect(rendered).to have_selector(".status", text: 'Queued')
-    end
 
-    it "shows record pids" do
-      render
       expect(rendered).to have_link(records.first.pid, catalog_path(records.first))
-    end
-
-    it "shows record titles" do
-      render
       expect(rendered).to have_selector(".record_title", text: records.first.title)
-    end
-
-    it "shows record status" do
-      render
       expect(rendered).to have_selector(".record_status", text: "Queued")
     end
 
@@ -72,11 +73,10 @@ describe "batches/show.html.erb" do
 
     context "with some records reviewed" do
       let(:records) do
-        d1 = FactoryGirl.create(:tufts_audio)
-        d2 = FactoryGirl.create(:tufts_pdf)
-        d1.reviewed
-        [d1, d2]
+        d1 = mock_model(TuftsAudio, pid: 'tufts:456', title: 'another one', reviewed?: true)
+        [d1, pdf]
       end
+      let(:records_by_pid) { { records[0].pid => records[0], records[1].pid => records[1] } }
 
       it "shows a complete reviewed status" do
         render
@@ -92,61 +92,47 @@ describe "batches/show.html.erb" do
 
     context "with all records reviewed" do
       let(:records) do
-        doc = FactoryGirl.create(:tufts_pdf)
-        doc.reviewed
-        [doc]
+        [mock_model(TuftsAudio, pid: 'tufts:456', title: 'another one', reviewed?: true)]
       end
 
-      it "shows an incomplete reviewed status" do
+      it "shows an complete reviewed status" do
         render
         expect(rendered).to have_selector(".review_status", text: "Complete")
       end
     end
 
     context "with nil statuses on a recent batch" do
-      subject { FactoryGirl.create(:batch_template_update,
-                                   pids: records.map(&:id),
-                                   job_ids: ['missing']) }
+      let(:batch_status) { :not_available }
+      let(:line_item_status) { 'Status not available' }
 
       it 'says the batch status is not availble' do
         render
         expect(rendered).to have_selector(".batch_info .status", text: "Status not available")
-      end
-
-      it 'says statuses are not availble' do
-        render
         expect(rendered).to have_selector(".record_status", text: "Status not available")
       end
     end
 
     context "with nil statuses on an old batch" do
-      subject { FactoryGirl.create(:batch_template_update,
-                                   pids: records.map(&:id),
-                                   job_ids: ['missing'],
-                                   created_at: Resque::Plugins::Status::Hash.expire_in.seconds.ago) }
+      let(:line_item_status) { 'Status expired' }
+      let(:batch_status) { :not_available }
 
-      it 'says the batch status is not availble' do
+      it 'shows the status' do
         render
         expect(rendered).to have_selector(".batch_info .status", text: "Status not available")
-      end
-
-      it 'says the status is expired' do
-        render
         expect(rendered).to have_selector(".record_status", text: "Status expired")
       end
     end
 
     describe 'batch actions: ' do
+      before { render }
+
       context 'a batch with status "completed"' do
-        before do
-          allow_any_instance_of(BatchTemplateUpdate).to receive(:status) { 'completed' }
-          render
-        end
+        let(:batch_status) { :completed }
 
         it 'displays the form to operate on the batch' do
           expect(rendered).to have_selector("form[method=post][action='#{batches_path}']")
-          expect(rendered).to have_selector("input[type=hidden][name='batch[pids][]'][value='#{subject.pids.first}']")
-          expect(rendered).to have_link('Review Batch', href: catalog_index_path(search_field: 'batch', q: subject.id.to_s))
+          expect(rendered).to have_selector("input[type=hidden][name='batch[pids][]'][value='#{batch.pids.first}']")
+          expect(rendered).to have_link('Review Batch', href: catalog_index_path(search_field: 'batch', q: batch.id.to_s))
           expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchPublish]")
           expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchUnpublish]")
           expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchPurge]")
@@ -154,13 +140,11 @@ describe "batches/show.html.erb" do
       end
 
       context 'a batch status that is anything but "completed"' do
-        before { render }
-
         it 'disables the batch operation buttons' do
-          expect(subject.status).to eq :queued
+          expect(batch.status).to eq :queued
           expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchPublish][disabled=disabled]")
           expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchUnpublish][disabled=disabled]")
-          expect(rendered).to have_selector("a[href='#{catalog_index_path(search_field: 'batch', q: subject.id.to_s)}'][disabled]", text: 'Review Batch')
+          expect(rendered).to have_selector("a[href='#{catalog_index_path(search_field: 'batch', q: batch.id.to_s)}'][disabled]", text: 'Review Batch')
         end
       end
     end

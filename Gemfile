@@ -48,11 +48,16 @@ end
 
 group :development, :test do
   gem 'rspec-rails', '~> 2.99'
+  gem 'sqlite3'
+end
+
+group :test do
   gem 'capybara'
   gem 'poltergeist'
   gem 'factory_girl_rails'
-  gem 'sqlite3'
+  gem 'webmock'
   gem 'database_cleaner'
+  gem 'rspec-activemodel-mocks'
 end
 
 group :debug do
