@@ -27,25 +27,22 @@ class RecordsController < ApplicationController
       return
     end
 
-    args = params[:pid].present? ? {pid: params[:pid]} : {}
-
-    if !args[:pid] || (args[:pid] && TuftsBase.valid_pid?(args[:pid]))
-      if ActiveFedora::Base.exists?(args[:pid])
-        flash[:alert] = "A record with the pid \"#{args[:pid]}\" already exists."
-        redirect_to hydra_editor.edit_record_path(args[:pid])
-      else
-        klass = params[:type].constantize
-        @record = if klass.respond_to?(:build_draft_version)
-                    klass.build_draft_version(args)
-                  else
-                    klass.new(args)
-                  end
-        @record.save(validate: false)
-        redirect_to next_page
-      end
-    else
+    if params[:pid] && !TuftsBase.valid_pid?(params[:pid])
       flash.now[:error] = "You have specified an invalid pid. Pids must be in this format: tufts:1231"
       render 'choose_type'
+      return
+    end
+
+    if ActiveFedora::Base.exists?(params[:pid])
+      flash[:alert] = "A record with the pid \"#{params[:pid]}\" already exists."
+      redirect_to hydra_editor.edit_record_path(params[:pid])
+    else
+      @record = build_record
+      if @record.save
+        redirect_to next_page
+      else
+        render 'choose_type'
+      end
     end
   end
 
@@ -145,6 +142,18 @@ class RecordsController < ApplicationController
       hydra_editor.edit_record_path(@record)
     else
       record_attachments_path(@record)
+    end
+  end
+
+  def build_record
+    klass = params[:type].constantize
+    args = params.slice(:title, :pid).merge(displays: Array(params[:displays]))
+    if klass == TuftsTemplate
+      # Store the `title` parameter as `template_name`
+      args.merge!(template_name: args.delete(:title))
+      klass.new(args)
+    else
+      klass.build_draft_version(args)
     end
   end
 end

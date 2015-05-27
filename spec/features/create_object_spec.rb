@@ -18,28 +18,33 @@ feature 'Admin user creates document' do
     click_link 'Create a new object'
 
     select "Audio", from: 'Select an object type'
+    fill_in 'Title', with: 'My title'
+    select 'dl', from: 'displays'
     fill_in 'Pid', with: pid
     click_button 'Next'
 
     # On the upload page
-    page.should have_selector('.file.btn', text: 'Upload ARCHIVAL_WAV')
-    page.should have_selector('input[type="file"].fileupload')
-    page.should have_selector('div.progress.progress-striped > .bar')
+    expect(page).to have_selector('.file.btn', text: 'Upload ARCHIVAL_WAV')
+    expect(page).to have_selector('input[type="file"].fileupload')
+    expect(page).to have_selector('div.progress.progress-striped > .bar')
     click_button 'Next'
 
     fill_in '*Title', with: 'My title'
     select('dl', from: 'Displays in Portal')
     click_button 'Save'
 
-    page.should have_selector('div.alert', text: 'Object was successfully updated.')
+    expect(page).to have_selector('div.alert', text: 'Object was successfully updated.')
   end
 
   scenario 'then purges it, recreates it, and it is properly marked Active in Fedora' do
+    #TODO this should probably be a controller test as it would have less overhead
     # First create object
     visit root_path
     click_link 'Create a new object'
 
     select "Audio", from: 'Select an object type'
+    fill_in 'Title', with: 'My title'
+    select 'dl', from: 'displays'
     fill_in 'Pid', with: pid
     click_button 'Next'
 
@@ -49,17 +54,19 @@ feature 'Admin user creates document' do
     select('dl', from: 'Displays in Portal')
     click_button 'Save'
 
-    page.should have_selector('div.alert', text: 'Object was successfully updated.')
+    expect(page).to have_selector('div.alert', text: 'Object was successfully updated.')
 
     # Now Purge it
     click_link 'Purge'
-    page.should have_selector('div.alert', text: '"My title to be purged" has been purged')
+    expect(page).to have_selector('div.alert', text: '"My title to be purged" has been purged')
 
     # Now create another object with the recycled identifier
     visit root_path
     click_link 'Create a new object'
 
     select "Audio", from: 'Select an object type'
+    fill_in 'Title', with: 'My title'
+    select 'dl', from: 'displays'
     fill_in 'Pid', with: pid
     click_button 'Next'
 
@@ -68,7 +75,7 @@ feature 'Admin user creates document' do
     fill_in '*Title', with: 'My title to be recreated'
     select('dl', from: 'Displays in Portal')
     click_button 'Save'
-    
+
     audio = TuftsAudio.find(draft_pid)
     expect(audio.state).to eq "A"
   end
