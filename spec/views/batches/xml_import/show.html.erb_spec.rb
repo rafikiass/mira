@@ -83,7 +83,7 @@ describe "batches/xml_import/show.html.erb" do
         [mock_model(TuftsAudio, pid: 'tufts:456', title: 'another one', reviewed?: true)]
       end
 
-      it "shows an incomplete reviewed status" do
+      it "shows an complete reviewed status" do
         expect(rendered).to have_selector(".review_status", text: "Complete")
       end
     end

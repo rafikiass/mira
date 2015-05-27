@@ -1,14 +1,14 @@
 require 'spec_helper'
 
 describe "batches/new.html.erb" do
-  let!(:templates) { [
-      FactoryGirl.create(:tufts_template),
-      FactoryGirl.create(:tufts_template)
-    ] }
+  let(:template1) { mock_model(TuftsTemplate, template_name: 'one') }
+  let(:template2) { mock_model(TuftsTemplate, template_name: 'two') }
+  let(:templates) { [template1, template2] }
   let(:pids) { ["tufts:1", "tufts:2"] }
   let(:batch) { Batch.new(pids: pids, type: 'BatchTemplateUpdate') }
 
   before do
+    expect(TuftsTemplate).to receive(:active).and_return(templates)
     assign :batch, batch
     render
   end

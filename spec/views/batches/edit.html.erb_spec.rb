@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe "batches/edit.html.erb" do
-  let(:batch) { FactoryGirl.create(:batch_template_import) }
+  let(:creator) { mock_model(User, display_name: 'bob') }
+  let(:batch) { mock_model(BatchTemplateImport, pids: [], missing_files:[], display_name: 'foo', creator: creator, status: :queued) }
 
   before do
     assign :batch, batch

@@ -13,7 +13,7 @@ describe 'catalog/index.html.erb' do
     }.each do |m, result|
       allow(view).to receive(m) { result }
     end
-    allow(Deprecation).to receive(:silence)
+    # allow(Deprecation).to receive(:silence)
     stub_template 'catalog/_search_sidebar.html.erb' => '',
       'catalog/_search_header.html.erb' => '',
       'catalog/_results_pagination.html.erb' => ''
@@ -38,38 +38,26 @@ describe 'catalog/index.html.erb' do
     end
 
     describe 'batch operations' do
-      it 'submits to batch#create' do
+      it 'draws the form with required fields' do
         render
         expect(rendered).to have_selector("form[method=post][action='#{batches_path}']")
-      end
 
-      it 'sends the form page as a hidden field' do
-        render
+        #sends the form page as a hidden field
         expect(rendered).to have_selector("input[type=hidden][name='batch_form_page'][value='1']")
-      end
 
-      it 'displays the button to apply a template' do
-        render
+        #button to apply a template
         expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchTemplateUpdate][data-behavior=batch-create]")
-      end
 
-      it 'displays the button to publish' do
-        render
+        #button to publish
         expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchPublish][data-behavior=batch-create]")
-      end
 
-      it 'displays the button to unpublish' do
-        render
+        #button to unpublish
         expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchUnpublish][data-behavior=batch-create]")
-      end
 
-      it 'displays the button to revert' do
-        render
+        #button to revert
         expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchRevert][data-behavior=batch-create]")
-      end
 
-      it 'has the div needed by javascript to display the number of documents that are currently selected' do
-        render
+        # the div needed by javascript to display the number of documents that are currently selected
         expect(rendered).to have_selector("#selected_documents_count")
       end
     end
@@ -94,22 +82,18 @@ describe 'catalog/index.html.erb' do
 
     describe 'for drafts' do
       before do
-        @earlier = "2015-01-01 12:00:00"
-        @later =  "2015-01-01 13:00:00"
-        @document_list = [SolrDocument.new(id: 'pub', active_fedora_model_ssi: 'TuftsImage', edited_at_dtsi: @earlier, published_at_dtsi: @earlier),
-                          SolrDocument.new(id: 'unpub', active_fedora_model_ssi: 'TuftsImage', edited_at_dtsi: @earlier, published_at_dtsi: nil),
-                          SolrDocument.new(id: 'ed', active_fedora_model_ssi: 'TuftsImage', edited_at_dtsi: @later, published_at_dtsi: @earlier)
+        earlier = "2015-01-01 12:00:00"
+        later =  "2015-01-01 13:00:00"
+        @document_list = [SolrDocument.new(id: 'pub', active_fedora_model_ssi: 'TuftsImage', edited_at_dtsi: earlier, published_at_dtsi: earlier),
+                          SolrDocument.new(id: 'unpub', active_fedora_model_ssi: 'TuftsImage', edited_at_dtsi: earlier, published_at_dtsi: nil),
+                          SolrDocument.new(id: 'ed', active_fedora_model_ssi: 'TuftsImage', edited_at_dtsi: later, published_at_dtsi: earlier)
                           ]
         render
       end
 
-      it 'displays unpublished tags' do
+      it 'displays status tags' do
         expect(rendered).to have_selector(".unpublished", count: 1)
-      end
-      it 'displays published tags' do
         expect(rendered).to have_selector(".published", count: 1)
-      end
-      it 'displays edited tags' do
         expect(rendered).to have_selector(".edited", count: 1)
       end
     end

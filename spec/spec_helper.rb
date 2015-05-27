@@ -16,6 +16,8 @@ end
 
 require 'byebug' unless ENV['CI']
 
+require 'webmock/rspec'
+
 # Checks for pending migrations before tests are run.
 ActiveRecord::Migration.maintain_test_schema!
 
@@ -37,6 +39,7 @@ RSpec.configure do |config|
   config.infer_base_class_for_anonymous_controllers = false
 
   config.before(:suite) do
+    WebMock.allow_net_connect!
     clean_fedora_and_solr
     DatabaseCleaner.clean_with(:truncation)
   end
@@ -45,13 +48,19 @@ RSpec.configure do |config|
     clean_up_carrierwave_files
   end
 
-  config.before :each do
+  config.before :each do |v|
     if Capybara.current_driver == :rack_test
       DatabaseCleaner.strategy = :transaction
     else
       DatabaseCleaner.strategy = :truncation
     end
     DatabaseCleaner.start
+    WebMock.allow_net_connect!
+  end
+
+  config.before type: :view do
+    # View tests should never hit fedora/solr, it's all mocked.
+    WebMock.disable_net_connect!
   end
 
   config.after do

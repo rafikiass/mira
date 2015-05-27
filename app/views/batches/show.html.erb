@@ -1,8 +1,6 @@
 <div class="col-sm-12">
   <h1>Batch Status</h1>
 
-  <% @batch.pids = [] unless @batch.pids %>
-
   <%= link_to "All batches", batches_path %>
 
   <div class="batch_info">
@@ -17,7 +15,7 @@
 
   <div class="batch-actions">
     <%= form_tag batches_path, method: :post do %>
-      <% @batch.pids.each do |pid| %>
+      <% Array(@batch.pids).each do |pid| %>
         <%= hidden_field_tag :batch_pids, pid, multiple: true, name: 'batch[pids][]' %>
       <% end %>
 
