@@ -15,19 +15,10 @@ describe RecordsController do
       end
       after { @record.delete }
 
-      it 'assigns @record' do
-        expect(assigns(:record)).to eq @record
-      end
-
-      it 'redirects to the record show page' do
-        response.should redirect_to catalog_path(@record)
-      end
-
       it 'marks the record as reviewed' do
-        expect(@record.reload.reviewed?).to be_truthy
-      end
-
-      it 'sets the flash' do
+        expect(response).to redirect_to catalog_path(@record)
+        expect(assigns(:record)).to eq @record
+        expect(@record.reload).to be_reviewed
         expect(flash[:notice]).to eq "\"#{@record.title}\" has been marked as reviewed."
       end
     end
@@ -35,7 +26,7 @@ describe RecordsController do
     describe 'reviews a record - when it fails to save:' do
       before do
         @record = FactoryGirl.create(:tufts_pdf)
-        TuftsPdf.any_instance.should_receive(:save) { false }
+        allow_any_instance_of(TuftsPdf).to receive(:save) { false }
         put :review, id: @record
       end
       after { @record.delete }
@@ -60,28 +51,26 @@ describe RecordsController do
     describe "who goes to the new page" do
       routes { HydraEditor::Engine.routes }
 
-      it "should be successful" do
+      it "is successful" do
         get :new
-        response.should be_successful
-        response.should render_template(:choose_type)
+        expect(response).to be_successful
+        expect(response).to render_template(:choose_type)
       end
 
-      it "should be successful without a pid" do
-        get :new, :type=>'TuftsAudio'
-        assigns[:record].should be_kind_of TuftsAudio
-        assigns[:record].should_not be_new_record
-        response.should redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record])
+      it "is successful without a pid" do
+        get :new, type: 'TuftsAudio', title: 'An audiophile', displays: 'dl'
+        expect(assigns[:record]).to be_kind_of TuftsAudio
+        expect(assigns[:record]).to be_persisted
+        expect(assigns[:record].title).to eq 'An audiophile'
+        expect(assigns[:record].displays).to eq ['dl']
+        expect(response).to redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record])
       end
 
       describe 'with type TuftsTemplate' do
-        before { get :new, :type=>'TuftsTemplate' }
-
         it 'creates a new template' do
-          assigns[:record].should be_kind_of TuftsTemplate
-        end
-
-        it 'redirects to allow you to edit the new template' do
-          response.should redirect_to HydraEditor::Engine.routes.url_helpers.edit_record_path(assigns[:record])
+          get :new, type: 'TuftsTemplate', title: 'A template', displays: 'dl'
+          expect(assigns[:record]).to be_kind_of TuftsTemplate
+          expect(response).to redirect_to HydraEditor::Engine.routes.url_helpers.edit_record_path(assigns[:record])
         end
       end
 
@@ -97,10 +86,10 @@ describe RecordsController do
           end
         end
 
-        it "should assign a draft pid" do
-          get :new, type: 'TuftsAudio', pid: pid
+        it "assigns a draft pid" do
+          get :new, type: 'TuftsAudio', pid: pid, title: 'An audiophile', displays: 'dark'
           expect(assigns[:record]).to be_kind_of TuftsAudio
-          expect(assigns[:record]).not_to be_new_record
+          expect(assigns[:record]).to be_persisted
           expect(response).to redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record])
           expect(assigns[:record].pid).to eq draft_pid
         end
@@ -108,28 +97,28 @@ describe RecordsController do
 
       describe "with the pid of an existing object" do
         let(:record) { TuftsAudio.create(title: "existing", displays: ['dl']) }
-        it "should redirect to the edit page and give a warning" do
+        it "redirects to the edit page and give a warning" do
           get :new, :type=>'TuftsAudio', :pid=>record.id
-          response.should redirect_to HydraEditor::Engine.routes.url_helpers.edit_record_path(record.id)
-          flash[:alert].should == "A record with the pid \"#{record.id}\" already exists."
+          expect(response).to redirect_to HydraEditor::Engine.routes.url_helpers.edit_record_path(record.id)
+          expect(flash[:alert]).to eq "A record with the pid \"#{record.id}\" already exists."
         end
       end
 
-      it "should be an error with an invalid pid" do
+      it "has an error with an invalid pid" do
         get :new, :type=>'TuftsAudio', :pid => 'demo:FLORA:01.01'
-        response.should be_successful
-        response.should render_template(:choose_type)
-        flash[:error].should == "You have specified an invalid pid. Pids must be in this format: tufts:1231"
+        expect(response).to be_successful
+        expect(response).to render_template(:choose_type)
+        expect(flash[:error]).to eq "You have specified an invalid pid. Pids must be in this format: tufts:1231"
       end
     end
 
     describe "creating a new record" do
       routes { HydraEditor::Engine.routes }
 
-      it "should be successful" do
+      it "is successful" do
         post :create, :type=>'TuftsAudio', :tufts_audio=>{:title=>"My title", displays: ['dl']}
-        response.should redirect_to("/catalog/#{assigns[:record].pid}")
-        assigns[:record].title.should == 'My title'
+        expect(response).to redirect_to("/catalog/#{assigns[:record].pid}")
+        expect(assigns[:record].title).to eq 'My title'
       end
     end
 
@@ -148,7 +137,7 @@ describe RecordsController do
       let(:audio) { draft.find_published }
 
       context 'when editing the draft version' do
-        it "should be successful" do
+        it "is successful" do
           get :edit, id: draft
           expect(response).to be_successful
           expect(response).to render_template(:edit)
@@ -171,7 +160,7 @@ describe RecordsController do
           @audio.edit_users = [@user.email]
           @audio.save(validate: false)
         end
-        it "should remove the record" do
+        it "removes the record" do
           expect { delete :cancel, id: @audio}.to change{TuftsAudio.count}.by(-1)
         end
       end
@@ -182,22 +171,19 @@ describe RecordsController do
           @audio.edit_users = [@user.email]
           @audio.save!
         end
-        it "should not remove the record" do
-          expect { delete :cancel, id: @audio}.to_not change{TuftsAudio.count}
+        it "doesn't remove the record" do
+          expect { delete :cancel, id: @audio }.to_not change { TuftsAudio.count }
         end
       end
 
       describe "for a template" do
-        before do
-          @template = TuftsTemplate.new(template_name: 'My Template', title:'Populate DCA-META')
-          @template.save!
-        end
+        let(:template) { TuftsTemplate.create!(template_name: 'My Template', title:'Populate DCA-META') }
         after do
-          @template.destroy
+          template.destroy
         end
         it "redirects back to the template index" do
-         delete :cancel, id: @template
-         response.should redirect_to(Tufts::Application.routes.url_helpers.templates_path)
+         delete :cancel, id: template
+         expect(response).to redirect_to(Tufts::Application.routes.url_helpers.templates_path)
         end
       end
 
@@ -209,17 +195,14 @@ describe RecordsController do
       routes { HydraEditor::Engine.routes }
 
       describe "for a template" do
-        before do
-          @template = TuftsTemplate.new(template_name: 'My Template')
-          @template.save!
-        end
+        let(:template) { TuftsTemplate.create!(template_name: 'My Template') }
         after do
-          @template.destroy
+          template.destroy
         end
         it "redirects back to the template index" do
-          put :update, id: @template, tufts_template: {template_name: "My Updated Template"}
-          response.should redirect_to(Tufts::Application.routes.url_helpers.templates_path)
-          expect(@template.reload.template_name).to eq "My Updated Template"
+          put :update, id: template, tufts_template: {template_name: "My Updated Template"}
+          expect(response).to redirect_to(Tufts::Application.routes.url_helpers.templates_path)
+          expect(template.reload.template_name).to eq "My Updated Template"
         end
       end
 

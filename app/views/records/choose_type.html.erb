@@ -1,8 +1,13 @@
 <h1>Create a new record</h1>
 
-<%= bootstrap_form_tag url: hydra_editor.new_record_path, method: :get do |f| %>
-  <label class="control-label" for="type">Select an object type</label>
-  <%= select_tag :type, options_for_select(sorted_object_types) %>
+<%= bootstrap_form_tag url: hydra_editor.new_record_path, method: :get, html: { class: 'col-md-7' } do |f| %>
+  <%= f.form_group :type, id: 'type', label: { text: 'Select an object type' } do %>
+    <%= select_tag :type, options_for_select(sorted_object_types), class: 'form-control' %>
+  <% end %>
+  <%= f.text_field :title, required: true %>
+  <%= f.form_group :displays, id: 'displays', label: { text: 'Displays' } do %>
+    <%= select_tag :displays, options_for_select(displays_options), class: 'form-control' %>
+  <% end %>
   <%= f.text_field :pid, value: '', help: 'Leave blank for an auto-generated pid.' %>
 
   <%= f.primary 'Next'%>
