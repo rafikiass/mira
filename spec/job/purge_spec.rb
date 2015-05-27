@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Job::Purge do
+  let(:record) { FactoryGirl.create(:tufts_pdf) }
+  let(:user) { FactoryGirl.create(:user) }
+  let(:batch) { FactoryGirl.create(:batch_purge, creator: user, pids: pid_list) }
+  let(:pid_list) { [record.pid] }
 
   it 'uses the "purge" queue' do
     expect(Job::Purge.queue).to eq :purge
@@ -34,37 +38,41 @@ describe Job::Purge do
       obj_id = 'tufts:1'
       TuftsPdf.find(obj_id).destroy if TuftsPdf.exists?(obj_id)
 
-      job = Job::Purge.new('uuid', 'user_id' => 1, 'record_id' => obj_id)
+      job = Job::Purge.new('uuid', 'user_id' => user.id, 'record_id' => obj_id, 'batch_id' => batch.id)
       expect{job.perform}.to raise_error(ActiveFedora::ObjectNotFoundError)
     end
 
     it 'purges the record' do
-      record = FactoryGirl.create(:tufts_pdf)
       expect(ActiveFedora::Base).to receive(:find).with(record.id, cast: true).and_return(record)
-      job = Job::Purge.new('uuid', 'user_id' => 1, 'record_id' => record.id)
+      job = Job::Purge.new('uuid', 'user_id' => user.id, 'record_id' => record.id, 'batch_id' => batch.id)
       expect_any_instance_of(PurgeService).to receive(:run).once
       job.perform
       record.delete
     end
 
     it 'can be killed' do
-      record = FactoryGirl.create(:tufts_pdf)
-      job = Job::Purge.new('uuid', 'user_id' => 1, 'record_id' => record.id)
+      job = Job::Purge.new('uuid', 'user_id' => user.id, 'record_id' => record.id)
       allow(job).to receive(:tick).and_raise(Resque::Plugins::Status::Killed)
       expect{job.perform}.to raise_exception(Resque::Plugins::Status::Killed)
     end
 
     it 'runs the job as a batch item' do
-      pdf = FactoryGirl.create(:tufts_pdf)
-      batch_id = '10'
-      job = Job::Purge.new('uuid', 'record_id' => pdf.id, 'user_id' => '1', 'batch_id' => batch_id)
+      job = Job::Purge.new('uuid', 'record_id' => record.id, 'user_id' => '1', 'batch_id' => batch.id)
 
       job.perform
-      pdf.reload
-      expect(pdf.batch_id).to eq [batch_id]
+      record.reload
+      expect(record.batch_id).to eq [batch.id.to_s]
 
-      pdf.delete
+      record.delete
     end
 
+    it 'passes user_id so that the audit will record the user' do
+        attrs = { 'record_id' => record.id, 'user_id' => user.id, 'batch_id' => batch.id }
+        job = Job::Purge.new(attrs)
+        job.instance_variable_set(:@options, attrs)
+
+        expect(PurgeService).to receive(:new).with(record, user.id) { double(run: nil) }
+        job.perform
+    end
   end
 end

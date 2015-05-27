@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe Job::Revert do
+  let(:user) { FactoryGirl.create(:user) }
+  let(:batch) { FactoryGirl.create(:batch_revert, creator: user, pids: pid_list) }
+  let(:pid_list) { [record.pid] }
 
   it 'uses the "revert" queue' do
     expect(Job::Revert.queue).to eq :revert
@@ -32,16 +35,42 @@ describe Job::Revert do
   describe '#perform' do
 
     context 'both draft and published versions of the record exist' do
-      it 'copies the published version back to the draft' do
-        record = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title")
-        record.save!
-        PublishService.new(record).run
+      let!(:record) {
+        r = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title")
+        r.save!
+        PublishService.new(r).run
+        r
+      }
 
+      let!(:published_record) {
+        TuftsPdf.find(PidUtils.to_published(record.pid))
+      }
+
+      it 'runs the job as a batch item' do
+        job = Job::Revert.new('uuid', 'record_id' => record.id, 'user_id' => user.id, 'batch_id' => batch.id)
+
+        job.perform
+        record.reload
+        expect(record.batch_id).to eq [batch.id.to_s]
+
+        record.delete
+      end
+
+      it 'copies the published version back to the draft' do
         # make sure it reverts
         record.title = "changed title"
         record.save!
-        Job::Revert.new('uuid', 'record_id' => record.pid).perform
+        Job::Revert.new('uuid', 'record_id' => record.pid, 'batch_id' => batch.id).perform
         expect(record.reload.title).to eq "orig title"
+      end
+
+      it 'passes user_id so that the audit will record the user' do
+        attrs = { 'record_id' => record.id, 'user_id' => user.id, 'batch_id' => batch.id }
+        job = Job::Revert.new(attrs)
+        job.instance_variable_set(:@options, attrs)
+
+        expect(RevertService).to receive(:new).with(published_record, user.id) { double(run: nil) }
+        job.perform
       end
     end
 
@@ -62,25 +91,31 @@ describe Job::Revert do
       end
 
       it 'hard deletes' do
-        Job::Revert.new('uuid', 'record_id' => pid).perform
+        Job::Revert.new('uuid', 'record_id' => pid, 'batch_id' => batch.id).perform
         expect(TuftsPdf).not_to exist(published_pid)
         expect(TuftsPdf).to exist(pid)
       end
     end
 
     context 'draft record missing, published record exists' do
-      it 'copies from published' do
+      let(:record) {
         record = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title")
         record.save!
+        record
+      }
 
-        pid = record.pid
+      let!(:pid) { record.pid }
+      let(:pid_list) { [pid] }
+
+      it 'copies from published' do
+        # published record exists
         PublishService.new(record).run
 
         # missing draft
         record.destroy
 
         # make sure it reverts
-        Job::Revert.new('uuid', 'record_id' => pid).perform
+        Job::Revert.new('uuid', 'record_id' => pid, 'batch_id' => batch.id).perform
 
         draft_pid = PidUtils.to_draft(pid)
         published_pid = PidUtils.to_published(pid)
@@ -91,9 +126,10 @@ describe Job::Revert do
     end
 
     context 'both draft and published record missing' do
-      it 'succeeds and does nothing' do
-        pid = 'draft:1'
+      let(:pid) { 'draft:1' }
+      let(:pid_list) { [pid] }
 
+      it 'succeeds and does nothing' do
         # published record missing
         published_pid = PidUtils.to_published(pid)
         TuftsPdf.find(published_pid).destroy if TuftsPdf.exists?(published_pid)
@@ -102,7 +138,7 @@ describe Job::Revert do
         TuftsPdf.find(pid).destroy if TuftsPdf.exists?(pid)
 
         # make sure it does nothing
-        Job::Revert.new('uuid', 'record_id' => pid).perform
+        Job::Revert.new('uuid', 'record_id' => pid, 'batch_id' => batch.id).perform
         expect(TuftsPdf.exists?(pid)).to be_falsey
       end
     end
@@ -114,19 +150,5 @@ describe Job::Revert do
       expect{job.perform}.to raise_exception(Resque::Plugins::Status::Killed)
     end
 
-    it 'runs the job as a batch item' do
-      pdf = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title")
-      pdf.save!
-      PublishService.new(pdf).run
-
-      batch_id = '10'
-      job = Job::Revert.new('uuid', 'record_id' => pdf.id, 'user_id' => '1', 'batch_id' => batch_id)
-
-      job.perform
-      pdf.reload
-      expect(pdf.batch_id).to eq [batch_id]
-
-      pdf.delete
-    end
   end
 end

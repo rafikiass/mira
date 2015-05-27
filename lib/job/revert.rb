@@ -24,7 +24,7 @@ module Job
           record.save! # batch_id gets set on the object here, so we need to save it first
           record.reverting = false
 
-          RevertService.new(record).run
+          RevertService.new(record, options['user_id']).run
         end
       rescue ActiveFedora::ObjectNotFoundError => ex
         # nothing here. It's ok to try to revert a pid that doesn't exist.

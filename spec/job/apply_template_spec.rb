@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Job::ApplyTemplate do
+  let(:batch) { FactoryGirl.create(:batch_template_update, pids: pid_list) }
+  let(:pid_list) { ["draft:1", "draft:2"] }
 
   it 'uses the "templates" queue' do
     Job::ApplyTemplate.queue.should == :templates
@@ -35,18 +37,23 @@ describe Job::ApplyTemplate do
 
 
   describe '#perform' do
-    it 'raises an error if it fails to find the object' do
-      obj_id = 'tufts:1'
-      TuftsPdf.find(obj_id).destroy if TuftsPdf.exists?(obj_id)
+    context 'when it fails to find the object' do
+      let(:obj_id) { 'tufts:1' }
+      let(:pid_list) { [obj_id] }
 
-      job = Job::ApplyTemplate.new('uuid', 'user_id' => 1, 'record_id' => obj_id, 'attributes' => {})
-      expect{job.perform}.to raise_error(ActiveFedora::ObjectNotFoundError)
+      before do
+        TuftsPdf.find(obj_id).destroy if TuftsPdf.exists?(obj_id)
+      end
+
+      it 'raises an error' do
+        job = Job::ApplyTemplate.new('uuid', 'user_id' => batch.creator.id, 'record_id' => obj_id, 'batch_id' => batch.id, 'attributes' => {})
+        expect{job.perform}.to raise_error(ActiveFedora::ObjectNotFoundError)
+      end
     end
 
     it 'clears out the batch reviewed status marker' do
       object = TuftsPdf.new(title: 'old title', displays: ['dl'], qrStatus: [Reviewable.batch_review_text, 'status 2'])
       object.save!
-      batch = FactoryGirl.create(:batch_template_update)
       job = Job::ApplyTemplate.new('uuid', 'user_id' => 1, 'record_id' => object.id, 'batch_id' => batch.id, 'attributes' => {toc: 'new toc'})
 
       job.perform
@@ -60,7 +67,6 @@ describe Job::ApplyTemplate do
       before do
         @object = TuftsPdf.new(title: 'old title', displays: ['dl'], qrStatus: ['status 2'])
         @object.save!
-        batch = FactoryGirl.create(:batch_template_update)
         @job = Job::ApplyTemplate.new('uuid', 'user_id' => 1, 'record_id' => @object.id, 'batch_id' => batch.id, 'attributes' => { qrStatus: Reviewable.batch_review_text })
       end
       after { @object.delete }
@@ -75,7 +81,6 @@ describe Job::ApplyTemplate do
     it 'updates the record' do
       object = TuftsPdf.new(title: 'old title', toc: ['old toc'], displays: ['dl'])
       object.save!
-      batch = FactoryGirl.create(:batch_template_update)
       job = Job::ApplyTemplate.new('uuid', 'user_id' => 1, 'record_id' => object.id, 'batch_id' => batch.id,  'attributes' => {toc: 'new toc'})
       job.perform
       object.reload
@@ -94,7 +99,6 @@ describe Job::ApplyTemplate do
 
     it 'runs the job as a batch item' do
       pdf = FactoryGirl.create(:tufts_pdf)
-      batch = FactoryGirl.create(:batch_template_update)
       job = Job::ApplyTemplate.new('uuid', 'record_id' => pdf.id, 'user_id' => '1', 'batch_id' => batch.id, 'attributes' => {toc: 'new toc 123'})
 
       job.perform

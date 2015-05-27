@@ -18,7 +18,7 @@ module Job
 
       run_as_batch_item(options['record_id'], options['batch_id']) do |record|
         record.save! # batch_id gets set on the object here, so we need to save it first
-        PurgeService.new(record).run
+        PurgeService.new(record, options['user_id']).run
       end
     end
 

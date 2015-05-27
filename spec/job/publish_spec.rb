@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Job::Publish do
+  let(:record) { FactoryGirl.create(:tufts_pdf) }
+  let(:user) { FactoryGirl.create(:user) }
+  let(:batch) { FactoryGirl.create(:batch_publish, creator: user, pids: pid_list) }
+  let(:pid_list) { [record.pid] }
 
   it 'uses the "publish" queue' do
     expect(Job::Publish.queue).to eq :publish
@@ -30,27 +34,29 @@ describe Job::Publish do
   end
 
   describe '#perform' do
-    let(:user) { FactoryGirl.create(:user) }
+    context 'when it fails to find the object' do
+      let(:obj_id) { 'tufts:1' }
+      let(:pid_list) { [obj_id] }
 
-    it 'raises an error if it fails to find the object' do
-      obj_id = 'tufts:1'
-      TuftsPdf.find(obj_id).destroy if TuftsPdf.exists?(obj_id)
+      before do
+        TuftsPdf.find(obj_id).destroy if TuftsPdf.exists?(obj_id)
+      end
 
-      job = Job::Publish.new('uuid', 'user_id' => 1, 'record_id' => obj_id)
-      expect{job.perform}.to raise_error(ActiveFedora::ObjectNotFoundError)
+      it 'raises an error' do
+        job = Job::Publish.new('uuid', 'user_id' => user.id, 'record_id' => obj_id, 'batch_id' => batch.id)
+        expect{job.perform}.to raise_error(ActiveFedora::ObjectNotFoundError)
+      end
     end
 
     it 'publishes the record' do
-      record = FactoryGirl.create(:tufts_pdf)
       expect(ActiveFedora::Base).to receive(:find).with(record.id, cast: true).and_return(record)
-      job = Job::Publish.new('uuid', 'user_id' => user.id, 'record_id' => record.id)
+      job = Job::Publish.new('uuid', 'user_id' => user.id, 'record_id' => record.id, 'batch_id' => batch.id)
       expect_any_instance_of(PublishService).to receive(:run).once
       job.perform
       record.delete
     end
 
     it 'can be killed' do
-      record = FactoryGirl.create(:tufts_pdf)
       job = Job::Publish.new('uuid', 'user_id' => 1, 'record_id' => record.id)
       allow(job).to receive(:tick).and_raise(Resque::Plugins::Status::Killed)
       expect{job.perform}.to raise_exception(Resque::Plugins::Status::Killed)
@@ -58,12 +64,11 @@ describe Job::Publish do
 
     it 'runs the job as a batch item' do
       pdf = FactoryGirl.create(:tufts_pdf)
-      batch_id = '10'
-      job = Job::Publish.new('uuid', 'record_id' => pdf.id, 'user_id' => user.id, 'batch_id' => batch_id)
+      job = Job::Publish.new('uuid', 'record_id' => pdf.id, 'user_id' => user.id, 'batch_id' => batch.id)
 
       job.perform
       pdf.reload
-      expect(pdf.batch_id).to eq [batch_id]
+      expect(pdf.batch_id).to eq [batch.id.to_s]
 
       pdf.delete
     end
