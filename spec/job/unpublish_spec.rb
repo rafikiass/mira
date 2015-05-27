@@ -40,7 +40,7 @@ describe Job::Unpublish do
       obj_id = 'tufts:1'
       TuftsPdf.find(obj_id).destroy if TuftsPdf.exists?(obj_id)
 
-      job = Job::Unpublish.new('uuid', 'user_id' => 1, 'record_id' => obj_id, 'batch_id' => batch.id)
+      job = Job::Unpublish.new('uuid', 'user_id' => user.id, 'record_id' => obj_id, 'batch_id' => batch.id)
       expect{job.perform}.to raise_error(ActiveFedora::ObjectNotFoundError)
     end
 
@@ -56,7 +56,7 @@ describe Job::Unpublish do
     end
 
     it 'can be killed' do
-      job = Job::Unpublish.new('uuid', 'user_id' => 1, 'record_id' => record.id)
+      job = Job::Unpublish.new('uuid', 'user_id' => user.id, 'record_id' => record.id)
       allow(job).to receive(:tick).and_raise(Resque::Plugins::Status::Killed)
       expect{job.perform}.to raise_exception(Resque::Plugins::Status::Killed)
     end

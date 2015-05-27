@@ -57,7 +57,7 @@ describe Job::Publish do
     end
 
     it 'can be killed' do
-      job = Job::Publish.new('uuid', 'user_id' => 1, 'record_id' => record.id)
+      job = Job::Publish.new('uuid', 'user_id' => user.id, 'record_id' => record.id)
       allow(job).to receive(:tick).and_raise(Resque::Plugins::Status::Killed)
       expect{job.perform}.to raise_exception(Resque::Plugins::Status::Killed)
     end

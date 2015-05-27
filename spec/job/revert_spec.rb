@@ -145,7 +145,7 @@ describe Job::Revert do
 
     it 'can be killed' do
       record = FactoryGirl.create(:tufts_pdf)
-      job = Job::Revert.new('uuid', 'user_id' => 1, 'record_id' => record.id)
+      job = Job::Revert.new('uuid', 'user_id' => user.id, 'record_id' => record.id)
       allow(job).to receive(:tick).and_raise(Resque::Plugins::Status::Killed)
       expect{job.perform}.to raise_exception(Resque::Plugins::Status::Killed)
     end

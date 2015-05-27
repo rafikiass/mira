@@ -3,6 +3,7 @@ require 'spec_helper'
 describe Job::ApplyTemplate do
   let(:batch) { FactoryGirl.create(:batch_template_update, pids: pid_list) }
   let(:pid_list) { ["draft:1", "draft:2"] }
+  let(:user) { batch.creator }
 
   it 'uses the "templates" queue' do
     Job::ApplyTemplate.queue.should == :templates
@@ -46,7 +47,7 @@ describe Job::ApplyTemplate do
       end
 
       it 'raises an error' do
-        job = Job::ApplyTemplate.new('uuid', 'user_id' => batch.creator.id, 'record_id' => obj_id, 'batch_id' => batch.id, 'attributes' => {})
+        job = Job::ApplyTemplate.new('uuid', 'user_id' => user.id, 'record_id' => obj_id, 'batch_id' => batch.id, 'attributes' => {})
         expect{job.perform}.to raise_error(ActiveFedora::ObjectNotFoundError)
       end
     end
@@ -54,7 +55,7 @@ describe Job::ApplyTemplate do
     it 'clears out the batch reviewed status marker' do
       object = TuftsPdf.new(title: 'old title', displays: ['dl'], qrStatus: [Reviewable.batch_review_text, 'status 2'])
       object.save!
-      job = Job::ApplyTemplate.new('uuid', 'user_id' => 1, 'record_id' => object.id, 'batch_id' => batch.id, 'attributes' => {toc: 'new toc'})
+      job = Job::ApplyTemplate.new('uuid', 'user_id' => user.id, 'record_id' => object.id, 'batch_id' => batch.id, 'attributes' => {toc: 'new toc'})
 
       job.perform
       object.reload
@@ -67,7 +68,7 @@ describe Job::ApplyTemplate do
       before do
         @object = TuftsPdf.new(title: 'old title', displays: ['dl'], qrStatus: ['status 2'])
         @object.save!
-        @job = Job::ApplyTemplate.new('uuid', 'user_id' => 1, 'record_id' => @object.id, 'batch_id' => batch.id, 'attributes' => { qrStatus: Reviewable.batch_review_text })
+        @job = Job::ApplyTemplate.new('uuid', 'user_id' => user.id, 'record_id' => @object.id, 'batch_id' => batch.id, 'attributes' => { qrStatus: Reviewable.batch_review_text })
       end
       after { @object.delete }
 
@@ -81,7 +82,7 @@ describe Job::ApplyTemplate do
     it 'updates the record' do
       object = TuftsPdf.new(title: 'old title', toc: ['old toc'], displays: ['dl'])
       object.save!
-      job = Job::ApplyTemplate.new('uuid', 'user_id' => 1, 'record_id' => object.id, 'batch_id' => batch.id,  'attributes' => {toc: 'new toc'})
+      job = Job::ApplyTemplate.new('uuid', 'user_id' => user.id, 'record_id' => object.id, 'batch_id' => batch.id,  'attributes' => {toc: 'new toc'})
       job.perform
       object.reload
       object.toc.should == ['old toc', 'new toc']
@@ -90,7 +91,7 @@ describe Job::ApplyTemplate do
     it "can be killed" do
       object = TuftsPdf.new(title: 'old title', toc: ['old toc'], displays: ['dl'])
       object.save!
-      job = Job::ApplyTemplate.new('uuid', 'user_id' => 1, 'record_id' => object.id, 'attributes' => {toc: 'new toc'})
+      job = Job::ApplyTemplate.new('uuid', 'user_id' => user.id, 'record_id' => object.id, 'attributes' => {toc: 'new toc'})
       allow(job).to receive(:tick).and_raise(Resque::Plugins::Status::Killed)
       expect{job.perform}.to raise_exception(Resque::Plugins::Status::Killed)
       object.reload
@@ -99,7 +100,7 @@ describe Job::ApplyTemplate do
 
     it 'runs the job as a batch item' do
       pdf = FactoryGirl.create(:tufts_pdf)
-      job = Job::ApplyTemplate.new('uuid', 'record_id' => pdf.id, 'user_id' => '1', 'batch_id' => batch.id, 'attributes' => {toc: 'new toc 123'})
+      job = Job::ApplyTemplate.new('uuid', 'record_id' => pdf.id, 'user_id' => user.id, 'batch_id' => batch.id, 'attributes' => {toc: 'new toc 123'})
 
       job.perform
       pdf.reload
@@ -114,7 +115,7 @@ describe Job::ApplyTemplate do
         @batch = FactoryGirl.create(:batch_template_update, behavior: BatchTemplateUpdate::PRESERVE)
         @pdf = FactoryGirl.create(:tufts_pdf, title: 'old title')
         new_attrs = { title: 'new title' }
-        @job = Job::ApplyTemplate.new('uuid', 'record_id' => @pdf.id, 'user_id' => '1', 'batch_id' => @batch.id, 'attributes' => new_attrs)
+        @job = Job::ApplyTemplate.new('uuid', 'record_id' => @pdf.id, 'user_id' => user.id, 'batch_id' => @batch.id, 'attributes' => new_attrs)
       end
 
       it 'passes the overwrite value to apply_attributes' do

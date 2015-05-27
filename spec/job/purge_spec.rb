@@ -57,7 +57,7 @@ describe Job::Purge do
     end
 
     it 'runs the job as a batch item' do
-      job = Job::Purge.new('uuid', 'record_id' => record.id, 'user_id' => '1', 'batch_id' => batch.id)
+      job = Job::Purge.new('uuid', 'record_id' => record.id, 'user_id' => user.id, 'batch_id' => batch.id)
 
       job.perform
       record.reload
