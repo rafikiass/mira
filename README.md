@@ -86,9 +86,15 @@ brew install redis
 redis-server &
 ```
 
-##Start background worker
+## Start background worker(s) with resque-pool
+Modify the config/resque-pool.yml to set your environment, queue names, and number of workers. A common setting for a development environment would be:
+```
+development:
+"*": 2
+```
+ Then start a pool of workers:
 ```bash
-$ QUEUE=* bundle exec rake environment resque:work
+$ bundle exec resque-pool 
 ```
 
 ### Optional: start resque-web
