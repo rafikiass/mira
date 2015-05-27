@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "batches/xml_import/edit.html.erb" do
+describe "batch/xml_imports/edit.html.erb" do
   let(:creator) { mock_model(User, display_name: 'bob') }
   let(:batch) { mock_model(BatchXmlImport, pids: [], missing_files:[], display_name: 'foo', creator: creator, status: :queued) }
 

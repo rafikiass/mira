@@ -45,8 +45,8 @@ Tufts::Application.routes.draw do
     get :new_template_import, on: :collection
   end
 
-  namespace :batches do
-    resources :xml_import, only: [:new, :show, :create, :edit, :update]
+  namespace :batch do
+    resources :xml_imports, only: [:new, :show, :create, :edit, :update]
   end
 
   namespace :handle do

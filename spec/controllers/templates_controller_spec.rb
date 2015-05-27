@@ -1,13 +1,10 @@
 require 'spec_helper'
 
 describe TemplatesController do
-  before do
-    @user = FactoryGirl.create(:user)
-    @admin = FactoryGirl.create(:admin)
-  end
+  before { sign_in user }
 
   describe 'as a non-admin user' do
-    before { sign_in @user }
+    let(:user) { create(:user) }
 
     it 'redirects to contributions' do
       get :index
@@ -17,15 +14,15 @@ describe TemplatesController do
   end
 
   describe 'as an admin user' do
-    before { sign_in @admin }
+    let(:user) { create(:admin) }
 
     context 'with some objects' do
-      before :all do
+      before do
         TuftsTemplate.destroy_all
-        FactoryGirl.create(:tufts_template)
-        FactoryGirl.create(:tufts_template)
-        FactoryGirl.create(:tufts_pdf)
-        FactoryGirl.create(:tufts_audio)
+        create(:tufts_template)
+        create(:tufts_template)
+        create(:tufts_pdf)
+        create(:tufts_audio)
       end
 
       it 'returns only templates' do

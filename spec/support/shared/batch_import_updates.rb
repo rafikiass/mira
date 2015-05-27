@@ -7,7 +7,7 @@ shared_examples 'an import happy path' do
 
   it 'HTML response redirects to batch show page' do
     if batch.kind_of? BatchXmlImport
-      expect(response).to redirect_to(batches_xml_import_path(batch))
+      expect(response).to redirect_to(batch)
     else
       expect(response).to redirect_to(batch_path(batch))
     end
@@ -69,8 +69,9 @@ shared_examples 'a JSON import' do
     it 'returns JSON data needed by the view template' do
       patch :update, id: batch.id, documents: [file1], format: :json
       json = JSON.parse(response.body)['files'].first
-      expect(json['pid']).to eq TuftsPdf.first.pid
-      expect(json['title']).to eq TuftsPdf.first.title
+      doc = TuftsPdf.find(batch.reload.pids.last)
+      expect(json['pid']).to eq doc.pid
+      expect(json['title']).to eq doc.title
       expect(json['name']).to eq file1.original_filename
       expect(json['warning']).to be_nil
       expect(json['error']).to be_nil
