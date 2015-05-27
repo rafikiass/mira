@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "batches/xml_import/show.html.erb" do
+describe "batch/xml_imports/show.html.erb" do
 
   let(:creator) { mock_model(User, display_name: 'bob') }
 

@@ -1,4 +1,4 @@
-class Batches::XmlImportController < ApplicationController
+class Batch::XmlImportsController < ApplicationController
   before_filter :build_batch, only: :create
   load_resource only: [:new, :show, :edit], instance_name: :batch, class: 'BatchXmlImport'
   before_filter :load_batch, only: :update
@@ -33,7 +33,7 @@ class Batches::XmlImportController < ApplicationController
       format.html do
         flash[:alert] = (warnings + errors).join(', ')
         if success
-          redirect_to batches_xml_import_path(@batch)
+          redirect_to batch_xml_import_path(@batch)
         else
           render :edit
         end
@@ -49,7 +49,7 @@ class Batches::XmlImportController < ApplicationController
     @batch.creator = current_user
 
     if @batch.save
-      redirect_to edit_batches_xml_import_path(@batch)
+      redirect_to edit_batch_xml_import_path(@batch)
     else
       render :new
     end

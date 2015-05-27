@@ -1,6 +1,6 @@
 <h1> Xml-based Batch Import </h1>
 
-<%= bootstrap_form_for @batch, as: :batch, url: batches_path do |f| %>
+<%= bootstrap_form_for @batch do |f| %>
   <% if @batch.errors[:base].present? %>
     <div class="alert alert-danger">
       <h4>There were errors that prevented this Batch xml import from being saved:</h4>
@@ -11,7 +11,6 @@
       </ul>
     </div>
   <% end %>
-  <%= f.hidden_field :type %>
   <%= f.file_field :metadata_file %>
   <%= f.submit 'Next' %>
 <% end %>

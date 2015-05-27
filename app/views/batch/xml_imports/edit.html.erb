@@ -22,9 +22,9 @@
   </div>
 <% end %>
 
-<%= bootstrap_form_for @batch, url: batches_xml_import_path(@batch), html: { multipart: true, id: 'fileupload' } do |f| %>
+<%= bootstrap_form_for @batch, html: { multipart: true, id: 'fileupload' } do |f| %>
   <%= render 'batches/bootstrap_upload_form', f: f %>
 <% end %>
 
-<%= link_to "Batch Summary", batch_path(@batch), class: 'js-only hidden disabled btn btn-primary', id: 'next_button' %>
+<%= link_to "Batch Summary", @batch, class: 'js-only hidden disabled btn btn-primary', id: 'next_button' %>
 
