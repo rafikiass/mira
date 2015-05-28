@@ -1,8 +1,12 @@
 FactoryGirl.define do
   factory :tufts_video do
+    initialize_with { new(namespace: namespace) }
+
     transient do
       user { FactoryGirl.create(:user) }
+      namespace { PidUtils.draft_namespace }
     end
+
     sequence(:title) {|n| "Title #{n}" }
     displays { ['dl'] }
     after(:build) { |deposit, evaluator|

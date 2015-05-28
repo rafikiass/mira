@@ -14,4 +14,9 @@ class TemplatesController < CatalogController
   def filter_templates
     # Clears the Template filter set in the CatalogController
   end
+
+  def only_draft_objects(solr_parameters, user_parameters)
+    # nop - override method from CatalogController
+  end
+
 end

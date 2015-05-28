@@ -52,6 +52,28 @@ describe CatalogController do
         expect(found).to_not include bad.id
       end
 
+      context 'with both draft and published objects' do
+        before do
+          ActiveFedora::Base.delete_all
+        end
+
+        let!(:draft_record) do
+          r = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title")
+          r.save!
+          r
+        end
+
+        let!(:published_record) do
+          PublishService.new(draft_record).run
+          TuftsPdf.find(PidUtils.to_published(draft_record.pid))
+        end
+
+        it 'displays only the draft records' do
+          get :index
+          records = assigns[:document_list].map(&:id)
+          expect(records).to eq [draft_record.pid]
+        end
+      end
     end
 
     it 'can view someone elses document' do

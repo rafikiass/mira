@@ -9,7 +9,7 @@ class CatalogController < ApplicationController
   before_filter :enforce_show_permissions, :only => :show
 
   # This filters out objects that you want to exclude from search results, like FileAssets
-  CatalogController.solr_search_params_logic += [:exclude_unwanted_models]
+  CatalogController.solr_search_params_logic += [:exclude_unwanted_models, :only_draft_objects]
 
   def index
     redirect_to contributions_path unless current_user.admin?
@@ -210,5 +210,10 @@ protected
   def filter_trove_collections
     %{NOT active_fedora_model_ssi:CourseCollection
       NOT active_fedora_model_ssi:PersonalCollection}
+  end
+
+  def only_draft_objects(solr_parameters, user_parameters)
+    solr_parameters[:fq] ||= []
+    solr_parameters[:fq] << "id:#{PidUtils.draft_namespace}*"
   end
 end

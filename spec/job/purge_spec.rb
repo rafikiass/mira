@@ -58,6 +58,7 @@ describe Job::Purge do
 
     it 'runs the job as a batch item' do
       job = Job::Purge.new('uuid', 'record_id' => record.id, 'user_id' => user.id, 'batch_id' => batch.id)
+      allow(PurgeService).to receive(:new).with(record, user.id) { double(run: nil) }
 
       job.perform
       record.reload

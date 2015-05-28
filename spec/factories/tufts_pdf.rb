@@ -1,8 +1,12 @@
 FactoryGirl.define do
   factory :tufts_pdf do
+    initialize_with { new(namespace: namespace) }
+
     transient do
+      namespace { PidUtils.draft_namespace }
       user { FactoryGirl.create(:user) }
     end
+
     sequence(:title) {|n| "Title #{n}" }
     displays { ['dl'] }
     after(:build) { |deposit, evaluator|
@@ -12,9 +16,6 @@ FactoryGirl.define do
   end
 
   factory :self_deposit_pdf, parent: :tufts_pdf do
-    transient do
-      user { FactoryGirl.create(:user) }
-    end
     createdby Contribution::SELFDEP
     after(:build) do |deposit, evaluator|
       deposit.note = ["#{evaluator.user.display_name} self-deposited on #{Time.now.strftime('%Y-%m-%d at %H:%M:%S %Z')} using the Deposit Form for the Tufts Digital Library"]

@@ -4,9 +4,9 @@ feature 'Search by batch ID' do
   before do
     ActiveFedora::Base.delete_all
 
-    @image = TuftsImage.create!(title: 'Img 1', displays: ['dl'], batch_id: ['2'])
-    @pdf = TuftsPdf.create!(title: 'PDF 1', displays: ['dl'], batch_id: ['27'])
-    @audio = TuftsAudio.create!(title: 'Aud 1', displays: ['dl'], batch_id: ['32'])
+    @image = TuftsImage.create!(title: 'Img 1', displays: ['dl'], batch_id: ['2'], namespace: PidUtils.draft_namespace)
+    @pdf = TuftsPdf.create!(title: 'PDF 1', displays: ['dl'], batch_id: ['27'], namespace: PidUtils.draft_namespace)
+    @audio = TuftsAudio.create!(title: 'Aud 1', displays: ['dl'], batch_id: ['32'], namespace: PidUtils.draft_namespace)
 
     sign_in :admin
   end
