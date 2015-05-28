@@ -25,14 +25,13 @@ describe 'unpublished/index.html.erb' do
   end
 
   describe 'batch operations' do
-    it 'displays the button to publish' do
-      render
-      expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchPublish][data-behavior=batch-create]")
-    end
+    before { render }
 
-    it 'there is no unpublish button' do
-      render
-      expect(rendered).to_not have_selector("button[type=submit][name='batch[type]'][value=BatchUnpublish][data-behavior=batch-create]")
+    it 'displays the button to publish' do
+      expect(rendered).to have_selector("form[method=post][action='#{batch_publishes_path}'] input[type=submit][value=Publish][data-behavior=batch-create]")
+
+      # not the unpublish button
+      expect(rendered).to_not have_selector("input[type=submit][value=Unpublish]")
     end
   end
 end

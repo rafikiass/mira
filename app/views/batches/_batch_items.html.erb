@@ -1,0 +1,25 @@
+  <div class="batch-items">
+    <table class="table">
+      <tr>
+        <th>PID</th>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Review Status</th>
+      </tr>
+
+      <% batch.pids.each do |pid| %>
+        <% record = records_by_pid[pid] %>
+        <% job = batch.jobs.select {|job| job && job.options && (job.options['record_id'] == pid) }.first %>
+        <tr>
+          <td class="record_pid"><%= link_to pid, catalog_path(pid) %></td>
+          <td class="record_title"><%= record.try(&:title) %></td>
+          <td class="record_status"><%= line_item_status(batch, job, pid) %></td>
+          <td class="record_reviewed_status">
+            <%= check_box_tag :reviewed, :reviewed, record.try(:reviewed?), type: :checkbox, disabled: true  %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+
+

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "batches/new_template_import.html.erb" do
+describe "batch/template_imports/new.html.erb" do
   let(:batch) { BatchTemplateImport.new }
   let(:templates) { [build(:tufts_template), build(:tufts_template)] }
 

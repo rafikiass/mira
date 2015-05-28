@@ -2,22 +2,19 @@
 <div id="documents">
   <%= check_box_tag 'check_all', 'yes', @all_checked %>
 
-  <%= button_tag "Apply Template", type: :submit, name: 'batch[type]', value: "BatchTemplateUpdate", class: "btn btn-primary", 'data-behavior'=>'batch-create' %>
+  <%= button_to "Apply Template", new_batch_template_update_path, method: :get, class: "btn btn-primary", data: { behavior: 'batch-create' } %>
 
-  <%= button_tag "Publish", type: :submit, name: 'batch[type]', value: "BatchPublish", class: "btn btn-primary", 'data-behavior'=>'batch-create' %>
+  <%= button_to "Publish", batch_publishes_path, class: "btn btn-primary", data: { behavior: 'batch-create' } %>
 
   <% unless controller.is_a?(UnpublishedController) %>
-    <%= button_tag "Unpublish", type: :submit,
-      name: 'batch[type]', value: "BatchUnpublish",
+    <%= button_to "Unpublish", batch_unpublishes_path,
       class: "btn btn-primary",
-      'data-behavior'=>'batch-create' %>
+      data: { behavior: 'batch-create' } %>
   <% end %>
 
-  <%= button_tag "Revert", type: :submit,
-    name: 'batch[type]', value: "BatchRevert",
+  <%= button_to "Revert", batch_reverts_path,
     class: "btn btn-primary",
-    data: { confirm: "All pending edits will be reverted for the selected records.  This action cannot be undone. Do you wish to proceed?" },
-    'data-behavior'=>'batch-create' %>
+    data: { confirm: "All pending edits will be reverted for the selected records.  This action cannot be undone. Do you wish to proceed?",  behavior: 'batch-create' } %>
 
   <div id='selected_documents_count'> <br /> </div>
 

@@ -1,66 +1,41 @@
 require 'spec_helper'
 
 shared_examples 'requires a list of pids' do |batch_factory|
-
   context 'error path - no pids were selected:' do
+    context "with a referrer" do
+      before { allow(controller.request).to receive(:referer) { catalog_index_path } }
 
-    it 'redirects to previous page' do
-      allow(controller.request).to receive(:referer) { catalog_index_path }
-      post :create, batch: FactoryGirl.attributes_for(batch_factory, pids: [])
-      response.should redirect_to(request.referer)
+      it 'redirects to previous page' do
+        allow(controller.request).to receive(:referer) { catalog_index_path }
+        post :create, batch: attributes_for(batch_factory, pids: [])
+        expect(response).to redirect_to(request.referer)
+      end
     end
 
-    it 'redirects to root if there is no referer' do
-      post :create, batch: FactoryGirl.attributes_for(batch_factory, pids: [])
-      response.should redirect_to(root_path)
+    context "with no referrer" do
+      it 'redirects to root' do
+        post :create, batch: attributes_for(batch_factory, pids: [])
+        expect(response).to redirect_to(root_path)
+        expect(flash[:error]).to == 'Please select some records to do batch updates.'
+      end
     end
-
-    it 'sets the flash' do
-      post :create, batch: FactoryGirl.attributes_for(batch_factory, pids: [])
-      flash[:error].should == 'Please select some records to do batch updates.'
-    end
-
   end
 end
 
 
 shared_examples 'batch creation happy path' do |batch_class|
   let(:factory_name) { batch_class.to_s.underscore.to_sym }
-  let(:different_user) { FactoryGirl.create(:admin) }
-  let(:service_name) { batch_class == BatchTemplateUpdate ? BatchTemplateUpdateRunnerService : BatchRunnerService }
-
-  before do
-    allow_any_instance_of(service_name).to receive(:run) { true }
-  end
-
-  it 'assigns the current user as the creator' do
-    attrs = FactoryGirl.attributes_for(factory_name, creator_id: different_user.id)
-    post 'create', batch: attrs
-
-    expect(assigns[:batch].creator).to eq controller.current_user
-  end
+  let(:different_user) { create(:admin) }
+  let(:service_name) { BatchRunnerService }
 
   it 'creates a batch' do
-    batch_count = Batch.count
-    post 'create', batch: FactoryGirl.attributes_for(factory_name)
-    expect(Batch.count).to eq batch_count + 1
-  end
-
-  it 'assigns @batch' do
-    post 'create', batch: FactoryGirl.attributes_for(factory_name)
-    expect(assigns[:batch]).to be_kind_of batch_class
-  end
-
-  it 'runs the batch' do
-    batch = Batch.new(FactoryGirl.attributes_for(factory_name))
-    allow(Batch).to receive(:new) { batch }
     expect_any_instance_of(service_name).to receive(:run) { true }
-    post 'create', batch: FactoryGirl.attributes_for(factory_name)
-  end
-
-  it 'redirects to the batch show page' do
-    post 'create', batch: FactoryGirl.attributes_for(factory_name)
-    response.should redirect_to(batch_path(assigns[:batch]))
+    expect {
+      post 'create', batch: attributes_for(factory_name, creator_id: different_user.id)
+    }.to change { Batch.count }.by(1)
+    expect(assigns[:batch]).to be_kind_of batch_class
+    expect(assigns[:batch].creator).to eq controller.current_user
+    expect(response).to redirect_to(assigns[:batch])
   end
 end
 
@@ -68,29 +43,21 @@ end
 shared_examples 'batch run failure recovery' do |batch_class|
   let(:factory_name) { batch_class.to_s.underscore.to_sym }
   let(:attrs) { FactoryGirl.attributes_for(factory_name) }
-  let(:service_name) { batch_class == BatchTemplateUpdate ? BatchTemplateUpdateRunnerService : BatchRunnerService }
-  before do
-    allow_any_instance_of(service_name).to receive(:run) { false }
-  end
+  let(:service_name) { BatchRunnerService }
 
   context 'error path - batch fails to run:' do
-
-    it 'sets the flash' do
-      batch_class.any_instance.stub(:save) { true }
-      post :create, batch: attrs
-      flash[:error].should == 'Unable to run batch, please try again later.'
+    before do
+      allow_any_instance_of(service_name).to receive(:run) { false }
     end
 
     it "doesn't create a batch object" do
-      batch_count = Batch.count
-      post 'create', batch: attrs
-      expect(Batch.count).to eq batch_count
-    end
-
-    it 'still assigns @batch' do
-      post 'create', batch: attrs
+      batch_class.any_instance.stub(:save) { true }
+      expect {
+        post :create, batch: attrs
+      }.not_to change { Batch.count }
+      expect(flash[:error]).to eq 'Unable to run batch, please try again later.'
       expect(assigns[:batch].pids).to eq attrs[:pids]
-      expect(assigns[:batch].new_record?).to be_truthy
+      expect(assigns[:batch]).to be_new_record
     end
   end
 end

@@ -1,0 +1,11 @@
+  <div class="batch_info">
+    <%= make_dl "Batch Type", batch.display_name, "type" %>
+    <%= make_dl "Batch id", batch.id, "batch_id" %>
+    <%= make_dl "Record Count", records_by_pid.count, "record_count" %>
+    <%= make_dl "Creator", batch.creator.display_name, "creator" %>
+    <%= make_dl "Created at", batch.created_at, "created_at" %>
+    <%= make_dl "Status", batch_status_text(batch), "status" %>
+    <%= make_dl "Review Status", (records_by_pid.values.all?{|m| m.try(:reviewed?)} ? "Complete" : "Incomplete"), "review_status" %>
+  </div>
+
+

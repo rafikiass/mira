@@ -1,5 +1,4 @@
-<%= bootstrap_form_for @batch, as: :batch, url: batches_path do |f| %>
-  <%= f.hidden_field :type %>
+<%= bootstrap_form_for @batch do |f| %>
   <% @batch.pids.each do |pid| %>
     <%= f.hidden_field :pids, multiple: true, value: pid %>
   <% end %>
