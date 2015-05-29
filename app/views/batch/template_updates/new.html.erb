@@ -7,14 +7,23 @@
 
   <%= f.label :behavior, 'Template Behavior' %>
 
-  <%= f.radio_button :behavior, BatchTemplateUpdate::PRESERVE, checked: true %>
-  <strong> Preserve: </strong> &nbsp;
-  Append template metadata to blank and multivalued fields.
+  <div class='well'>
+    <div class='form-group'>
+      <%= f.radio_button :behavior, BatchTemplateUpdate::PRESERVE, checked: true %>
+      <div class='radio-label'>
+        <strong> Preserve: </strong> &nbsp;
+        Append template metadata to blank and multivalued fields.
+      </div>
+    </div>
 
-  <%= f.radio_button :behavior, BatchTemplateUpdate::OVERWRITE %>
-  <strong> Overwrite: </strong> &nbsp;
-  Apply the template and overwrite any exisiting data with data from the template. Use this option with caution.
-  <br /> <br />
+    <div class='form-group'>
+      <%= f.radio_button :behavior, BatchTemplateUpdate::OVERWRITE %>
+      <div class='radio-label'>
+        <strong> Overwrite: </strong> &nbsp;
+        Apply the template and overwrite any exisiting data with data from the template. Use this option with caution.
+      </div>
+    </div>
+  </div>
 
   <%= f.submit "Apply Template", class: 'btn btn-primary' %>
   <%= link_to "Cancel", :back, :class=>'btn btn-default' %>

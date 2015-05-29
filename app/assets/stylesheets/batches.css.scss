@@ -21,7 +21,14 @@
   margin-bottom: 0.5em;
 }
 
-input[type='radio'][name='batch[behavior]'] {
-  margin: 0.5em 1em;
+input[type='radio'][name='batch_template_update[behavior]'] {
+  margin-left: 0;
 }
 
+.radio-label {
+  margin-left: 2em;
+}
+
+#new_batch_template_update, #new_batch {
+  padding-right: 25px;
+}
