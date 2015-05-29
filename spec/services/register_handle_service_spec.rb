@@ -25,8 +25,6 @@ describe RegisterHandleService do
     end
 
     context "when the handle registers" do
-      before { object.save!; PublishService.new(object).run }
-      let(:published_version) { object.find_published }
       let(:message) { "success" }
 
       let(:batch_file) do
@@ -36,19 +34,34 @@ describe RegisterHandleService do
         "2 URL 86400 1110 UTF8 http://dl.tufts.edu/catalog/#{object.pid}\n\n"
       end
 
-      it "makes a batch file" do
-        expect { subject }.to change {
-          File.exists?(file_name) }.from(false).to(true)
+      context "and there is a published version" do
+        before { object.save!; PublishService.new(object).run }
+        let!(:published_version) { object.find_published }
+        it "makes a batch file" do
+          expect { subject }.to change {
+            File.exists?(file_name) }.from(false).to(true)
 
-        expect(object.identifier).to_not be_blank
-        expect(File.read(file_name)).to eq batch_file
-        expect(object).to be_published # ensure we haven't changed the status
+          expect(object.identifier).to_not be_blank
+          expect(File.read(file_name)).to eq batch_file
+          expect(object).to be_published # ensure we haven't changed the status
 
-        expect(published_version.identifier).to_not be_blank
-        expect(published_version).to be_published # ensure we haven't changed the status
+          expect(published_version.identifier).to_not be_blank
+          expect(published_version).to be_published # ensure we haven't changed the status
+        end
+      end
+
+      context "and there isn't a published version" do
+        before { object.save! }
+
+        it "makes a batch file" do
+          expect { subject }.to change {
+            File.exists?(file_name) }.from(false).to(true)
+
+          expect(object.identifier).to_not be_blank
+          expect(File.read(file_name)).to eq batch_file
+          expect(object).not_to be_published # ensure we haven't changed the status
+        end
       end
     end
-
-    
   end
 end
