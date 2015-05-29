@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe 'Batch routes:' do
   it 'routes to create' do
-    expect(post: 'batches').to route_to(
-      controller: 'batches',
+    expect(post: 'batch/template_updates').to route_to(
+      controller: 'batch/template_updates',
       action: 'create'
     )
   end
@@ -16,17 +16,17 @@ describe 'Batch routes:' do
   end
 
   it 'routes to show' do
-    expect(get: 'batches/1').to route_to(
-      controller: 'batches',
+    expect(get: 'batch/template_updates/1').to route_to(
+      controller: 'batch/template_updates',
       action: 'show',
       id: '1'
     )
   end
 
-  it 'routes to new_template_import' do
-    expect(get: 'batches/new_template_import').to route_to(
-      controller: 'batches',
-      action: 'new_template_import'
+  it 'routes to template_import#new' do
+    expect(get: 'batch/template_imports/new').to route_to(
+      controller: 'batch/template_imports',
+      action: 'new'
     )
   end
 
@@ -38,19 +38,18 @@ describe 'Batch routes:' do
   end
 
   it 'routes to edit' do
-    expect(get: 'batches/1/edit').to route_to(
-      controller: 'batches',
+    expect(get: 'batch/xml_imports/1/edit').to route_to(
+      controller: 'batch/xml_imports',
       action: 'edit',
       id: '1'
     )
   end
 
   it 'routes to update' do
-    expect(patch: 'batches/1').to route_to(
-      controller: 'batches',
+    expect(patch: 'batch/xml_imports/1').to route_to(
+      controller: 'batch/xml_imports',
       action: 'update',
       id: '1'
     )
   end
-
 end

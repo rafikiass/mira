@@ -12,10 +12,6 @@ describe Batch::XmlImportsController do
       get :show, id: batch_xml_import
       response.should redirect_to(new_user_session_path)
     end
-    it 'denies access to new_template_import' do
-      get :new
-      response.should redirect_to(new_user_session_path)
-    end
   end
 
   context "an admin" do

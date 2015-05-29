@@ -1,11 +1,6 @@
 require 'spec_helper'
 
 feature 'Publish multiple objects at once' do
-
-  after :all do
-    ActiveFedora::Base.delete_all
-  end
-
   before do
     ActiveFedora::Base.delete_all
     sign_in :admin
@@ -41,6 +36,4 @@ feature 'Publish multiple objects at once' do
       expect(page).to have_content boat.pid
     end
   end
-
 end
-

@@ -25,37 +25,29 @@ describe 'catalog/index.html.erb' do
       allow(view).to receive(:has_search_parameters?) { true }
     end
 
-    describe 'checkboxes' do
-      before do
-        render
-      end
-      it 'has a box to select all documents' do
-        expect(rendered).to have_selector("input#check_all[type=checkbox]")
-      end
-      it 'lets you select individual documents' do
-        expect(rendered).to have_selector("input.batch_document_selector[type=checkbox][name='batch[pids][]'][value='#{@document_list.first.id}']")
-      end
-    end
-
     describe 'batch operations' do
+      before { render }
       it 'draws the form with required fields' do
-        render
-        expect(rendered).to have_selector("form[method=post][action='#{batches_path}']")
-
-        #sends the form page as a hidden field
-        expect(rendered).to have_selector("input[type=hidden][name='batch_form_page'][value='1']")
+        # a box to select all documents
+        expect(rendered).to have_selector("input#check_all[type=checkbox]")
+        # checkboxes for individual documents
+        expect(rendered).to have_selector("input.batch_document_selector[type=checkbox][name='batch[pids][]'][value='#{@document_list.first.id}']")
 
         #button to apply a template
-        expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchTemplateUpdate][data-behavior=batch-create]")
+        expect(rendered).to have_selector("form[method=get][action='#{new_batch_template_update_path}'] " +
+            "input[type=submit][data-behavior=batch-create]")
 
         #button to publish
-        expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchPublish][data-behavior=batch-create]")
+        expect(rendered).to have_selector("form[method=post][action='#{batch_publishes_path}'] " +
+            "input[type=submit][data-behavior=batch-create]")
 
         #button to unpublish
-        expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchUnpublish][data-behavior=batch-create]")
+        expect(rendered).to have_selector("form[method=post][action='#{batch_unpublishes_path}'] " +
+            "input[type=submit][data-behavior=batch-create]")
 
         #button to revert
-        expect(rendered).to have_selector("button[type=submit][name='batch[type]'][value=BatchRevert][data-behavior=batch-create]")
+        expect(rendered).to have_selector("form[method=post][action='#{batch_reverts_path}'] " +
+            "input[type=submit][data-behavior=batch-create]")
 
         # the div needed by javascript to display the number of documents that are currently selected
         expect(rendered).to have_selector("#selected_documents_count")

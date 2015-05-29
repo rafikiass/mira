@@ -41,12 +41,15 @@ Tufts::Application.routes.draw do
     resources :attachments, constraints: { id: ALLOW_DOTS }
   end
 
-  resources :batches, only: [:index, :create, :show, :edit, :update] do
-    get :new_template_import, on: :collection
-  end
-
+  resources :batches, only: [:index]
   namespace :batch do
     resources :xml_imports, only: [:new, :show, :create, :edit, :update]
+    resources :template_updates, only: [:new, :show, :create]
+    resources :template_imports, only: [:new, :show, :create, :edit, :update]
+    resources :purges, only: [:new, :show, :create]
+    resources :reverts, only: [:new, :show, :create]
+    resources :publishes, only: [:new, :show, :create]
+    resources :unpublishes, only: [:new, :show, :create]
   end
 
   namespace :handle do

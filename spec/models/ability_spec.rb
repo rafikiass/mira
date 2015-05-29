@@ -18,8 +18,6 @@ describe Ability do
       expect(subject).to be_able_to(:remove_user, Role)
 
       expect(subject).to be_able_to(:index, Batch)
-      expect(subject).to be_able_to(:new_template_import, Batch)
-      expect(subject).to be_able_to(:new_xml_import, Batch)
       expect(subject).to be_able_to(:create, Batch)
       expect(subject).to be_able_to(:show, Batch)
       expect(subject).to be_able_to(:edit, Batch)
@@ -52,8 +50,6 @@ describe Ability do
       expect(subject).to_not be_able_to(:remove_user, Role)
 
       expect(subject).to_not be_able_to(:index, Batch)
-      expect(subject).to_not be_able_to(:new_template_import, Batch)
-      expect(subject).to_not be_able_to(:new_xml_import, Batch)
       expect(subject).to_not be_able_to(:create, Batch)
       expect(subject).to_not be_able_to(:show, Batch)
       expect(subject).to_not be_able_to(:edit, Batch)

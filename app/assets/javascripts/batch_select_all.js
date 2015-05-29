@@ -33,6 +33,18 @@ function handleCheckAllClick(e){
   updateCheckedCounter(e.data);
 }
 
+function serializeForm(e) {
+  // e.preventDefault();
+  // console.log(e);
+  form = $(e.currentTarget).closest('form');
+  e.data.singleCheckboxes.each(function(index, element){
+    $('<input />').attr('type', 'hidden')
+          .attr('name', "pids[]")
+          .attr('value', element.value)
+          .appendTo(form);
+  });
+}
+
 $(document).ready(function() {
   batchElements = {
     checkAll: $('#documents #check_all'),
@@ -42,6 +54,7 @@ $(document).ready(function() {
   }
   $('#documents #check_all').bind('click', batchElements, handleCheckAllClick);
   $('#documents .batch_document_selector').bind('click', batchElements, handleCheckSingleClick);
+  batchElements.buttons.bind('click', batchElements, serializeForm);
 
   // set initial state of buttons
   setButtonDisabledState(batchElements);
