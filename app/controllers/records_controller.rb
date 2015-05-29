@@ -106,26 +106,36 @@ class RecordsController < ApplicationController
     end
   end
 
-  def redirect_after_update
-    if @record.is_a?(TuftsTemplate)
-      templates_path
-    else
-      main_app.catalog_path @record
+  protected
+
+    def redirect_after_update
+      if @record.is_a?(TuftsTemplate)
+        templates_path
+      else
+        main_app.catalog_path @record
+      end
     end
-  end
 
-  def set_attributes
-    resource.working_user = current_user
-    # set rightsMetadata access controls
-    resource.apply_depositor_metadata(current_user)
 
-    # pull out because it's not a real attribute (it's derived, but still updatable)
-    resource.stored_collection_id = raw_attributes.delete(:stored_collection_id).try(&:first)
+    def set_attributes
+      resource.working_user = current_user
+      # set rightsMetadata access controls
+      resource.apply_depositor_metadata(current_user)
 
-    resource.datastreams= raw_attributes[:datastreams] if raw_attributes[:datastreams]
-    resource.relationship_attributes = raw_attributes['relationship_attributes'] if raw_attributes['relationship_attributes']
-    super
-  end
+      # pull out because it's not a real attribute (it's derived, but still updatable)
+      resource.stored_collection_id = raw_attributes.delete(:stored_collection_id).try(&:first)
+
+      resource.datastreams= raw_attributes[:datastreams] if raw_attributes[:datastreams]
+      resource.relationship_attributes = raw_attributes['relationship_attributes'] if raw_attributes['relationship_attributes']
+      super
+    end
+
+    # Remove any of the blank entries in `displays'
+    def collect_form_attributes
+      super.tap do |attrs|
+        attrs[:displays] = attrs[:displays].reject(&:blank?).uniq if attrs[:displays]
+      end
+    end
 
   private
 

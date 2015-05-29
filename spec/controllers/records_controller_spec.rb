@@ -236,6 +236,11 @@ describe RecordsController do
           put :update, id: audio, :tufts_audio=>{:stored_collection_id=>["updated_id"]}
           expect(assigns[:record].stored_collection_id).to eq 'updated_id'
         end
+
+        it "removes blanks and duplicates" do
+          put :update, id: audio, tufts_audio: { displays: ["dl", "", "trove", "dl"] }
+          expect(assigns[:record].displays).to eq ["dl", "trove"]
+        end
       end
 
       describe "with an image" do
