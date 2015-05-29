@@ -106,5 +106,14 @@ describe "batch/xml_imports/show.html.erb" do
         expect(rendered).to have_selector(".record_status", text: "Status expired")
       end
     end
+
+    context 'a batch with missing files' do
+      let(:missing_file) { 'missing_file.pdf' }
+      let(:batch) { mock_model(BatchXmlImport, pids: records.map(&:pid), missing_files: [missing_file], display_name: 'howdy', jobs: jobs, creator: creator, status: batch_status, pid: 'tufts:123') }
+
+      it 'it displays the list of missing files' do
+        expect(rendered).to have_selector('li', text: missing_file)
+      end
+    end
   end
 end
