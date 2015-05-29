@@ -38,10 +38,12 @@ function serializeForm(e) {
   // console.log(e);
   form = $(e.currentTarget).closest('form');
   e.data.singleCheckboxes.each(function(index, element){
-    $('<input />').attr('type', 'hidden')
-          .attr('name', "pids[]")
-          .attr('value', element.value)
-          .appendTo(form);
+    if ($(element).is(':checked')) {
+      $('<input />').attr('type', 'hidden')
+            .attr('name', "pids[]")
+            .attr('value', element.value)
+            .appendTo(form);
+    }
   });
 }
 
