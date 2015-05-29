@@ -48,7 +48,7 @@ describe RecordsController do
       end
     end
 
-    describe "who goes to the new page" do
+    context "who goes to the new page" do
       routes { HydraEditor::Engine.routes }
 
       it "is successful" do
@@ -58,7 +58,7 @@ describe RecordsController do
       end
 
       it "is successful without a pid" do
-        get :new, type: 'TuftsAudio', title: 'An audiophile', displays: 'dl'
+        get :new, type: 'TuftsAudio', title: 'An audiophile', displays: 'dl', pid: ''
         expect(assigns[:record]).to be_kind_of TuftsAudio
         expect(assigns[:record]).to be_persisted
         expect(assigns[:record].title).to eq 'An audiophile'
@@ -66,7 +66,7 @@ describe RecordsController do
         expect(response).to redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record])
       end
 
-      describe 'with type TuftsTemplate' do
+      context 'with type TuftsTemplate' do
         it 'creates a new template' do
           get :new, type: 'TuftsTemplate', title: 'A template', displays: 'dl'
           expect(assigns[:record]).to be_kind_of TuftsTemplate
@@ -74,7 +74,7 @@ describe RecordsController do
         end
       end
 
-      describe "with a pid" do
+      context "with a pid" do
         let(:pid) { 'tufts:123.1231' }
         let(:draft_pid) { 'draft:123.1231' }
 
@@ -95,7 +95,7 @@ describe RecordsController do
         end
       end
 
-      describe "with the pid of an existing object" do
+      context "with the pid of an existing object" do
         let(:record) { TuftsAudio.create(title: "existing", displays: ['dl']) }
         it "redirects to the edit page and give a warning" do
           get :new, :type=>'TuftsAudio', :pid=>record.id
