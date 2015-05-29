@@ -22,6 +22,7 @@ describe Ability do
       expect(subject).to be_able_to(:show, Batch)
       expect(subject).to be_able_to(:edit, Batch)
       expect(subject).to be_able_to(:update, Batch)
+      expect(subject).to be_able_to(:download, Batch)
 
       expect(subject).to be_able_to(:create, DepositType)
       expect(subject).to be_able_to(:read, DepositType)
@@ -54,6 +55,7 @@ describe Ability do
       expect(subject).to_not be_able_to(:show, Batch)
       expect(subject).to_not be_able_to(:edit, Batch)
       expect(subject).to_not be_able_to(:update, Batch)
+      expect(subject).to_not be_able_to(:download, Batch)
 
       expect(subject).to_not be_able_to(:create, DepositType)
       expect(subject).to_not be_able_to(:read, DepositType)

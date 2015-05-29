@@ -5,7 +5,11 @@
     <%= make_dl "Creator", batch.creator.display_name, "creator" %>
     <%= make_dl "Created at", batch.created_at, "created_at" %>
     <%= make_dl "Status", batch_status_text(batch), "status" %>
+
+    <% if batch.type == 'BatchExport' %>
+      <%= make_dl 'Download', batch_export_download_link(batch), "export_download" %>
+    <% end %>
+
     <%= make_dl "Review Status", (records_by_pid.values.all?{|m| m.try(:reviewed?)} ? "Complete" : "Incomplete"), "review_status" %>
   </div>
-
 

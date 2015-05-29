@@ -7,8 +7,9 @@ class DraftExportService
 
     @batch_id = options.fetch(:batch_id)
 
-    @export_directory = options[:export_directory] || File.join(Settings.object_store_root, "export")
     @output = ""
+
+    @export_filename = BatchExportFilename.new(@batch_id)
   end
 
   attr_reader :record_ids, :datastream_ids, :batch_id, :export_directory, :output
@@ -19,7 +20,11 @@ class DraftExportService
   end
 
   def full_export_file_path
-    Rails.root.join export_directory, export_filename
+    @export_filename.full_path
+  end
+
+  def export_directory
+    @export_filename.export_directory
   end
 
   private
@@ -58,15 +63,8 @@ class DraftExportService
   end
 
   def ensure_export_directory_exists
-    FileUtils.mkdir_p export_directory
+    FileUtils.mkdir_p @export_filename.export_directory
   end
 
-  def export_filename
-    @export_filename ||= "#{current_timestamp}.xml"
-  end
-
-  def current_timestamp
-    Time.now.strftime("%Y-%m-%d-%H%M%S.%6N")
-  end
 
 end

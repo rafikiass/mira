@@ -45,13 +45,6 @@ describe DraftExportService do
       end
     end
 
-    context 'when supplied with a value' do
-      let(:export_directory) { '/tmp' }
-
-      it 'uses the supplied export_directory' do
-        expect(subject).to eq('/tmp')
-      end
-    end
   end
 
   describe '#run' do
@@ -92,6 +85,16 @@ describe DraftExportService do
     it 'generates a file in the expected location' do
       expect(File.exist?(svc.full_export_file_path)).to be_truthy
     end
+
+    describe '#full_export_file_path' do
+      subject { svc.full_export_file_path }
+
+      it 'is named including the supplied batch_id' do
+        expect(subject).to eq(File.join(Settings.object_store_root, "export", "batch_1234.xml"))
+      end
+
+    end
+
 
     context 'the generated xml document' do
       subject { doc }

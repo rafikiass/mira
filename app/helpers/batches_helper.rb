@@ -19,6 +19,10 @@ module BatchesHelper
     batch.status == :not_available ? 'Status not available' : batch.status.to_s.capitalize
   end
 
+  def batch_export_download_link(batch)
+    batch.status == :completed ? link_to(BatchExportFilename.new(batch.id).file_name, download_batch_export_url(batch)) : 'XML file will be available for download when export is complete'
+  end
+
   def job_status_text(batch, job)
     if job.nil?
       if batch.created_at <= Resque::Plugins::Status::Hash.expire_in.seconds.ago

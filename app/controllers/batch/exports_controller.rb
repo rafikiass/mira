@@ -1,8 +1,13 @@
 class Batch::ExportsController < BatchesController
   before_filter :build_batch, only: :create
-  load_resource only: [:new, :show, :edit], instance_name: :batch, class: 'BatchExport'
+  load_resource only: [:new, :show, :edit, :download], instance_name: :batch, class: 'BatchExport'
   before_filter :load_batch, only: :update
+
   authorize_resource instance_name: :batch, class: 'BatchExport', except: :new
+
+  def download
+    send_file BatchExportFilename.new(@batch.id).full_path
+  end
 
 private
 
