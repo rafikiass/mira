@@ -12,8 +12,10 @@ class TemplateImportAction < BatchImportAction
                else
                  record_class.new(attrs)
                end
-      save_record_with_document(record, doc)
-      [doc, record, collect_warning(record, doc), nil]
+      dsid = record.class.original_file_datastreams.first
+      save_record_with_document(record, dsid, doc)
+      warning = collect_warning(record, dsid, doc)
+      [doc, record, warning, nil]
     end
     docs, records, warnings, errors = @document_statuses.transpose
 
@@ -22,4 +24,17 @@ class TemplateImportAction < BatchImportAction
       errors.compact.empty? &&   # we have no errors from building records
       records.all?(&:persisted?) # all our records saved
   end
+
+  private
+
+    def save_record_with_document(record, dsid, doc)
+      record.working_user = current_user
+      if record.save
+        ArchivalStorageService.new(record, dsid, doc).run
+        record.save
+        Job::CreateDerivatives.create(record_id: record.pid)
+      else
+        false
+      end
+    end
 end

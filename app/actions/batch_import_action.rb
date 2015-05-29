@@ -9,20 +9,11 @@ class BatchImportAction
     @document_statuses = []
   end
 
-  def save_record_with_document(record, doc)
-    dsid = record.class.original_file_datastreams.first
-    record.working_user = current_user
-    if record.save
-      ArchivalStorageService.new(record, dsid, doc).run
-      record.save
-      Job::CreateDerivatives.create(record_id: record.pid)
-    else
-      false
-    end
-  end
-
-  def collect_warning(record, doc)
-    dsid = record.class.original_file_datastreams.first
+  # Return a warning if the file is the wrong type for the given record/dsid
+  # @param [#valid_type_for_datastream?] record the record to check
+  # @param [String] dsid the datastream identifier
+  # @param [File] doc the document to check
+  def collect_warning(record, dsid, doc)
     if !record.valid_type_for_datastream?(dsid, doc.content_type)
       "You provided a #{doc.content_type} file, which is not a valid type: #{doc.original_filename}"
     end
