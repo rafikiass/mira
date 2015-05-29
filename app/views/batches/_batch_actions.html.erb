@@ -1,30 +1,21 @@
   <div class="batch-actions">
-      <%# <% Array(batch.pids).each do |pid| %>
-      <%#   <%= hidden_field_tag :batch_pids, pid, multiple: true, name: 'batch[pids][]' %>
-      <%# <% end %>
+      <% disabled = batch.status != :completed %>
 
       <%= link_to 'Review Batch', catalog_index_path(search_field: 'batch', q: batch.id),
-        disabled: true || batch.status != :completed,
+        disabled: disabled,
         class: 'btn btn-primary' %>
 
-      <%= button_to "Publish Batch", batch_publishes_path, class: "btn btn-primary",
-        params: { pids: batch.pids },
-        disabled: batch.status != :completed,
+
+      <%= batch_action_button "Publish Batch", batch_publishes_path, batch, disabled: disabled,
         data: { confirm: "#{pluralize(batch.pids.count, 'object')} will be published. Do you wish to proceed?" } %>
 
-      <%= button_to "Unpublish Batch", batch_unpublishes_path, class: "btn btn-primary",
-        params: { pids: batch.pids },
-        disabled: batch.status != :completed,
+      <%= batch_action_button "Unpublish Batch", batch_unpublishes_path, batch, disabled: disabled,
         data: { confirm: "#{pluralize(batch.pids.count, 'object')} will be unpublished. Do you wish to proceed?" } %>
 
-      <%= button_to "Purge Batch", batch_purges_path, class: "btn btn-primary",
-        params: { pids: batch.pids },
-        disabled: batch.status != :completed,
+      <%= batch_action_button "Purge Batch", batch_purges_path, batch, disabled: disabled,
         data: { confirm: "WARNING: #{pluralize(batch.pids.count, 'object')} will be purged. Both draft and published versions will be permanently deleted. Do you wish to proceed?" } %>
 
-      <%= button_to "Revert Batch", batch_reverts_path, class: "btn btn-primary",
-        params: { pids: batch.pids },
-        disabled: batch.status != :completed,
+      <%= batch_action_button "Revert Batch", batch_reverts_path, batch, disabled: disabled,
         data: { confirm: "All pending edits will be reverted to match the published version for #{pluralize(batch.pids.count, 'object')}.  This action cannot be undone. Do you wish to proceed?" } %>
 
   </div>
