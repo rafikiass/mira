@@ -27,7 +27,7 @@ class RecordsController < ApplicationController
       return
     end
 
-    if params[:pid] && !TuftsBase.valid_pid?(params[:pid])
+    if params[:pid].present? && !TuftsBase.valid_pid?(params[:pid])
       flash.now[:error] = "You have specified an invalid pid. Pids must be in this format: tufts:1231"
       render 'choose_type'
       return
@@ -148,6 +148,7 @@ class RecordsController < ApplicationController
   def build_record
     klass = params[:type].constantize
     args = params.slice(:title, :pid).merge(displays: Array(params[:displays]))
+    args.delete(:pid) if args[:pid].blank?
     if klass == TuftsTemplate
       # Store the `title` parameter as `template_name`
       args.merge!(template_name: args.delete(:title))
