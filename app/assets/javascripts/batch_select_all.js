@@ -35,12 +35,18 @@ function handleCheckAllClick(e){
 
 function serializeForm(e) {
   // e.preventDefault();
-  // console.log(e);
+  //console.log(e);
   form = $(e.currentTarget).closest('form');
-  e.data.singleCheckboxes.each(function(index, element){
+
+  serializeCheckboxes(form, e.data.singleCheckboxes, "pids[]");
+  serializeCheckboxes(form, e.data.datastreamIds, "datastream_ids[]");
+}
+
+function serializeCheckboxes(form, elements, fieldName) {
+  elements.each(function(index, element) {
     if ($(element).is(':checked')) {
       $('<input />').attr('type', 'hidden')
-            .attr('name', "pids[]")
+            .attr('name', fieldName)
             .attr('value', element.value)
             .appendTo(form);
     }
@@ -52,7 +58,8 @@ $(document).ready(function() {
     checkAll: $('#documents #check_all'),
     singleCheckboxes: $('#documents .batch_document_selector'),
     buttons: $('[data-behavior=batch-create]'),
-    selectedDocumentsCount: $('#selected_documents_count')
+    selectedDocumentsCount: $('#selected_documents_count'),
+    datastreamIds: $('input.datastream'),
   }
   $('#documents #check_all').bind('click', batchElements, handleCheckAllClick);
   $('#documents .batch_document_selector').bind('click', batchElements, handleCheckSingleClick);
@@ -62,3 +69,4 @@ $(document).ready(function() {
   setButtonDisabledState(batchElements);
   updateCheckedCounter(batchElements);
 });
+

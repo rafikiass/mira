@@ -50,6 +50,7 @@ Tufts::Application.routes.draw do
     resources :reverts, only: [:new, :show, :create]
     resources :publishes, only: [:new, :show, :create]
     resources :unpublishes, only: [:new, :show, :create]
+    resources :exports, only: [:new, :show, :create]
   end
 
   namespace :handle do

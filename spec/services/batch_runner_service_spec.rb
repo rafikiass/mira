@@ -11,7 +11,6 @@ describe BatchRunnerService do
       it { is_expected.to be false }
     end
 
-
     context "with multiple pids" do
       let(:batch) { FactoryGirl.build(:batch_revert, pids: [7, 8]) }
 
@@ -22,6 +21,7 @@ describe BatchRunnerService do
         expect(batch.job_ids).to eq [:a, :b]
       end
     end
+
   end
 end
 

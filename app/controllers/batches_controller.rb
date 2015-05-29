@@ -62,10 +62,10 @@ private
   end
 
   def require_pids_and_run_batch
-    if !@batch.pids.present?
-      no_pids_selected
-    else
+    if @batch.pids.present?
       create_and_run_batch
+    else
+      no_pids_selected
     end
   end
 
