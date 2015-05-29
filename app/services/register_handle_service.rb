@@ -1,6 +1,7 @@
 class RegisterHandleService
   attr_reader :object, :messages
 
+  # @param [ActiveFedora::Base] object the object to generate a handle for.
   def initialize(object)
     @object = object
   end

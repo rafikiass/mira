@@ -13,7 +13,8 @@ module Job
     end
 
     def perform
-      RegisterHandleService.new(options['record_id']).run
+      object = ActiveFedora::Base.find(options['record_id'])
+      RegisterHandleService.new(object).run
     end
   end
 end
