@@ -13,6 +13,9 @@ describe XmlBatchImportAction do
       let(:uploaded_files) { [] }
       let(:documents) { [pdf, docx] }
 
+      let(:draft_pid) { 'draft:1' }
+      let(:published_pid)   { 'tufts:1' }
+
       let(:xml) { '<input>
        <digitalObject xmlns:dc="http://purl.org/dc/elements/1.1/"
             xmlns:admin="http://nils.lib.tufts.edu/dcaadmin/"
@@ -35,7 +38,51 @@ describe XmlBatchImportAction do
         expect(new_datastreams['Archival.pdf']).not_to be_new
         expect(new_datastreams['Transfer.binary']).not_to be_new
       end
+
+      context "with an existing published record" do
+        let!(:draft_record) {
+          draft = TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title", pid: draft_pid)
+          draft.save!
+          draft
+        }
+
+        let!(:published_record) {
+          PublishService.new(draft_record).run
+          TuftsPdf.find(published_pid)
+        }
+
+        let(:xmas) { DateTime.parse('2014-12-25 11:30') }
+
+        before do
+          allow(uploaded_files).to receive(:build)
+          allow(batch).to receive(:save)
+
+          # Because the workflow_status depends on comparing
+          # timestamps, hard-code the timestamps to a known
+          # time, otherwise this test might intermittently fail
+          # if it takes less than 1 second to run.
+          # Using the reverting flag is a trick to allow me to
+          # set edited_at directly, so that the save won't
+          # overwrite it with DateTime.now.
+          [draft_record, published_record].each do |record|
+            record.reverting = true
+            record.edited_at = xmas
+            record.published_at = xmas
+            record.save!
+            record.reverting = false
+          end
+        end
+
+        it "has the correct workflow status after import" do
+          expect(draft_record.workflow_status).to eq :published
+          expect { action.run }.to change { TuftsPdf.count }.by(0)
+          expect(draft_record.reload.workflow_status).to eq :edited
+          expect(draft_record.published_at).to eq xmas
+          expect(draft_record.edited_at).to_not eq xmas
+        end
+      end
     end
+
   end
 
   describe "#collect_warning" do

@@ -28,8 +28,18 @@ class XmlBatchImportAction < BatchImportAction
         create_file(model, dsid, filename)
       end
       model.working_user = current_user
+      set_publish_time(model)
       saved = model.save
       Job::CreateDerivatives.create(record_id: model.pid) if saved
+    end
+
+    # If a published version of this object exists, copy the
+    # publish timestamp so that the object will have the correct
+    # workflow_status after it is imported.
+    def set_publish_time(model)
+      return unless ActiveFedora::Base.exists?(PidUtils.to_published(model.pid))
+      published_object = model.find_published
+      model.published_at = published_object.published_at if published_object
     end
 
     # @param [ActiveFedora::Base] model

@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :tufts_pdf do
+  factory :tufts_pdf, aliases: [:pdf] do
     initialize_with { new(namespace: namespace) }
 
     transient do
