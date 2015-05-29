@@ -39,7 +39,7 @@ class XmlBatchImportAction < BatchImportAction
       file = @documents.find { |d| d.original_filename == filename }
       ArchivalStorageService.new(model, dsid, file).run
       save_attached_files(model, file, dsid)
-      warning = collect_warning(model, file)
+      warning = collect_warning(model, dsid, file)
       @document_statuses << [filename, model, warning, nil]
     rescue MetadataXmlParserError => e
       @document_statuses << [filename, model, warning, e.message]

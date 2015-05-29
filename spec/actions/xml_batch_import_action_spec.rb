@@ -37,4 +37,23 @@ describe XmlBatchImportAction do
       end
     end
   end
+
+  describe "#collect_warning" do
+    let(:batch) { double('XmlBatchImport') }
+    let(:documents) { [] }
+
+    let(:doc) { double(content_type: content_type, original_filename: 'MSS025.006.004.archival.wav') }
+
+    subject { action.collect_warning(TuftsAudio.new, 'ARCHIVAL_WAV', doc) }
+
+    context "with a valid mime-type" do
+      let(:content_type) { 'audio/x-wav' }
+      it { is_expected.to be_nil }
+    end
+
+    context "with an invalid mime-type" do
+      let(:content_type) { 'application/pdf' }
+      it { is_expected.to eq 'You provided a application/pdf file, which is not a valid type: MSS025.006.004.archival.wav' }
+    end
+  end
 end
