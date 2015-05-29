@@ -1,4 +1,14 @@
 module BatchesHelper
+
+  def batch_action_button(title, path, batch, options)
+    form_tag(path) do
+      content_tag(:div) do
+        submit_tag(title, { class: 'btn btn-primary' }.merge(options)) +
+        hidden_pids(batch)
+      end
+    end
+  end
+
   def make_dl(title, value, css_class)
     content_tag(:dl, class: "dl-horizontal " + css_class) do
       content_tag(:dt) { title } + content_tag(:dd) { value.to_s }
@@ -37,4 +47,8 @@ module BatchesHelper
     batch.job_ids.present? ?  batch.job_ids.count : batch.pids.count
   end
 
+  private
+    def hidden_pids(batch)
+      safe_join(batch.pids.map { |pid| hidden_field_tag('pids[]', pid) } )
+    end
 end

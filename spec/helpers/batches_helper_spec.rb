@@ -71,4 +71,18 @@ describe BatchesHelper do
     end
   end
 
+  describe "#batch_action_button" do
+    subject { batch_action_button(title, path, batch, options) }
+    let(:title) { 'Batch Stuff' }
+    let(:path) { '/things' }
+    let(:batch) { double(pids: ['tufts:1', 'tufts:2']) }
+    let(:options) { { data: { confirm: 'really?' } } }
+
+    it "draws the form" do
+      expect(subject).to have_selector 'form[action="/things"]'
+      expect(subject).to have_selector 'input[type=submit][value="Batch Stuff"][data-confirm="really?"]'
+      expect(subject).to have_selector 'input[type=hidden][name="pids[]"][value="tufts:1"]'
+      expect(subject).to have_selector 'input[type=hidden][name="pids[]"][value="tufts:2"]'
+    end
+  end
 end

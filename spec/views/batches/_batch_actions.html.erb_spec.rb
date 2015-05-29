@@ -28,6 +28,12 @@ describe 'batches/_batch_actions.html.erb' do
       #button to revert
       expect(rendered).to have_selector("form[method=post][action='#{batch_reverts_path}'] " +
           "input[type=submit][value='Revert Batch']")
+
+      #hidden pids
+      expect(rendered).to have_selector("form[method=post][action='#{batch_reverts_path}'] " +
+          "input[type=hidden][name='pids[]'][value='tufts:1']")
+      expect(rendered).to have_selector("form[method=post][action='#{batch_reverts_path}'] " +
+          "input[type=hidden][name='pids[]'][value='tufts:2']")
     end
   end
 
