@@ -57,12 +57,17 @@ class Batch::XmlImportsController < ApplicationController
 
   def edit
     if @batch.metadata_file.present?
-      parser = MetadataXmlParser.new(@batch.metadata_file.read)
-      @pids_that_already_exist = parser.pids.select {|pid| ActiveFedora::Base.exists?(pid)}
+      # Warn the user about existing records that will be overwritten:
+      @pids_that_already_exist = records_that_will_be_overwritten
     end
   end
 
   private
+
+  def records_that_will_be_overwritten
+    parser = MetadataXmlParser.new(@batch.metadata_file.read)
+    parser.pids.select { |pid| ActiveFedora::Base.exists?(PidUtils.to_draft(pid)) }
+  end
 
   def build_batch
     @batch = BatchXmlImport.new(params.require(:batch_xml_import).permit(:template_id, { pids: [] }, :record_type, :metadata_file, :behavior))
