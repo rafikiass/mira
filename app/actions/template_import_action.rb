@@ -12,7 +12,7 @@ class TemplateImportAction < BatchImportAction
                else
                  record_class.new(attrs)
                end
-      dsid = record.class.original_file_datastreams.first
+      dsid = record.class.default_datastream
       save_record_with_document(record, dsid, doc)
       warning = collect_warning(record, dsid, doc)
       [doc, record, warning, nil]

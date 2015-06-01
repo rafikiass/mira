@@ -25,12 +25,9 @@ class ImportRecord
   end
 
   private
-    def default_datastream
-      @model.class.original_file_datastreams.first
-    end
 
     def dsid_for_node(file_node)
       datastream_attribute = file_node.attributes['datastream']
-      datastream_attribute ? datastream_attribute.value : default_datastream
+      datastream_attribute ? datastream_attribute.value : @model.class.default_datastream
     end
 end
