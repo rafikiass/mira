@@ -102,17 +102,17 @@ describe DraftExportService do
       it 'is in the correct format' do
         expect(subject.xpath('/items/digitalObject').count).to eq(2)
         expect(subject.xpath('/items/digitalObject[1]/pid').text).to eq(pdf.pid)
-        expect(subject.xpath('/items/digitalObject[1]/dataStream').count).to eq(2)
+        expect(subject.xpath('/items/digitalObject[1]/datastream').count).to eq(2)
 
         expect(subject.xpath('/items/digitalObject[2]/pid').text).to eq(img.pid)
-        expect(subject.xpath('/items/digitalObject[2]/dataStream').count).to eq(2)
+        expect(subject.xpath('/items/digitalObject[2]/datastream').count).to eq(2)
       end
     end
 
     it "includes empty dataStream objects in the output" do
       allow(pdf).to receive(:datastreams) { { "DC-DETAIL-META" => double('fake-datastream', read: "") } }
 
-      dca_meta_node = doc.xpath("/items/digitalObject[1]/dataStream[@id=DC-DETAIL-META]")
+      dca_meta_node = doc.xpath("/items/digitalObject[1]/datastream[@id=DC-DETAIL-META]")
 
       expect(dca_meta_node.children.size).to eq(0)
     end

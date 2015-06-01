@@ -42,7 +42,7 @@ class DraftExportService
 
           datastream_ids.each do |datastream|
             if ds = object.datastreams[datastream]
-              xml.dataStream(id: datastream) do
+              xml.datastream(id: datastream) do
                 xml << ds.read.to_s
               end
             end
