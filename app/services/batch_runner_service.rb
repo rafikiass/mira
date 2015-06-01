@@ -30,6 +30,8 @@ class BatchRunnerService
         Job::Purge
       when BatchExport
         Job::Export
+      when Batch::MetadataImport
+        Job::Import
       else
         raise "Unknown job type for #{batch.class}"
       end

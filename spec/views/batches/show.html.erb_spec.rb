@@ -8,7 +8,7 @@ describe "batches/show.html.erb" do
   let(:creator) { mock_model User, display_name: 'Mike K.' }
 
   before do
-    assign :batch, batch
+    allow(view).to receive(:resource) { batch }
     assign :records_by_pid, records_by_pid
   end
 
