@@ -51,11 +51,12 @@ describe Batch::XmlImportsController do
     end
 
     describe "GET 'edit'" do
+      # The batch metadata file specifies tufts:1
       let(:batch) { create(:batch_xml_import) }
 
       before do
         ActiveFedora::Base.delete_all
-        TuftsPdf.create(attributes_for(:tufts_pdf, pid: 'tufts:1'))
+        TuftsPdf.create(attributes_for(:tufts_pdf, pid: 'draft:1'))
       end
 
       it 'assigns @pids_that_already_exist' do
