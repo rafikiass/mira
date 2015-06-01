@@ -111,7 +111,7 @@ describe Batch::XmlImportsController do
       context "adding a file that was uploaded previously" do
         let!(:record) do
           create(:tufts_pdf).tap do |r|
-            ArchivalStorageService.new(r, TuftsPdf.original_file_datastreams.first, file1).run
+            ArchivalStorageService.new(r, TuftsPdf.default_datastream, file1).run
             r.save!
           end
         end
@@ -146,7 +146,7 @@ describe Batch::XmlImportsController do
         context "with duplicate file upload" do
           let!(:record) do
             create(:tufts_pdf).tap do |r|
-              ArchivalStorageService.new(r, TuftsPdf.original_file_datastreams.first, file1).run
+              ArchivalStorageService.new(r, TuftsPdf.default_datastream, file1).run
             end
           end
 

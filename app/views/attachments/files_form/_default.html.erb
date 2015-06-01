@@ -1,5 +1,5 @@
-<%= form_for @record, url: record_attachment_path(@record, @record.class.original_file_datastreams.first) do |f| %>
+<%= form_for @record, url: record_attachment_path(@record, @record.class.default_datastream) do |f| %>
 
-  <%= render 'attachments/files_form/upload', dsid: @record.class.original_file_datastreams.first, record: @record %>
+  <%= render 'attachments/files_form/upload', dsid: @record.class.default_datastream, record: @record %>
 <% end %>
 
