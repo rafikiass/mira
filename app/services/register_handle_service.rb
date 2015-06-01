@@ -10,7 +10,7 @@ class RegisterHandleService
     handle = generate_handle
     file_name = BatchFileGenerator.new(handle, url, key_path, password).generate
     if register_handle(file_name)
-      record_handle(handle)
+      RecordHandleService.new(object, handle).run
     else
       message = "Unable to register handle #{handle} for #{object.pid}\n#{messages}"
       HandleLogService.log(nil, object.pid, message)
@@ -60,27 +60,6 @@ class RegisterHandleService
       out
     end
 
-    def record_handle(handle)
-      [object.find_published, object.find_draft].each do |obj|
-        update_respecting_published_status(obj) do |item|
-          item.update_attributes(handle_attribute => [handle])
-        end
-      end
-    end
-
-    def update_respecting_published_status(obj, &block)
-      if obj.published?
-        obj.publishing = true
-        yield obj
-        obj.publishing = false
-      else
-        yield obj
-      end
-    end
-
-    def handle_attribute
-      :identifier
-    end
 
     def generate_handle
       "#{namespace}/#{sequence_number}"
