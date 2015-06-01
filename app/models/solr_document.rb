@@ -22,4 +22,11 @@ class SolrDocument
     self[Solrizer.solr_name("published_at", :stored_sortable, type: :date)]
   end
 
+  def has_datastream_content?(dsid)
+    return unless self['object_profile_ssm']
+    json = JSON.parse(Array(self['object_profile_ssm']).first)
+    datastreams = json.fetch('datastreams', {})
+    !datastreams.fetch(dsid, {}).empty?
+  end
+
 end

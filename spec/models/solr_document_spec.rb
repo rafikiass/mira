@@ -54,4 +54,51 @@ describe SolrDocument do
     end
   end
 
+  describe '#has_datastream_content?' do
+    let(:data_with_content) { "{\"datastreams\":{\"DC\":{},\"RELS-EXT\":{},\"Archival.pdf\":{},\"Transfer.binary\":{\"dsLabel\":\"File Datastream\"}}}" }
+    let(:empty_data) { "{\"datastreams\":{\"DC\":{},\"RELS-EXT\":{},\"Archival.pdf\":{},\"Transfer.binary\":{}}}" }
+
+    let(:doc) { SolrDocument.new('object_profile_ssm' => profile_data) }
+
+    context 'with data in the given datastream' do
+      let(:profile_data) { data_with_content }
+
+      it 'is true' do
+        expect(doc.has_datastream_content?('Transfer.binary')).to be_truthy
+      end
+    end
+
+    context 'with empty datastream' do
+      let(:profile_data) { empty_data }
+
+      it 'is false' do
+        expect(doc.has_datastream_content?('Transfer.binary')).to be_falsey
+      end
+    end
+
+    context 'without object_profile_ssm key' do
+      let(:profile_data) { nil }
+
+      it 'is false' do
+        expect(doc.has_datastream_content?('Transfer.binary')).to be_falsey
+      end
+    end
+
+    context 'without datastreams key' do
+      let(:profile_data) { "{\"some_other_key\":{\"DC\":{}}}" }
+
+      it 'is false' do
+        expect(doc.has_datastream_content?('Transfer.binary')).to be_falsey
+      end
+    end
+
+    context 'using bad dsid' do
+      let(:profile_data) { data_with_content }
+
+      it 'is false' do
+        expect(doc.has_datastream_content?('bad_dsid')).to be_falsey
+      end
+    end
+  end
+
 end

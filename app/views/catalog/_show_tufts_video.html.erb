@@ -1,10 +1,12 @@
 <%= render partial: 'show_default', locals: {document: document} %>
 
-<h3>Archival Video</h3>
-<%= link_to "Download", download_path(document.id, datastream_id: 'Archival.video') %>
-<% if (document['object_type_ssim']||[]).include? 'Text' %>
-  <h3>XML</h3>
-  <%= link_to "Download", download_path(document.id, datastream_id: 'ARCHIVAL_XML') %>
+<% download_links = { 'Archival.video' => 'Archival Video',
+                      'ARCHIVAL_XML' => 'Archival XML',
+                      'Access.webm' => 'WebM',
+                      'Access.mp4' => 'MP4' } %>
+
+<% download_links.each do |dsid, title| %>
+  <%= render partial: 'show_datastream_download_link', locals: { document: document, dsid: dsid, download_section_title: title } %>
 <% end %>
 
 <h3>Access Video</h3>

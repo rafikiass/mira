@@ -1,4 +1,8 @@
 <%= render partial: 'show_default', locals: {document: document} %>
 
-<%= link_to "Download", download_path(document.id, datastream_id: 'Archival.pdf') %>
+<% download_links = { 'Archival.pdf' => 'Archival PDF',
+                      'Transfer.binary' => 'Transfer Binary' } %>
 
+<% download_links.each do |dsid, title| %>
+  <%= render partial: 'show_datastream_download_link', locals: { document: document, dsid: dsid, download_section_title: title } %>
+<% end %>

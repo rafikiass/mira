@@ -1,0 +1,4 @@
+<% if document.has_datastream_content?(dsid) %>
+  <h3><%= download_section_title %></h3>
+  <%= link_to "Download #{dsid}", download_path(document.id, datastream_id: dsid) %>
+<% end %>
