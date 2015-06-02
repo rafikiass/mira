@@ -14,10 +14,10 @@ class ImportRecord
     end
   end
 
-  # Return true if all of this records files are included in the superset
+  # Return true if any of this records files are included in the superset
   # @param [Array<String>] superset
   def files_subset?(superset)
-    filenames.all? { |filename| superset.include?(filename) }
+    filenames.any? { |filename| superset.include?(filename) }
   end
 
   def build_model

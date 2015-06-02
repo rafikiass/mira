@@ -15,6 +15,10 @@ FactoryGirl.define do
     rights { ['http://dca.tufts.edu/ua/access/rights-creator.html'] }
   end
 
+  factory :pdf_with_pid, parent: :tufts_pdf do
+    initialize_with { new(pid: pid) }
+  end
+
   factory :self_deposit_pdf, parent: :tufts_pdf do
     createdby Contribution::SELFDEP
     after(:build) do |deposit, evaluator|
