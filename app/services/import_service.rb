@@ -21,7 +21,7 @@ class ImportService
   end
 
   def run
-    record.xpath('./dataStream').each do |ds_node|
+    record.xpath('./datastream').each do |ds_node|
       dsid = ds_node.attributes['id'].value
       object.datastreams[dsid].content = ds_node.children.to_xml.strip
     end
