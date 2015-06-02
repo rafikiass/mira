@@ -5,9 +5,15 @@ class Batch::MetadataImportsController < BatchesController
   end
 
   def create
-    doc = Nokogiri::XML.parse(resource.metadata_file)
-    resource.pids = doc.xpath('//items/digitalObject/pid').map(&:content)
-    create_and_run_batch
+    parser = MetadataImportParser.new(resource.metadata_file)
+    # sanity check
+    if parser.valid?
+      resource.pids = parser.pids
+      create_and_run_batch
+    else
+      flash[:error] = parser.errors.join(', ')
+      render :new
+    end
   end
 
   protected
