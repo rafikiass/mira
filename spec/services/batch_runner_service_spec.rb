@@ -12,7 +12,7 @@ describe BatchRunnerService do
     end
 
     context "with multiple pids" do
-      let(:batch) { FactoryGirl.build(:batch_revert, pids: [7, 8]) }
+      let(:batch) { build(:batch_revert, pids: [7, 8]) }
 
       it 'queues a job for each pid and saves the job ids' do
         expect(Job::Revert).to receive(:create).with(user_id: batch.creator.id, batch_id: batch.id, record_id: 7) { :a }

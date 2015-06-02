@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150521145848) do
+ActiveRecord::Schema.define(version: 20150601221522) do
 
   create_table "batches", force: true do |t|
     t.integer  "creator_id"
@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 20150521145848) do
     t.datetime "created_at"
     t.text     "job_ids"
     t.string   "record_type"
-    t.string   "metadata_file"
+    t.text     "metadata_file"
     t.string   "behavior"
   end
 
@@ -29,16 +29,16 @@ ActiveRecord::Schema.define(version: 20150521145848) do
     t.integer  "user_id",     null: false
     t.string   "document_id"
     t.string   "title"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "user_type"
   end
 
   create_table "deposit_types", force: true do |t|
     t.string   "display_name"
     t.text     "deposit_agreement"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "deposit_view"
     t.string   "license_name"
   end
@@ -58,8 +58,8 @@ ActiveRecord::Schema.define(version: 20150521145848) do
   create_table "searches", force: true do |t|
     t.text     "query_params"
     t.integer  "user_id"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "user_type"
   end
 
@@ -67,7 +67,6 @@ ActiveRecord::Schema.define(version: 20150521145848) do
 
   create_table "sequences", force: true do |t|
     t.integer "value", default: 0
-    t.string  "name"
     t.string  "scope"
   end
 
@@ -91,8 +90,8 @@ ActiveRecord::Schema.define(version: 20150521145848) do
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "guest",                  default: false
   end
 

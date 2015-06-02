@@ -2,20 +2,22 @@ class BatchesController < ApplicationController
   load_and_authorize_resource only: :index
   before_filter :paginate, only: :index
 
+  helper_method :resource
+
   def index
     @batches = @batches.order(created_at: :desc)
   end
 
-  def new_template_import
-    @batch = BatchTemplateImport.new
-  end
-
   def create
-    require_pids_and_run_batch
+    if resource.pids.present?
+      create_and_run_batch
+    else
+      no_pids_selected
+    end
   end
 
   def show
-    @records_by_pid = (@batch.pids || []).reduce({}) do |acc, pid|
+    @records_by_pid = (resource.pids || []).reduce({}) do |acc, pid|
       begin
         r = ActiveFedora::Base.find(pid, cast: true)
         acc.merge(r.pid => r)
@@ -25,6 +27,12 @@ class BatchesController < ApplicationController
     end
   end
 
+  protected
+
+    def resource
+      @batch
+    end
+
 private
 
   def paginate
@@ -32,15 +40,15 @@ private
   end
 
   def create_and_run_batch
-    @batch.creator = current_user
+    resource.creator = current_user
 
-    if @batch.save
+    if resource.save
       if run_batch
-        redirect_to @batch
+        redirect_to resource
       else
         flash[:error] = "Unable to run batch, please try again later."
-        @batch.delete
-        @batch = Batch.new @batch.attributes.except('id')
+        resource.delete
+        reinit_resource
         render_new_or_redirect
       end
     else
@@ -48,8 +56,12 @@ private
     end
   end
 
+  def reinit_resource
+    @batch = Batch.new resource.attributes.except('id')
+  end
+
   def run_batch
-    BatchRunnerService.new(@batch).run
+    BatchRunnerService.new(resource).run
   end
 
   def render_new_or_redirect
@@ -59,14 +71,6 @@ private
   def no_pids_selected
     flash[:error] = 'Please select some records to do batch updates.'
     redirect_to (request.referer || root_path)
-  end
-
-  def require_pids_and_run_batch
-    if @batch.pids.present?
-      create_and_run_batch
-    else
-      no_pids_selected
-    end
   end
 
   def collect_errors(batch, records)
@@ -79,7 +83,7 @@ private
       format.html do
         flash[:alert] = (warnings + errors).join(', ')
         if successful
-          redirect_to @batch
+          redirect_to resource
         else
           render :edit
         end
