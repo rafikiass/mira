@@ -25,7 +25,11 @@ class CreateRecordService
     record_class = valid_record_class
     attrs = record_attributes(record_class)
 
-    if record_class.respond_to?(:build_draft_version)
+    draft_pid = PidUtils.to_draft(attrs[:pid]) if attrs[:pid]
+
+    if draft_pid && ActiveFedora::Base.exists?(draft_pid)
+      record_class.find(draft_pid)
+    elsif record_class.respond_to?(:build_draft_version)
       record_class.build_draft_version(attrs)
     else
       raise "#{record_class} doesn't implement build_draft_version"

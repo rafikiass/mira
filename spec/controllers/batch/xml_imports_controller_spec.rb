@@ -3,6 +3,10 @@ require 'spec_helper'
 describe Batch::XmlImportsController do
   let(:batch_xml_import) { create(:batch_xml_import ) }
 
+  before do
+    ActiveFedora::Base.delete_all
+  end
+
   context "non admin" do
     it 'denies access to create' do
       post :create

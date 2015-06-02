@@ -100,8 +100,12 @@ shared_examples 'a JSON import' do
     before do
       # Force creation of batch so it doesn't choke on the errors we create in TuftsPdf
       batch
+
+      pid = 'draft:123'
+      ActiveFedora::Base.find(pid).delete if ActiveFedora::Base.exists?(pid)
+
       # A record with errors
-      @pdf = FactoryGirl.create(:tufts_pdf)
+      @pdf = FactoryGirl.create(:pdf_with_pid, pid: pid)
       @error1 = 'Record error 1'
       @error2 = 'Record error 2'
       @pdf.errors.add(:base, @error1)

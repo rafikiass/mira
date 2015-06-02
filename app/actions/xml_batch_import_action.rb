@@ -7,14 +7,14 @@ class XmlBatchImportAction < BatchImportAction
     check_for_unknown_files(parser.filenames)
     check_for_duplicates
 
-    records_with_all_uploaded_files(parser.records, uploaded_filenames).each do |record|
+    records_with_an_uploaded_file(parser.records, uploaded_filenames).each do |record|
       create_model(record)
     end
     @batch.save
     docs, records, warnings, errors = document_statuses.transpose
 
     # we have no errors from building records and all our records saved
-    errors.compact.empty? && records.all?(&:persisted?)
+    Array(errors).compact.empty? && Array(records).all?(&:persisted?)
   end
 
   private
@@ -47,6 +47,7 @@ class XmlBatchImportAction < BatchImportAction
     # @param [String] filename The name of the file to attach
     def create_file(model, dsid, filename)
       file = @documents.find { |d| d.original_filename == filename }
+      return unless file  # nop if file isn't found
       ArchivalStorageService.new(model, dsid, file).run
       save_attached_files(model, file, dsid)
       warning = collect_warning(model, dsid, file)
@@ -81,7 +82,7 @@ class XmlBatchImportAction < BatchImportAction
       @uploaded_filenames ||= @documents.map(&:original_filename)
     end
 
-    def records_with_all_uploaded_files(nodes, uploaded_filenames)
+    def records_with_an_uploaded_file(nodes, uploaded_filenames)
       nodes.select { |node| node.files_subset?(uploaded_filenames) }
     end
 
