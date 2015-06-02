@@ -15,7 +15,7 @@ module RecordsHelper
   end
 
   def sorted_object_types
-    object_type_options.to_a.sort{|a,b| a.first <=> b.first }
+    object_type_options.except('Template').to_a.sort{|a,b| a.first <=> b.first }
   end
 
   # rels-ext selection options for the form to edit a record
