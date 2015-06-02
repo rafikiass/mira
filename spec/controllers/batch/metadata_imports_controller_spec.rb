@@ -24,14 +24,36 @@ describe Batch::MetadataImportsController do
 
     describe "create" do
       let(:service) { double }
-      let(:file) { fixture_file_upload('export/sample_export.xml', 'application/xml') }
+      let(:parser) { double('Parser', valid?: true, pids: ["draft:12440", "draft:12439"]) }
 
-      it "makes an import" do
-        expect(BatchRunnerService).to receive(:new).with(an_instance_of(Batch::MetadataImport)) { service }
-        expect(service).to receive(:run) { true }
-        get :create, batch_metadata_import: { metadata_file: file }
-        expect(response).to redirect_to assigns[:metadata_import]
-        expect(assigns[:metadata_import].pids).to eq ["draft:12440", "draft:12439", "draft:12438", "draft:12437", "draft:12436", "draft:12435", "draft:12432", "draft:12430", "draft:12429", "draft:12428"]
+      let(:file) { fixture_file_upload('export/sample_export.xml', 'application/xml') }
+      let(:xml) { file.read.tap { file.rewind } }
+
+      before do
+        allow(MetadataImportParser).to receive(:new).with(xml).and_return(parser)
+        allow(BatchRunnerService).to receive(:new).with(an_instance_of(Batch::MetadataImport)) { service }
+      end
+
+      context "with a good import file" do
+        it "makes an import" do
+          expect(service).to receive(:run) { true }
+          get :create, batch_metadata_import: { metadata_file: file }
+          expect(response).to redirect_to assigns[:metadata_import]
+          expect(assigns[:metadata_import].pids).to eq ["draft:12440", "draft:12439"]
+        end
+      end
+
+      context "with a bad import file" do
+        before do
+          allow(parser).to receive(:valid?).and_return(false)
+          allow(parser).to receive(:errors).and_return(["The file you uploaded doesn't contain any digital objects"])
+        end
+        it "doesn't import" do
+          expect(service).not_to receive(:run)
+          get :create, batch_metadata_import: { metadata_file: file }
+          expect(response).to render_template :new
+          expect(flash[:error]).to eq "The file you uploaded doesn't contain any digital objects"
+        end
       end
     end
 
