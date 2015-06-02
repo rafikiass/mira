@@ -1,0 +1,6 @@
+<%= render 'show_default', document: document %>
+
+<% generic_items(document).each do |item| %>
+  <h3><%= item[:file_name] %> <small>(<%= item[:mime_type] %>)</small></h3>
+  <%= link_to "Download", item[:download_path] %>
+<% end %>

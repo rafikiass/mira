@@ -1,4 +1,4 @@
-<%= render partial: 'show_default', locals: {document: document} %>
+<%= render 'show_default', document: document %>
 
 <h3>Archival WAV</h3>
 <%= link_to "Download", download_path(document.id, datastream_id: 'ARCHIVAL_WAV') %>

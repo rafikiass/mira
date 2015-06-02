@@ -8,7 +8,7 @@ Tufts::Application.routes.draw do
 
   # This is from Blacklight::Routes#solr_document, but with the constraints added which allows periods in the id
   resources :solr_document, path: 'catalog', controller: 'catalog', only: [:show, :update]
-  resources :downloads, only: [:show], constraints: { id: ALLOW_DOTS }
+  get 'downloads/:id(/:offset)', to: 'downloads#show', constraints: { id: ALLOW_DOTS, offset: /\d+/ }, as: 'download'
 
   resources :templates, only: [:index]
   unauthenticated do
