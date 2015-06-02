@@ -50,8 +50,10 @@ Tufts::Application.routes.draw do
     resources :reverts, only: [:new, :show, :create]
     resources :publishes, only: [:new, :show, :create]
     resources :unpublishes, only: [:new, :show, :create]
-    resources :exports, only: [:new, :show, :create]
     resources :metadata_imports, only: [:new, :show, :create]
+    resources :exports, only: [:new, :show, :create] do
+      get :download, on: :member
+    end
   end
 
   namespace :handle do

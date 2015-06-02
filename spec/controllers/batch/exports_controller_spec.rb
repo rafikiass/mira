@@ -13,12 +13,30 @@ describe Batch::ExportsController do
       get :show, id: batch_export
       expect(response).to redirect_to(new_user_session_path)
     end
+
+    it 'denies access to download' do
+      get :show, id: batch_export
+      expect(response).to redirect_to(new_user_session_path)
+    end
   end
 
   describe "an admin" do
     let(:user) { create(:admin) }
     before do
       sign_in user
+    end
+
+    describe 'GET #download' do
+      context "happy path" do
+        it "sends the file" do
+          allow(BatchExport).to receive(:find).with("42") { mock_model(BatchExport, id: 42) }
+
+          get :download, id: 42
+
+          expect(response.status).to eq(200)
+          expect(response.headers["Content-Disposition"]).to eq('attachment; filename="batch_42.xml"')
+        end
+      end
     end
 
     describe "POST 'create'" do
