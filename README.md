@@ -124,7 +124,7 @@ $ rake handle:register[tufts:123]
 Handles register by sequence number which is stored in the database. You can update the number by issuing the following command in the rails console replacing 100 with the starting value you desire.
 
 ```ruby
-Sequence.first_or_initialize(scope: 'handle').update(value: 100)
+Sequence.where(scope: 'handle').first_or_initialize.update(value: 100)
 ```
 
 
