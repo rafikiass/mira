@@ -34,7 +34,6 @@ input[type='radio'][name='batch_template_update[behavior]'] {
 }
 
 .batch-actions form {
-  float: left;
-  padding-right: 1em;
+  display: inline-block;
   margin-bottom: 1em;
 }
