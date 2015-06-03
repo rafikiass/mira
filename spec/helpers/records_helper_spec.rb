@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe RecordsHelper do
-  it "has object_type_options" do
-    expect(helper.object_type_options).to eq('Audio' => 'TuftsAudio',
+  describe "#object_type_options" do
+    subject { helper.object_type_options }
+    it { is_expected.to eq('Audio' => 'TuftsAudio',
        "Collection creator" => "TuftsRCR",
        "Collection guide" => "TuftsEAD",
        "Generic object" => "TuftsGenericObject",
@@ -11,27 +12,39 @@ describe RecordsHelper do
        'TEI' => 'TuftsTEI',
        'Template' => 'TuftsTemplate',
        'Video' => 'TuftsVideo',
-       'Voting Record' => 'TuftsVotingRecord')
+       'Voting Record' => 'TuftsVotingRecord') }
   end
 
-  it "should have model_labels" do
-    expect(helper.model_label('TuftsAudio')).to eq 'audio'
-    expect(helper.model_label('TuftsPdf')).to eq 'PDF'
-    expect(helper.model_label('TuftsTemplate')).to eq 'Template'
+  describe "#model_labels" do
+    subject { helper.model_label(model) }
+
+    context "TuftsAudio" do
+      let(:model) { 'TuftsAudio' }
+      it { is_expected.to eq 'audio' }
+    end
+
+    context "TuftsPdf" do
+      let(:model) { 'TuftsPdf' }
+      it { is_expected.to eq 'PDF' }
+    end
+
+    context "TuftsTemplate" do
+      let(:model) { 'TuftsTemplate' }
+      it { is_expected.to eq 'Template' }
+    end
   end
 
-  it 'has sorted object types' do
-    options = helper.sorted_object_types
-    expect(options).to eq [["Audio", "TuftsAudio"],
+  describe "sorted_object_types" do
+    subject { helper.sorted_object_types }
+    it { is_expected.to eq [["Audio", "TuftsAudio"],
                            ["Collection creator", "TuftsRCR"],
                            ["Collection guide", "TuftsEAD"],
                            ["Generic object", "TuftsGenericObject"],
                            ["Image", "TuftsImage"],
                            ["PDF", "TuftsPdf"],
                            ["TEI", "TuftsTEI"],
-                           ["Template", "TuftsTemplate"],
                            ["Video", "TuftsVideo"],
-                           ["Voting Record", "TuftsVotingRecord"]]
+                           ["Voting Record", "TuftsVotingRecord"]] }
   end
 
   describe "displays_options" do
