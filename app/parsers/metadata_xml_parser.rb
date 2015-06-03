@@ -1,83 +1,3 @@
-class MetadataXmlParserError < StandardError
-  def initialize(line=nil, details={})
-    @line = line
-    @details = details
-    super(message)
-  end
-
-  def append_details
-    @details.empty? ? "" : " (" + @details.map{|k,v| "#{k}: #{v}"}.join(", ") + ")"
-  end
-end
-
-class NodeNotFoundError < MetadataXmlParserError
-  def initialize(line, element, details={})
-    @element = element
-    super(line, details)
-  end
-
-  def message
-    "Could not find #{@element} attribute for record beginning at line #{@line}" + append_details
-  end
-end
-
-class HasModelNodeInvalidError < MetadataXmlParserError
-  def initialize(line, message, details={})
-    @msg = message
-    super(line, details)
-  end
-
-  def message
-    "Invalid data in <rel:hasModel> for record beginning at line #{@line}." + @msg + append_details
-  end
-end
-
-class DuplicateFilenameError < MetadataXmlParserError
-  def message
-    "Duplicate filename found at line #{@line}" + append_details
-  end
-end
-
-class DuplicatePidError < MetadataXmlParserError
-  def message
-    "Multiple PIDs defined for record beginning at line #{@line}" + append_details
-  end
-end
-
-class InvalidPidError < MetadataXmlParserError
-  def message
-    "Invalid PID defined for record beginning at line #{@line}. Pids must be in this format: tufts:1231" + append_details
-  end
-end
-
-class ModelValidationError < MetadataXmlParserError
-  def initialize(line, error_message, details={})
-    @error_message = error_message
-    super(line, details)
-  end
-
-  def message
-    "#{@error_message} for record beginning at line #{@line}" + append_details
-  end
-end
-
-class FileNotFoundError < MetadataXmlParserError
-  def initialize(filename, details={})
-    @filename = filename
-    super(details)
-  end
-
-  def message
-    "#{@filename} doesn't exist in the metadata file" + append_details
-  end
-end
-
-class MissingFilenameError < MetadataXmlParserError
-  def message
-    "Missing filename in file node at line #{@line}" + append_details
-  end
-end
-
 class MetadataXmlParser
   def initialize(xml)
     @xml = xml
@@ -179,5 +99,85 @@ class MetadataXmlParser
     doc.xpath("//digitalObject/pid/text()")
   end
 
+end
+
+class MetadataXmlParserError < StandardError
+  def initialize(line=nil, details={})
+    @line = line
+    @details = details
+    super(message)
+  end
+
+  def append_details
+    @details.empty? ? "" : " (" + @details.map{|k,v| "#{k}: #{v}"}.join(", ") + ")"
+  end
+end
+
+class NodeNotFoundError < MetadataXmlParserError
+  def initialize(line, element, details={})
+    @element = element
+    super(line, details)
+  end
+
+  def message
+    "Could not find #{@element} attribute for record beginning at line #{@line}" + append_details
+  end
+end
+
+class HasModelNodeInvalidError < MetadataXmlParserError
+  def initialize(line, message, details={})
+    @msg = message
+    super(line, details)
+  end
+
+  def message
+    "Invalid data in <rel:hasModel> for record beginning at line #{@line}." + @msg + append_details
+  end
+end
+
+class DuplicateFilenameError < MetadataXmlParserError
+  def message
+    "Duplicate filename found at line #{@line}" + append_details
+  end
+end
+
+class DuplicatePidError < MetadataXmlParserError
+  def message
+    "Multiple PIDs defined for record beginning at line #{@line}" + append_details
+  end
+end
+
+class InvalidPidError < MetadataXmlParserError
+  def message
+    "Invalid PID defined for record beginning at line #{@line}. Pids must be in this format: tufts:1231" + append_details
+  end
+end
+
+class ModelValidationError < MetadataXmlParserError
+  def initialize(line, error_message, details={})
+    @error_message = error_message
+    super(line, details)
+  end
+
+  def message
+    "#{@error_message} for record beginning at line #{@line}" + append_details
+  end
+end
+
+class FileNotFoundError < MetadataXmlParserError
+  def initialize(filename, details={})
+    @filename = filename
+    super(details)
+  end
+
+  def message
+    "#{@filename} doesn't exist in the metadata file" + append_details
+  end
+end
+
+class MissingFilenameError < MetadataXmlParserError
+  def message
+    "Missing filename in file node at line #{@line}" + append_details
+  end
 end
 
