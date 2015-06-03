@@ -8,11 +8,11 @@ describe Batch::TemplateImportsController do
   context "non admin" do
     it 'denies access to create' do
       post :create
-      response.should redirect_to(new_user_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
     it 'denies access to show' do
       get :show, id: batch_template_import
-      response.should redirect_to(new_user_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 
@@ -141,18 +141,18 @@ describe Batch::TemplateImportsController do
           get :show, id: batch_template_import
           response.should be_success
           response.should render_template(:show)
-          expect(assigns[:batch]).to eq batch_template_import
-          expected = records.reduce({}){|acc, r| acc.merge(r.pid => r)}
-          expect(assigns[:records_by_pid]).to eq expected
+          expect(assigns[:batch]).to be_kind_of BatchPresenter
+          expect(assigns[:batch].id).to eq batch_template_import.id
         end
       end
 
       context 'with no pids (yet)' do
         let(:batch_template_import) { create(:batch_template_import, pids: nil) }
 
-        it 'gracefully sets @records_by_pid empty' do
+        it 'has no items in the presenter' do
           get :show, id: batch_template_import
-          expect(assigns[:records_by_pid]).to eq({})
+          expect(assigns[:batch]).to be_kind_of BatchPresenter
+          expect(assigns[:batch].item_count).to eq 0
         end
       end
 

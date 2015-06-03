@@ -8,10 +8,16 @@ class ImportRecord
     node.xpath('./file').map(&:content)
   end
 
+  # @return [Hash] with dsid as the key and the file name as the value
   def files
     node.xpath('./file').each_with_object({}) do |file_node, h|
       h[dsid_for_node(file_node)] = file_node.content
     end
+  end
+
+  # we may not have a pid node
+  def pid
+    node.xpath('./pid').first.try(:content)
   end
 
   # Return true if any of this records files are included in the superset
@@ -21,13 +27,17 @@ class ImportRecord
   end
 
   def build_model
-    @model ||= CreateRecordService.new(node).run
+    @model ||= create_record_service.run
+  end
+
+  def create_record_service
+    @create_record_service ||= CreateRecordService.new(node)
   end
 
   private
 
     def dsid_for_node(file_node)
       datastream_attribute = file_node.attributes['datastream']
-      datastream_attribute ? datastream_attribute.value : @model.class.default_datastream
+      datastream_attribute ? datastream_attribute.value : create_record_service.valid_record_class.default_datastream
     end
 end

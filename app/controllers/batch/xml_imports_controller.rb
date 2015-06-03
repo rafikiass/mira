@@ -4,19 +4,14 @@ class Batch::XmlImportsController < ApplicationController
   before_filter :load_batch, only: :update
   authorize_resource instance_name: :batch, class: 'BatchXmlImport', except: :new
 
+  helper_method :resource
+
   def new
     @batch = BatchXmlImport.new
   end
 
   def show
-    @records_by_pid = (@batch.pids || []).reduce({}) do |acc, pid|
-      begin
-        r = ActiveFedora::Base.find(pid, cast: true)
-        acc.merge(r.pid => r)
-      rescue ActiveFedora::ObjectNotFoundError
-        acc
-      end
-    end
+    @batch = XmlImportPresenter.new(@batch)
   end
 
   def update
@@ -26,14 +21,14 @@ class Batch::XmlImportsController < ApplicationController
       render :edit
       return
     end
-    action = XmlBatchImportAction.new(@batch, current_user, params[:documents])
+    action = XmlBatchImportAction.new(resource, current_user, params[:documents])
     success = action.run
     docs, records, warnings, errors = action.document_statuses.transpose.map(&:compact)
     respond_to do |format|
       format.html do
         flash[:alert] = (warnings + errors).join(', ')
         if success
-          redirect_to batch_xml_import_path(@batch)
+          redirect_to batch_xml_import_path(resource)
         else
           render :edit
         end
@@ -46,9 +41,9 @@ class Batch::XmlImportsController < ApplicationController
   end
 
   def create
-    @batch.creator = current_user
+    resource.creator = current_user
 
-    if @batch.save
+    if resource.save
       redirect_to edit_batch_xml_import_path(@batch)
     else
       render :new
@@ -56,11 +51,17 @@ class Batch::XmlImportsController < ApplicationController
   end
 
   def edit
-    if @batch.metadata_file.present?
+    if resource.metadata_file.present?
       # Warn the user about existing records that will be overwritten:
       @pids_that_already_exist = records_that_will_be_overwritten
     end
   end
+
+  protected
+
+    def resource
+      @batch
+    end
 
   private
 

@@ -17,14 +17,7 @@ class BatchesController < ApplicationController
   end
 
   def show
-    @records_by_pid = (resource.pids || []).reduce({}) do |acc, pid|
-      begin
-        r = ActiveFedora::Base.find(pid, cast: true)
-        acc.merge(r.pid => r)
-      rescue ActiveFedora::ObjectNotFoundError
-        acc
-      end
-    end
+    @batch = BatchPresenter.new(@batch)
   end
 
   protected

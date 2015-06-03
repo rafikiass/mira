@@ -1,0 +1,34 @@
+  <div class="batch-items">
+    <table class="table">
+      <tr>
+        <th>PID</th>
+        <th>Filename</th>
+        <th>Status</th>
+        <th>Review Status</th>
+      </tr>
+
+      <% batch.items.each do |item| %>
+        <tr>
+          <td class="record_pid">
+            <% if item.pid %>
+              <%= link_to item.title, catalog_path(item.pid) %>
+            <% else %>
+              Not specified
+            <% end %>
+          </td>
+          <td class="record_title"><%= item.filename %></td>
+          <td class="record_status"><%= item.status %></td>
+          <td class="record_reviewed_status">
+            <% if item.pid %>
+              <%= check_box_tag :reviewed, :reviewed, item.review_status, type: :checkbox, disabled: true  %>
+            <% else %>
+              N/A
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+
+
+

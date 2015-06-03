@@ -3,8 +3,10 @@ require 'spec_helper'
 describe 'batches/_batch_actions.html.erb' do
   let(:batch) { mock_model(BatchXmlImport, pids: ['tufts:1', 'tufts:2'],
                            status: batch_status) }
+  let(:presenter) { XmlImportPresenter.new(batch) }
+
   before do
-    render 'batches/batch_actions', batch: batch
+    render 'batches/batch_actions', batch: presenter
   end
 
   context 'a batch with status "completed"' do

@@ -12,13 +12,23 @@
         <th>Status</th>
       </tr>
       <% @batches.each do |batch| %>
+
+        <% presenter = case batch # TODO move to a presenter factory
+                       when BatchTemplateImport
+                         TemplateImportPresenter.new(batch)
+                       when BatchXmlImport
+                         XmlImportPresenter.new(batch)
+                       else
+                         BatchPresenter.new(batch)
+                       end %>
+
         <tr>
           <td class="batch_id"><%= link_to batch.id, batch %></td>
           <td class="display_name"><%= batch.display_name %></td>
           <td class="creator"><%= batch.creator.display_name %></td>
           <td class="created_at"><%= time_ago_in_words(batch.created_at) %> ago</td>
-          <td class="item_count"><%= item_count(batch) %></td>
-          <td class="status"><%= batch_status_text(batch) %></td>
+          <td class="item_count"><%= presenter.item_count %></td>
+          <td class="status"><%= presenter.status_text %></td>
         </tr>
       <% end %>
     </table>

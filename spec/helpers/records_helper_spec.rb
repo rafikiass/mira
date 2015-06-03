@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe RecordsHelper do
-  it "should have object_type_options" do
-    helper.object_type_options.should == {'Audio' => 'TuftsAudio',
+  it "has object_type_options" do
+    expect(helper.object_type_options).to eq('Audio' => 'TuftsAudio',
        "Collection creator" => "TuftsRCR",
        "Collection guide" => "TuftsEAD",
        "Generic object" => "TuftsGenericObject",
@@ -11,13 +11,13 @@ describe RecordsHelper do
        'TEI' => 'TuftsTEI',
        'Template' => 'TuftsTemplate',
        'Video' => 'TuftsVideo',
-       'Voting Record' => 'TuftsVotingRecord'}
+       'Voting Record' => 'TuftsVotingRecord')
   end
 
   it "should have model_labels" do
-    helper.model_label('TuftsAudio').should == 'audio'
-    helper.model_label('TuftsPdf').should == 'PDF'
-    helper.model_label('TuftsTemplate').should == 'Template'
+    expect(helper.model_label('TuftsAudio')).to eq 'audio'
+    expect(helper.model_label('TuftsPdf')).to eq 'PDF'
+    expect(helper.model_label('TuftsTemplate')).to eq 'Template'
   end
 
   it 'has sorted object types' do

@@ -7,15 +7,13 @@
         <th>Review Status</th>
       </tr>
 
-      <% batch.pids.each do |pid| %>
-        <% record = records_by_pid[pid] %>
-        <% job = batch.jobs.select {|job| job && job.options && (job.options['record_id'] == pid) }.first %>
+      <% batch.items.each do |item| %>
         <tr>
-          <td class="record_pid"><%= link_to pid, catalog_path(pid) %></td>
-          <td class="record_title"><%= record.try(&:title) %></td>
-          <td class="record_status"><%= line_item_status(batch, job, pid) %></td>
+          <td class="record_pid"><%= link_to item.title, catalog_path(item.pid) %></td>
+          <td class="record_title"><%= item.record_title %></td>
+          <td class="record_status"><%= item.status %></td>
           <td class="record_reviewed_status">
-            <%= check_box_tag :reviewed, :reviewed, record.try(:reviewed?), type: :checkbox, disabled: true  %>
+            <%= check_box_tag :reviewed, :reviewed, item.review_status, type: :checkbox, disabled: true  %>
           </td>
         </tr>
       <% end %>

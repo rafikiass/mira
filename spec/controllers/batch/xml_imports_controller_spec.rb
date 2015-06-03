@@ -10,17 +10,17 @@ describe Batch::XmlImportsController do
   context "non admin" do
     it 'denies access to create' do
       post :create
-      response.should redirect_to(new_user_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
     it 'denies access to show' do
       get :show, id: batch_xml_import
-      response.should redirect_to(new_user_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 
   context "an admin" do
     before do
-      sign_in FactoryGirl.create(:admin)
+      sign_in create(:admin)
     end
 
     describe "GET 'new'" do
@@ -214,16 +214,18 @@ describe Batch::XmlImportsController do
           expect(response).to be_success
           expect(response).to render_template(:show)
           expect(assigns[:batch].id).to eq batch_xml_import.id
-          expected = records.reduce({}) { |acc, r| acc.merge(r.pid => r) }
-          expect(assigns[:records_by_pid]).to eq expected
+          expect(assigns[:batch]).to be_kind_of BatchPresenter
+          expect(assigns[:batch].items).to all(be_kind_of XmlImportItemStatus)
         end
       end
 
       context 'with no pids (yet)' do
+        # TODO move to presenter spec
         let(:uploaded_files) { [] }
-        it 'gracefully sets @records_by_pid empty' do
+        it 'has no items in the presenter' do
           get :show, id: batch_xml_import
-          expect(assigns[:records_by_pid]).to eq({})
+          expect(assigns[:batch]).to be_kind_of BatchPresenter
+          expect(assigns[:batch].item_count).to eq 0
         end
       end
 

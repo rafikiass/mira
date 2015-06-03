@@ -3,7 +3,7 @@
 
   <%= link_to "All batches", batches_path %>
 
-  <%= render 'batch_info', batch: resource, records_by_pid: @records_by_pid %>
+  <%= render 'batch_info', batch: resource %>
   <%= render "batch_actions", batch: resource %>
-  <%= render "batch_items", batch: resource, records_by_pid: @records_by_pid %>
+  <%= render "batch_items", batch: resource %>
 </div>

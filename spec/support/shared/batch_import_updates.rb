@@ -28,19 +28,10 @@ shared_examples 'an import happy path' do
 end
 
 shared_examples 'an import error path (no documents uploaded)' do
-  before do
+  it 'renders the form again' do
     patch :update, id: batch.id, documents: []
-  end
-
-  it 'renders the form' do
-    response.should render_template(:edit)
-  end
-
-  it 'displays a flash message' do
+    expect(response).to render_template(:edit)
     expect(flash[:error]).to match /please select some files/i
-  end
-
-  it 'assigns @batch' do
     expect(assigns[:batch].id).to eq batch.id
   end
 end

@@ -17,11 +17,11 @@ describe 'deposit_types/index.html.erb' do
   it 'have links for each deposit type' do
     render
     @deposit_types.each do |dt|
-      rendered.should have_selector("a[href='#{deposit_type_path(dt)}']", text: dt.display_name)
+      expect(rendered).to have_selector("a[href='#{deposit_type_path(dt)}']", text: dt.display_name)
     end
-    rendered.should have_selector 'td[class="deposit_view"]', count: @deposit_types.count
-    rendered.should have_selector 'td[class="deposit_agreement"]', count: @deposit_types.count
-    rendered.should have_selector 'td[class="license_name"]', count: @deposit_types.count
+    expect(rendered).to have_selector 'td[class="deposit_view"]', count: @deposit_types.count
+    expect(rendered).to have_selector 'td[class="deposit_agreement"]', count: @deposit_types.count
+    expect(rendered).to have_selector 'td[class="license_name"]', count: @deposit_types.count
 
   end
 
