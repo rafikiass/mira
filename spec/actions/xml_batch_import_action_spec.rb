@@ -100,7 +100,7 @@ describe XmlBatchImportAction do
 
     context "with an invalid mime-type" do
       let(:content_type) { 'application/pdf' }
-      it { is_expected.to eq 'You provided a application/pdf file, which is not a valid type: MSS025.006.004.archival.wav' }
+      it { is_expected.to eq 'You provided a application/pdf file, which is not a valid type for: ARCHIVAL_WAV' }
     end
   end
 end

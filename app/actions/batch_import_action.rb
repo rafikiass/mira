@@ -15,7 +15,7 @@ class BatchImportAction
   # @param [File] doc the document to check
   def collect_warning(record, dsid, doc)
     if !record.valid_type_for_datastream?(dsid, doc.content_type)
-      "You provided a #{doc.content_type} file, which is not a valid type: #{doc.original_filename}"
+      "You provided a #{doc.content_type} file, which is not a valid type for: #{dsid}"
     end
   end
 

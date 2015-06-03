@@ -47,7 +47,7 @@ shared_examples 'an import error path (wrong file format)' do
     expect(TuftsPdf.count).to eq 1
     record = TuftsPdf.first
     expect(assigns[:batch].pids.sort).to eq [record.pid, 'oldpid:123'].sort
-    expect(flash[:alert]).to match /#{file1.content_type} file, which is not a valid type: #{file1.original_filename}/i
+    expect(flash[:alert]).to match /#{file1.content_type} file, which is not a valid type for: Archival.pdf/i
   end
 end
 
@@ -82,7 +82,7 @@ shared_examples 'a JSON import' do
       expect(json['pid']).to eq record.pid
       expect(json['name']).to eq file1.original_filename
       expect(json['title']).to eq record.title
-      expect(json['warning']).to eq "You provided a #{file1.content_type} file, which is not a valid type: #{file1.original_filename}"
+      expect(json['warning']).to eq "You provided a #{file1.content_type} file, which is not a valid type for: Archival.pdf"
       expect(json['error']).to be_nil
     end
   end
