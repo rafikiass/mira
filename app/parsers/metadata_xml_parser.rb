@@ -72,6 +72,12 @@ class FileNotFoundError < MetadataXmlParserError
   end
 end
 
+class MissingFilenameError < MetadataXmlParserError
+  def message
+    "Missing filename in file node at line #{@line}" + append_details
+  end
+end
+
 class MetadataXmlParser
   def initialize(xml)
     @xml = xml
@@ -86,25 +92,12 @@ class MetadataXmlParser
   end
 
   def validate
-    errors = doc.errors
+    validate_blank_files
+    validate_duplicate_filename
+    validate_duplicate_pids
+    validate_pids
 
-    # check for duplicate filenames
-    files = doc.xpath("//digitalObject/file/text()")
-    files.group_by(&:content).values.map{|nodes| nodes.drop(1)}.flatten.each do |duplicate|
-      errors << DuplicateFilenameError.new(duplicate.line, ParsingError.for(duplicate))
-    end
-
-    pids = doc.xpath("//digitalObject/pid/text()")
-    # check for duplicate pids
-    pids.group_by(&:content).values.map{|nodes| nodes.drop(1)}.flatten.each do |duplicate|
-      errors << DuplicatePidError.new(duplicate.line, ParsingError.for(duplicate))
-    end
-    # check for invalid pids
-    pids.reject{|pid| TuftsBase.valid_pid?(pid.content)}.each do |invalid|
-      errors << InvalidPidError.new(invalid.line, ParsingError.for(invalid))
-    end
-
-    doc.xpath('//digitalObject').map do |digital_object|
+    doc.xpath('//digitalObject').each do |digital_object|
       if self.class.file(digital_object).nil?
         errors << NodeNotFoundError.new(digital_object.line, '<file>', ParsingError.for(digital_object))
       end
@@ -118,6 +111,7 @@ class MetadataXmlParser
         errors << e
       end
     end
+
     errors
   end
 
@@ -133,7 +127,6 @@ class MetadataXmlParser
     raise FileNotFoundError.new(document_filename)
   end
 
-
   def pids
     doc.xpath('//digitalObject/pid').map(&:content)
   end
@@ -142,11 +135,49 @@ class MetadataXmlParser
     @records ||= doc.xpath('//digitalObject').map { |elem| ImportRecord.new(elem) }
   end
 
-
   class << self
     def file(node)
       node.xpath("./file").map(&:content).first
     end
 
   end
+
+  private
+  def validate_blank_files
+    digital_objects = doc.xpath("//digitalObject")
+    digital_objects.xpath("./file").each do |file_node|
+      if file_node.text.blank?
+        errors << MissingFilenameError.new(file_node.line)
+      end
+    end
+  end
+
+  def validate_duplicate_filename
+    files = doc.xpath("//digitalObject/file/text()")
+    files.group_by(&:content).values.map { |nodes| nodes.drop(1) }.flatten.each do |duplicate|
+      errors << DuplicateFilenameError.new(duplicate.line, ParsingError.for(duplicate))
+    end
+  end
+
+  def validate_duplicate_pids
+    pid_text.group_by(&:content).values.map { |nodes| nodes.drop(1) }.flatten.each do |duplicate|
+      errors << DuplicatePidError.new(duplicate.line, ParsingError.for(duplicate))
+    end
+  end
+
+  def validate_pids
+    pid_text.reject { |pid| TuftsBase.valid_pid?(pid.content) }.each do |invalid|
+      errors << InvalidPidError.new(invalid.line, ParsingError.for(invalid))
+    end
+  end
+
+  def errors
+    doc.errors
+  end
+
+  def pid_text
+    doc.xpath("//digitalObject/pid/text()")
+  end
+
 end
+

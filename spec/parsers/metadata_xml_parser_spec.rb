@@ -39,12 +39,26 @@ describe MetadataXmlParser do
       end
     end
 
-    context "without a filename" do
-      let(:xml) { build_node('file' => []).to_xml }
-      it "has errors" do
-        expect(errors.first).to match /Could not find <file> .* line 1/
+    context "file validation" do
+      context "without a filename" do
+        let(:xml) { "<input>" +
+                    build_node('file' => ['']).to_xml +
+                    "</input>" }
+
+        it "has errors" do
+          expect(errors.first).to match /Missing filename in file node at line 3/
+        end
+      end
+
+      context "without a file node" do
+        let(:xml) { build_node('file' => []).to_xml }
+
+        it "has errors" do
+          expect(errors.first).to match  /Could not find <file> attribute for record beginning at line 1 .*/
+        end
       end
     end
+
 
     context "with duplicate filename" do
       let(:xml) { "<input>" +
