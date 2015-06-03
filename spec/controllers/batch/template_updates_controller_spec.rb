@@ -7,12 +7,12 @@ describe Batch::TemplateUpdatesController do
   context "non admin" do
     it 'denies access to create' do
       post :create
-      response.should redirect_to(new_user_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
 
     it 'denies access to show' do
       get :show, id: batch_template_update.id
-      response.should redirect_to(new_user_session_path)
+      expect(response).to redirect_to(new_user_session_path)
     end
   end
 
@@ -116,8 +116,7 @@ describe Batch::TemplateUpdatesController do
           expect(response).to be_success
           expect(response).to render_template(:show)
           expect(assigns[:batch].id).to eq batch_template_update.id
-          expected = records.reduce({}) { |acc, r| acc.merge(r.pid => r) }
-          expect(assigns[:records_by_pid]).to eq expected
+          expect(assigns[:batch]).to be_kind_of BatchPresenter
         end
       end
 

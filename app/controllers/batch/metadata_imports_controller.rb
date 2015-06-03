@@ -4,6 +4,10 @@ class Batch::MetadataImportsController < BatchesController
   def new
   end
 
+  def show
+    @metadata_import = BatchPresenter.new(@metadata_import)
+  end
+
   def create
     parser = MetadataImportParser.new(resource.metadata_file)
     # sanity check

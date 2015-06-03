@@ -1,11 +1,9 @@
 <div class="col-sm-12">
   <h1>Batch Status</h1>
 
-  <% @batch.pids = [] unless @batch.pids %>
-
   <%= link_to "All batches", batches_path %>
 
-  <% missing = @batch.missing_files %>
+  <% missing = resource.missing_files %>
   <% unless missing.blank? %>
     <div class="alert alert-warning">
       <strong>Warning:</strong> Metadata exists for the following files that have not been updated:<br/>
@@ -14,13 +12,13 @@
           <li><%= file %></li>
         <% end %>
       </ul>
-      <%= link_to "add additional files to this batch", edit_batch_xml_import_path(@batch) %>
+      <%= link_to "add additional files to this batch", edit_batch_xml_import_path(resource) %>
     </div>
   <% end %>
 
-  <%= render 'batches/batch_info', batch: @batch, records_by_pid: @records_by_pid %>
-  <%= render "batches/batch_actions", batch: @batch %>
-  <%= render "batches/batch_items", batch: @batch, records_by_pid: @records_by_pid %>
+  <%= render 'batches/batch_info', batch: resource %>
+  <%= render "batches/batch_actions", batch: resource %>
+  <%= render "batch_items", batch: resource %>
 
 </div>
 

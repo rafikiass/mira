@@ -2,74 +2,61 @@ require 'spec_helper'
 
 describe "batch/xml_imports/show.html.erb" do
 
+  let(:batch) { mock_model(BatchXmlImport, pids: [], missing_files:[], display_name: 'foo', creator: creator, status: batch_status) }
+  let(:batch_status) { :queued }
+
   let(:creator) { mock_model(User, display_name: 'bob') }
+  let(:presenter) { XmlImportPresenter.new(batch) }
+  before do
+    allow(presenter).to receive(:items) { items }
+    allow(view).to receive(:resource) { presenter }
+  end
 
-  describe 'a batch with no pids' do
-    let(:batch) { mock_model(BatchXmlImport, pids: [], missing_files:[], display_name: 'foo', creator: creator, status: :queued) }
-    before do
-      assign :batch, batch
-      assign :records_by_pid, {}
-    end
-
+  describe 'a XmlImportPresenter with no items' do
+    let(:items) { [] }
     it "displays gracefully" do
       expect { render }.to_not raise_error
     end
   end
 
   describe 'apply_template' do
-    let(:batch) { mock_model(BatchXmlImport, pids: records.map(&:pid), missing_files: [],
-                             display_name: 'howdy', jobs: jobs,
-                             creator: creator, status: batch_status, pid: 'tufts:123') }
     let(:pdf) { mock_model(TuftsPdf, pid: 'tufts:234', title: 'A pdf') }
-    let(:records) { [pdf] }
-    let(:records_by_pid) { { records[0].pid => records[0] } }
-    let(:batch_status) { :queued }
-    let(:jobs) do
-      records.zip(0.upto(records.length)).map do |r, uuid|
-        double('uuid' => uuid,
-             'status' => 'queued',
-             'options' => {'record_id' => r.pid})
-      end
-    end
-    let(:line_item_status) { 'Queued' }
+    let(:items) { [item_status] }
+    let(:dsid) { 'Archival.pdf' }
+    let(:filename) { 'my_upload.pdf' }
+    let(:item_status) { XmlImportItemStatus.new(batch, pdf.pid, dsid, filename) }
+    let(:line_item_status) { 'Completed' }
 
     before do
-      allow(Resque::Plugins::Status::Hash).to receive(:get) do |uuid|
-        jobs.find{|j| j.uuid == uuid}
-      end
-      allow(view).to receive(:line_item_status).and_return(line_item_status)
-      assign :batch, batch
-      assign :records_by_pid, records_by_pid
-      render
+      allow(item_status).to receive(:status).and_return(line_item_status)
+      allow(item_status).to receive(:review_status).and_return(true)
     end
 
     it "shows batch information" do
+      render
       expect(rendered).to have_selector(".type", text: batch.display_name)
       expect(rendered).to have_selector(".batch_id", text: batch.id)
-      expect(rendered).to have_selector(".record_count", text: records.count)
+      expect(rendered).to have_selector(".record_count", text: '0')
       expect(rendered).to have_selector(".creator", text: batch.creator.display_name)
       expect(rendered).to have_selector(".created_at", text: batch.created_at)
       expect(rendered).to have_selector(".status", text: 'Queued')
-      expect(rendered).to have_link(records.first.pid, catalog_path(records.first))
-      expect(rendered).to have_selector(".record_title", text: records.first.title)
-      expect(rendered).to have_selector(".record_status", text: "Queued")
-    end
-
-    context "with missing records" do
-      it "should render successfully" do
-        pid = records.first.pid
-        records.first.destroy
-        render
-        expect(rendered).to have_selector(".record_pid", text: pid)
-      end
+      expect(rendered).to have_link('tufts:234', catalog_path('tufts:234'))
+      expect(rendered).to have_selector(".record_title", text: 'my_upload.pdf')
+      expect(rendered).to have_selector(".record_status", text: "Completed")
     end
 
     context "with some records reviewed" do
-      let(:records) do
-        d1 = mock_model(TuftsAudio, pid: 'tufts:456', title: 'another one', reviewed?: true)
-        [d1, pdf]
+      let(:items) { [item_status, reviewed_item] }
+      let(:reviewed_item) { XmlImportItemStatus.new(batch, 'tufts:9999', 'archival.pdf', 'hello.pdf') }
+      let(:alt_record) { mock_model TuftsPdf, pid: 'tufts:9999', title: "Another doc" }
+      before do
+        allow(presenter).to receive(:review_status) { 'Incomplete' }
+        allow(reviewed_item).to receive(:record).and_return(alt_record)
+        allow(reviewed_item).to receive(:status).and_return('Complete')
+        allow(reviewed_item).to receive(:review_status) { true }
+        allow(item_status).to receive(:review_status) { false }
+        render
       end
-      let(:records_by_pid) { { records[0].pid => records[0], records[1].pid => records[1] } }
 
       it "shows review status of each record" do
         expect(rendered).to have_selector(".review_status", text: "Incomplete")
@@ -79,8 +66,11 @@ describe "batch/xml_imports/show.html.erb" do
     end
 
     context "with all records reviewed" do
-      let(:records) do
-        [mock_model(TuftsAudio, pid: 'tufts:456', title: 'another one', reviewed?: true)]
+      before do
+        allow(presenter).to receive(:review_status) { 'Complete' }
+        allow(item_status).to receive(:status).and_return('Complete')
+        allow(item_status).to receive(:review_status) { true }
+        render
       end
 
       it "shows an complete reviewed status" do
@@ -92,6 +82,7 @@ describe "batch/xml_imports/show.html.erb" do
       let(:batch_status) { :not_available }
       let(:line_item_status) { 'Status not available' }
       it 'says statuses are not availble' do
+        render
         expect(rendered).to have_selector(".batch_info .status", text: "Status not available")
         expect(rendered).to have_selector(".record_status", text: "Status not available")
       end
@@ -102,6 +93,7 @@ describe "batch/xml_imports/show.html.erb" do
       let(:batch_status) { :not_available }
 
       it 'shows the status' do
+        render
         expect(rendered).to have_selector(".batch_info .status", text: "Status not available")
         expect(rendered).to have_selector(".record_status", text: "Status expired")
       end
@@ -109,9 +101,10 @@ describe "batch/xml_imports/show.html.erb" do
 
     context 'a batch with missing files' do
       let(:missing_file) { 'missing_file.pdf' }
-      let(:batch) { mock_model(BatchXmlImport, pids: records.map(&:pid), missing_files: [missing_file], display_name: 'howdy', jobs: jobs, creator: creator, status: batch_status, pid: 'tufts:123') }
+      let(:batch) { mock_model(BatchXmlImport, pids: [], missing_files: [missing_file], display_name: 'howdy', creator: creator, status: batch_status, pid: 'tufts:123') }
 
       it 'it displays the list of missing files' do
+        render
         expect(rendered).to have_selector('li', text: missing_file)
       end
     end

@@ -2,21 +2,18 @@ require 'spec_helper'
 
 describe "batches/show.html.erb" do
 
-  let(:batch) { mock_model BatchTemplateImport, pids: pids, creator: creator,
-                jobs: jobs, display_name: 'This is a batch', status: batch_status }
+  let(:batch) { mock_model BatchPublish, pids: [], job_ids: [4567], creator: creator,
+                display_name: 'This is a batch', status: batch_status }
   let(:batch_status) { :queued }
   let(:creator) { mock_model User, display_name: 'Mike K.' }
-
+  let(:presenter) { BatchPresenter.new(batch) }
   before do
-    allow(view).to receive(:resource) { batch }
-    assign :records_by_pid, records_by_pid
+    allow(presenter).to receive(:items) { items }
+    allow(view).to receive(:resource) { presenter }
   end
 
-  describe 'a batch with no pids' do
-    # subject { build(:batch_template_import, pids: nil) }
-    let(:pids) { [] }
-    let(:records_by_pid) { {} }
-    let(:jobs) { [] }
+  describe 'a BatchPresenter with no items' do
+    let(:items) { [] }
 
     it "displays gracefully" do
       expect { render }.to_not raise_error
@@ -24,32 +21,19 @@ describe "batches/show.html.erb" do
   end
 
   describe 'apply_template' do
-    # subject { FactoryGirl.create(:batch_template_update,
-    #                              pids: records.map(&:id),
-    #                              job_ids: jobs.map(&:uuid)) }
-    let(:pids) { records.map(&:pid) }
     let(:pdf) { mock_model TuftsPdf, pid: 'tufts:234', title: "A PDF doc" }
-    let(:records) { [pdf] }
-    let(:records_by_pid) { { records[0].pid => records[0] } }
+    let(:items) { [item_status] }
+    let(:item_status) { BatchItemStatus.new(batch, pdf.pid) }
 
-    let(:jobs) do
-      records.zip(0.upto(records.length)).map do |r, uuid|
-        double('uuid' => uuid,
-             'status' => 'queued',
-             'options' => {'record_id' => r.pid})
-      end
-    end
     let(:line_item_status) { 'Queued' }
 
     before do
-      allow(Resque::Plugins::Status::Hash).to receive(:get) do |uuid|
-        jobs.find { |j| j.uuid == uuid }
-      end
-      allow(view).to receive(:line_item_status).and_return(line_item_status)
-      render
+      allow(item_status).to receive(:record).and_return(pdf)
+      allow(item_status).to receive(:status).and_return(line_item_status)
     end
 
     it "shows batch information" do
+      render
       expect(rendered).to have_selector(".type", text: "This is a batch")
       expect(rendered).to have_selector(".batch_id", text: batch.id)
       expect(rendered).to have_selector(".record_count", text: 1)
@@ -57,43 +41,33 @@ describe "batches/show.html.erb" do
       expect(rendered).to have_selector(".created_at", text: batch.created_at)
       expect(rendered).to have_selector(".status", text: 'Queued')
 
-      expect(rendered).to have_link(records.first.pid, catalog_path(records.first))
-      expect(rendered).to have_selector(".record_title", text: records.first.title)
+      expect(rendered).to have_link(pdf.pid, catalog_path(pdf))
+      expect(rendered).to have_selector(".record_title", text: pdf.title)
       expect(rendered).to have_selector(".record_status", text: "Queued")
     end
 
-    context "with missing records" do
-      it "should render successfully" do
-        pid = records.first.pid
-        records.first.destroy
-        render
-        expect(rendered).to have_selector(".record_pid", text: pid)
-      end
-    end
-
     context "with some records reviewed" do
-      let(:records) do
-        d1 = mock_model(TuftsAudio, pid: 'tufts:456', title: 'another one', reviewed?: true)
-        [d1, pdf]
+      let(:items) { [item_status, reviewed_item] }
+      let(:reviewed_item) { BatchItemStatus.new(batch, 'tufts:9999') }
+      let(:alt_record) { mock_model TuftsPdf, pid: 'tufts:9999', title: "Another doc" }
+      before do
+        allow(presenter).to receive(:review_status) { 'Incomplete' }
+        allow(reviewed_item).to receive(:record).and_return(alt_record)
+        allow(reviewed_item).to receive(:status).and_return('Complete')
+        allow(reviewed_item).to receive(:review_status) { true }
+        allow(item_status).to receive(:review_status) { false }
       end
-      let(:records_by_pid) { { records[0].pid => records[0], records[1].pid => records[1] } }
 
       it "shows a complete reviewed status" do
         render
         expect(rendered).to have_selector(".review_status", text: "Incomplete")
-      end
-
-      it "shows review status of each record" do
-        render
         expect(rendered).to have_selector(".record_reviewed_status input[type=checkbox][disabled=disabled][checked=checked]")
         expect(rendered).to have_selector(".record_reviewed_status input[type=checkbox][disabled=disabled]:not([checked=checked])")
       end
     end
 
     context "with all records reviewed" do
-      let(:records) do
-        [mock_model(TuftsAudio, pid: 'tufts:456', title: 'another one', reviewed?: true)]
-      end
+      before { allow(presenter).to receive(:review_status) { 'Complete' } }
 
       it "shows an complete reviewed status" do
         render

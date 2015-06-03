@@ -7,16 +7,16 @@
 
 
       <%= batch_action_button "Publish Batch", batch_publishes_path, batch, disabled: disabled,
-        data: { confirm: "#{pluralize(batch.pids.count, 'object')} will be published. Do you wish to proceed?" } %>
+        data: { confirm: "#{pluralize(batch.item_count, 'object')} will be published. Do you wish to proceed?" } %>
 
       <%= batch_action_button "Unpublish Batch", batch_unpublishes_path, batch, disabled: disabled,
-        data: { confirm: "#{pluralize(batch.pids.count, 'object')} will be unpublished. Do you wish to proceed?" } %>
+        data: { confirm: "#{pluralize(batch.item_count, 'object')} will be unpublished. Do you wish to proceed?" } %>
 
       <%= batch_action_button "Purge Batch", batch_purges_path, batch, disabled: disabled,
-        data: { confirm: "WARNING: #{pluralize(batch.pids.count, 'object')} will be purged. Both draft and published versions will be permanently deleted. Do you wish to proceed?" } %>
+        data: { confirm: "WARNING: #{pluralize(batch.item_count, 'object')} will be purged. Both draft and published versions will be permanently deleted. Do you wish to proceed?" } %>
 
       <%= batch_action_button "Revert Batch", batch_reverts_path, batch, disabled: disabled,
-        data: { confirm: "All pending edits will be reverted to match the published version for #{pluralize(batch.pids.count, 'object')}.  This action cannot be undone. Do you wish to proceed?" } %>
+        data: { confirm: "All pending edits will be reverted to match the published version for #{pluralize(batch.item_count, 'object')}.  This action cannot be undone. Do you wish to proceed?" } %>
 
   </div>
 

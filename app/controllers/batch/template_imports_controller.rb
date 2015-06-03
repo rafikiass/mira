@@ -8,6 +8,10 @@ class Batch::TemplateImportsController < BatchesController
     @batch = BatchTemplateImport.new
   end
 
+  def show
+    @batch = TemplateImportPresenter.new(@batch)
+  end
+
   def create
     @batch.creator = current_user
 
