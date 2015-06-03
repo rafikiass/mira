@@ -1,7 +1,15 @@
 <%= render partial: 'show_default', locals: {document: document} %>
-<h3>Thumbnail</h3>
+
+<%= render partial: 'show_datastream_download_link', locals: { document: document, dsid: 'Archival.tif', download_section_title: 'Archival TIF' } %>
+
+<%= render partial: 'show_datastream_download_link', locals: { document: document, dsid: 'Thumbnail.png', download_section_title: 'Thumbnail' } %>
+<br /><br />
 <img src="<%= download_path(document.id, datastream_id: 'Thumbnail.png') %>">
-<h3>Basic</h3>
+
+<%= render partial: 'show_datastream_download_link', locals: { document: document, dsid: 'Basic.jpg', download_section_title: 'Basic' } %>
+<br /><br />
 <img src="<%= download_path(document.id, datastream_id: 'Basic.jpg') %>">
-<h3>Advanced</h3>
+
+<%= render partial: 'show_datastream_download_link', locals: { document: document, dsid: 'Advanced.jpg', download_section_title: 'Advanced' } %>
+<br /><br />
 <img src="<%= download_path(document.id, datastream_id: 'Advanced.jpg') %>">
