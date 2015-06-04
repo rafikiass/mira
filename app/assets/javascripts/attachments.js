@@ -7,8 +7,11 @@ $(function () {
 
     $('input#next').click(function(e) {
       if ($('.fileupload').attr('data-exists') == "false") {
-        return confirm("You have not uploaded a datastream, do you want to continue?");
+        alert("You have not uploaded a datastream");
+        return false;
       }
+
+      return true;
     });
 
     $('.fileupload').fileupload({
