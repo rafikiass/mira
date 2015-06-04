@@ -2,6 +2,10 @@ require 'spec_helper'
 
 describe MetadataXmlParser do
   before do
+    # tufts:1 is hardcoded into build_node(). We need to make sure the draft version
+    # is not in the repo:
+    ActiveFedora::Base.find('draft:1', cast: true).delete if ActiveFedora::Base.exists?('draft:1')
+
     allow(HydraEditor).to receive(:models).and_return(['TuftsPdf'])
   end
   let(:parser) { MetadataXmlParser.new(xml) }
