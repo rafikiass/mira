@@ -14,9 +14,9 @@
 <% if missing = @batch.missing_files %>
   <div class="well">
     The following files in this batch still need to be uploaded:<br/>
-    <ul>
-      <% missing.each do |file| %>
-        <li><%= file %></li>
+    <ul class="missing_files">
+      <% missing.sort_by { |a| [a.upcase, a] }.each_with_index do |file, index| %>
+        <li class="missing_file_<%= index %>"><%= file %></li>
       <% end %>
     </ul>
   </div>
