@@ -4,7 +4,7 @@
   <strong>NOTE:</strong> PIDs will be assigned automatically for objects created via template import
 </div>
 
-<%= bootstrap_form_for @batch, as: :batch, url: batches_path do |f| %>
+<%= bootstrap_form_for @batch, as: :batch do |f| %>
   <% if @batch.errors[:base].present? %>
     <div class="alert alert-danger">
       <h4>There were errors that prevented this Batch template import from being saved:</h4>

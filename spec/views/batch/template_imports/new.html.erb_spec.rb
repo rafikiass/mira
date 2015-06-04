@@ -10,15 +10,12 @@ describe "batch/template_imports/new.html.erb" do
     render
   end
 
-  it 'submits to batches#create' do
-    expect(rendered).to have_selector("form[method=post][action='#{batches_path}']")
-  end
-
   it 'displays the form to apply a template' do
+    expect(rendered).to have_selector("form[method=post][action='#{batch_template_imports_path}']")
     expect(rendered).to have_selector("input[type=hidden][name='batch[type]'][value=BatchTemplateImport]")
     expect(rendered).to have_selector("select[name='batch[template_id]']")
     templates.each do |t|
-      rendered.should have_selector("option[value='#{t.id}']")
+      expect(rendered).to have_selector("option[value='#{t.id}']")
     end
     expect(rendered).to have_selector("select[name='batch[record_type]']")
   end
