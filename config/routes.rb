@@ -10,7 +10,7 @@ Tufts::Application.routes.draw do
   resources :solr_document, path: 'catalog', controller: 'catalog', only: [:show, :update]
   get 'downloads/:id(/:offset)', to: 'downloads#show', constraints: { id: ALLOW_DOTS, offset: /\d+/ }, as: 'download'
 
-  resources :templates, only: [:index]
+  resources :templates, only: [:index, :create, :destroy]
   unauthenticated do
     root to: 'contribute#redirect'
   end

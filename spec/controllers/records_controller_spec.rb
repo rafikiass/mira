@@ -4,13 +4,13 @@ describe RecordsController do
 
   describe "an admin" do
     before do
-      @user = FactoryGirl.create(:admin)
+      @user = create(:admin)
       sign_in @user
     end
 
     describe 'reviews a record - happy path:' do
       before do
-        @record = FactoryGirl.create(:tufts_pdf)
+        @record = create(:tufts_pdf)
         put :review, id: @record
       end
       after { @record.delete }
@@ -25,7 +25,7 @@ describe RecordsController do
 
     describe 'reviews a record - when it fails to save:' do
       before do
-        @record = FactoryGirl.create(:tufts_pdf)
+        @record = create(:tufts_pdf)
         allow_any_instance_of(TuftsPdf).to receive(:save) { false }
         put :review, id: @record
       end
@@ -38,7 +38,7 @@ describe RecordsController do
 
     describe "reviews a record - when it's not a reviewable record :" do
       before do
-        @record = FactoryGirl.create(:tufts_template)
+        @record = create(:tufts_template)
         put :review, id: @record
       end
       after { @record.delete }
@@ -187,8 +187,7 @@ describe RecordsController do
         end
       end
 
-      it "should not remove the record if there are no existing versions of the dca-META" do
-      end
+      it "doesn't remove the record if there are no existing versions of the dca-META"
     end
 
     describe "updating a record" do
@@ -284,8 +283,8 @@ describe RecordsController do
 
         post :publish, id: @audio
 
-        response.should redirect_to("/catalog/#{assigns[:record].pid}")
-        flash[:notice].should == '"My title2" has been published'
+        expect(response).to redirect_to("/catalog/#{assigns[:record].pid}")
+        expect(flash[:notice]).to eq '"My title2" has been published'
       end
     end
 
@@ -323,7 +322,7 @@ describe RecordsController do
           expect_any_instance_of(RevertService).to receive(:run).once
 
           post :revert, id: draft
-          response.should redirect_to(catalog_path(draft))
+          expect(response).to redirect_to(catalog_path(draft))
         end
 
       end
@@ -345,7 +344,7 @@ describe RecordsController do
           expect_any_instance_of(RevertService).to receive(:run).once
 
           post :revert, id: audio
-          response.should redirect_to(catalog_path(draft))
+          expect(response).to redirect_to(catalog_path(draft))
         end
       end
     end
@@ -368,24 +367,12 @@ describe RecordsController do
         expect(response).to redirect_to(Tufts::Application.routes.url_helpers.root_path)
         expect(flash[:notice]).to eq '"My title2" has been purged'
       end
-
-    end
-
-    describe "destroying a template" do
-      before do
-        @template = TuftsTemplate.new(template_name: 'My Template')
-        @template.save!
-      end
-      it "routes back to the template index" do
-        delete :destroy, id: @template
-        response.should redirect_to(Tufts::Application.routes.url_helpers.templates_path)
-      end
     end
   end
 
   describe "a non-admin" do
     before do
-      sign_in FactoryGirl.create(:user)
+      sign_in create(:user)
     end
 
     describe "who goes to the new page" do
@@ -394,8 +381,8 @@ describe RecordsController do
       it "should not be allowed" do
         get :new
         expect(response).to be_redirect
-        response.should redirect_to Tufts::Application.routes.url_helpers.root_path
-        flash[:alert].should =~ /You are not authorized to access this page/i
+        expect(response).to redirect_to Tufts::Application.routes.url_helpers.root_path
+        expect(flash[:alert]).to match /You are not authorized to access this page/i
       end
     end
 
@@ -411,12 +398,12 @@ describe RecordsController do
     end
 
     describe 'reviews a record' do
-      let(:record) { FactoryGirl.create(:tufts_pdf) }
+      let(:record) { create(:tufts_pdf) }
 
       it 'is not allowed' do
         put :review, id: record
         expect(response).to redirect_to Tufts::Application.routes.url_helpers.root_path
-        flash[:alert].should =~ /You are not authorized to access this page/i
+        expect(flash[:alert]).to match /You are not authorized to access this page/i
       end
     end
   end

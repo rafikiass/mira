@@ -80,18 +80,9 @@ class RecordsController < ApplicationController
 
   def destroy
     # set the flash using the title, before we delete it and the title is not available.
-    if @record.is_a?(TuftsTemplate)
-      flash[:notice] = "\"#{@record.template_name}\" has been purged"
-    else
-      flash[:notice] = "\"#{@record.title}\" has been purged"
-    end
-
+    flash[:notice] = "\"#{@record.title}\" has been purged"
     PurgeService.new(@record, current_user.id).run
-    if @record.is_a?(TuftsTemplate)
-      redirect_to templates_path
-    else
-      redirect_to root_path
-    end
+    redirect_to root_path
   end
 
   def cancel

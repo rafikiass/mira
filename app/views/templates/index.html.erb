@@ -8,7 +8,7 @@
 <table class="table">
   <thead>
   <tr>
-    <th><%= link_to "Add", hydra_editor.new_record_path(type: 'TuftsTemplate'), class: "btn btn-mini btn-primary" %></th>
+    <th><%= button_to "New Template", templates_path, class: "btn btn-primary" %></th>
     <th>PID</th>
     <th>Template Name</th>
     <th>Modified</th>
@@ -22,9 +22,9 @@
   <%= render partial: 'template', collection: @document_list, as: :template %>
 
   <tr>
-    <td><%= link_to "Add", hydra_editor.new_record_path(type: 'TuftsTemplate'), class: "btn btn-mini btn-primary" %></td>
+    <td><%= button_to "New Template", templates_path, class: "btn btn-primary" %></td>
     <td></td>
-    <td><%= link_to "Create a new Metadata Template", hydra_editor.new_record_path(type: 'TuftsTemplate') %> </td>
+    <td></td>
     <td></td>
     <td></td>
     <td></td>
