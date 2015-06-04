@@ -44,6 +44,7 @@ $ brew install ghostscript
 ### Clone the repo, install gems, and copy configuration files
 ```bash
 $ git clone https://github.com/curationexperts/mira.git
+$ cd mira
 $ bundle install
 $ rake config:copy
 ```
@@ -63,8 +64,8 @@ $ rake jetty:start
 
 Install & start redis.
 ```bash
-brew install redis
-redis-server &
+$ brew install redis
+$ redis-server &
 ```
 
 Start background workers with resque-pool, then start a pool of workers:
@@ -74,7 +75,7 @@ $ bundle exec resque-pool
 
 *Optional:* start resque-web:
 ```bash
-resque-web config/resque_conf.rb
+$ resque-web config/resque_conf.rb
 ```
 
 ### Run the application!
@@ -90,7 +91,7 @@ You can now connect to the running application at http://localhost:3000
 Make sure jetty is running, then run the rake task:
 
 ```bash
-rake tufts:fixtures
+$ rake tufts:fixtures
 ```
 
 ## Self Deposit Setup
