@@ -32,12 +32,12 @@ describe "batch/xml_imports/edit.html.erb" do
     end
 
     it "displays them in a specific sorted order" do
-      expect(rendered).to have_selector('li.missing_file_0', 'A')
-      expect(rendered).to have_selector('li.missing_file_1', 'a')
-      expect(rendered).to have_selector('li.missing_file_2', 'B')
-      expect(rendered).to have_selector('li.missing_file_3', 'b')
-      expect(rendered).to have_selector('li.missing_file_4', 'C')
-      expect(rendered).to have_selector('li.missing_file_5', 'c')
+      expect(rendered).to have_selector('ul.missing_files li:nth-child(1)', 'A')
+      expect(rendered).to have_selector('ul.missing_files li:nth-child(2)', 'a')
+      expect(rendered).to have_selector('ul.missing_files li:nth-child(3)', 'B')
+      expect(rendered).to have_selector('ul.missing_files li:nth-child(4)', 'b')
+      expect(rendered).to have_selector('ul.missing_files li:nth-child(5)', 'C')
+      expect(rendered).to have_selector('ul.missing_files li:nth-child(6)', 'c')
     end
 
   end
