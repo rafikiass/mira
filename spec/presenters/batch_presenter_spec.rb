@@ -2,7 +2,13 @@ require 'spec_helper'
 
 describe BatchPresenter do
   let(:presenter) { described_class.new(batch) }
-  let(:batch) { double }
+  let(:batch) { double(to_param: 123) }
+
+  describe '#to_param' do
+    it 'delegates to the batch' do
+      expect(presenter.to_param).to eq batch.to_param
+    end
+  end
 
   describe "#items" do
     subject { presenter.items }

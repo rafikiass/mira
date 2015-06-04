@@ -4,7 +4,7 @@ class BatchPresenter
     @batch = batch
   end
 
-  delegate :display_name, :id, :creator, :created_at, :status, :pids, to: :@batch
+  delegate :display_name, :id, :to_param, :creator, :created_at, :status, :pids, to: :@batch
 
   def items
     @items ||= pids.map { |pid| item_class.new(@batch, pid) }
