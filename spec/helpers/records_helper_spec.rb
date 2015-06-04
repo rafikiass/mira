@@ -49,6 +49,6 @@ describe RecordsHelper do
 
   describe "displays_options" do
     subject { helper.displays_options }
-    it { is_expected.to eq %w(dl trove tisch perseus elections dark nowhere) }
+    it { is_expected.to eq %w(nowhere dl trove tisch perseus elections) }
   end
 end
