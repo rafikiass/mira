@@ -41,11 +41,17 @@ class Batch::XmlImportsController < ApplicationController
   end
 
   def create
-    resource.creator = current_user
+    if resource
+      resource.creator = current_user
 
-    if resource.save
-      redirect_to edit_batch_xml_import_path(@batch)
+      if resource.save
+        redirect_to edit_batch_xml_import_path(@batch)
+      else
+        render :new
+      end
     else
+      @batch = BatchXmlImport.new
+      @batch.errors.add(:metadata_file, 'Please select a file')
       render :new
     end
   end
@@ -72,6 +78,8 @@ class Batch::XmlImportsController < ApplicationController
 
   def build_batch
     @batch = BatchXmlImport.new(params.require(:batch_xml_import).permit(:template_id, { pids: [] }, :record_type, :metadata_file, :behavior))
+  rescue ActionController::ParameterMissing
+    # @batch will be nil
   end
 
   def load_batch
