@@ -25,4 +25,21 @@ describe "batch/xml_imports/edit.html.erb" do
 
   end
 
+  describe "the list of missing files" do
+    before do
+      allow(batch).to receive(:missing_files) { %w(A B C a b c) }
+      render
+    end
+
+    it "displays them in a specific sorted order" do
+      expect(rendered).to have_selector('ul.missing_files li:nth-child(1)', 'A')
+      expect(rendered).to have_selector('ul.missing_files li:nth-child(2)', 'a')
+      expect(rendered).to have_selector('ul.missing_files li:nth-child(3)', 'B')
+      expect(rendered).to have_selector('ul.missing_files li:nth-child(4)', 'b')
+      expect(rendered).to have_selector('ul.missing_files li:nth-child(5)', 'C')
+      expect(rendered).to have_selector('ul.missing_files li:nth-child(6)', 'c')
+    end
+
+  end
+
 end
