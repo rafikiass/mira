@@ -1,14 +1,20 @@
 require 'spec_helper'
 
 describe RegisterHandleService do
-  let(:object) { TuftsPdf.build_draft_version(displays: ['dl'], title: "orig title") }
+  let(:object) { TuftsPdf.new(pid: 'draft:1', displays: ['dl'], title: "orig title") }
   let(:service) { described_class.new(object) }
 
+  describe "#url" do
+    subject { service.send(:url) }
+    it "is a production url" do
+      expect(subject).to eq "http://dl.tufts.edu/catalog/tufts:1"
+    end
+  end
   describe "#build_record" do
     subject { service.send(:build_record, 'hdl/hdl1') }
     let(:batch) { subject.to_batch }
     it "has the necessary metadata" do
-      expect(batch[0]).to eq "2 URL 86400 1110 UTF8 http://dl.tufts.edu/catalog/#{object.pid}"
+      expect(batch[0]).to eq "2 URL 86400 1110 UTF8 http://dl.tufts.edu/catalog/tufts:1"
       expect(batch[1]).to eq "6 EMAIL 86400 1110 UTF8 brian.goodmon@tufts.edu"
       expect(batch[2]).to eq "100 HS_ADMIN 86400 1110 ADMIN 300:111111111111:0.NA/10427.TEST"
     end

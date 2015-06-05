@@ -64,7 +64,7 @@ class RegisterHandleService
     end
 
     def url
-      "http://dl.tufts.edu/catalog/#{object.id}"
+      "http://dl.tufts.edu/catalog/#{PidUtils.to_published(object.id)}"
     end
     # Raised when there is a problem registering the handle
     class HandleServiceError < StandardError
