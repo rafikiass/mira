@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe CreateRecordService do
-  let(:service) { CreateRecordService.new(node) }
+describe BuildRecordService do
+  let(:service) { described_class.new(node) }
   let(:node) { Nokogiri::XML(xml).at_xpath("//digitalObject") }
   let(:xml) { build_node.to_xml }
 

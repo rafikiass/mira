@@ -61,8 +61,26 @@ describe MetadataXmlParser do
           expect(errors.first).to match  /Could not find <file> attribute for record beginning at line 1 .*/
         end
       end
+
     end
 
+    context "invalid datastream id" do
+      let(:xml) { '<items xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:admin="http://nils.lib.tufts.edu/dcaadmin/" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
+            <digitalObject>
+              <pid>tufts:SCORE001.002</pid>
+              <file datastream="PDF_CONTENT_DS">Adelita.pdf</file>
+              <file datastream="TRANSFER_BINARY_DS">Adelita.sib</file>
+              <rel:hasModel>info:fedora/cm:Text.PDF</rel:hasModel>
+              <admin:displays>nowhere</admin:displays>
+              <dc:title>Adelita</dc:title>
+            </digitalObject></items>'
+      }
+
+      it 'has errors' do
+        expect(errors.first).to match /Invalid datastream ID 'PDF_CONTENT_DS' for TuftsPdf \(file: Adelita\.pdf, pid: tufts:SCORE001\.002\)/
+        expect(errors.last).to match /Invalid datastream ID 'TRANSFER_BINARY_DS' for TuftsPdf \(file: Adelita\.pdf, pid: tufts:SCORE001\.002\)/
+      end
+    end
 
     context "with duplicate filename" do
       let(:xml) { "<input>" +

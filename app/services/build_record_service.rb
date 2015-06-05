@@ -1,6 +1,6 @@
 require 'metadata_xml_parser' # for error classes
 
-# Creates a new record (e.g. TuftsPdf, etc) when given a node with xml attributes.
+# Builds a new record (e.g. TuftsPdf, etc) when given a node with xml attributes.
 #   example:
 #   <digitalObject xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:admin="http://nils.lib.tufts.edu/dcaadmin/" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
 #       <pid>tufts:1</pid>
@@ -11,7 +11,7 @@ require 'metadata_xml_parser' # for error classes
 #       <admin:displays>dl</admin:displays>
 #   </digitalObject>
 #
-class CreateRecordService
+class BuildRecordService
 
   attr_reader :node
 

@@ -16,29 +16,14 @@ class MetadataXmlParser
     validate_duplicate_filename
     validate_duplicate_pids
     validate_pids
-
-    doc.xpath('//digitalObject').each do |digital_object|
-      if self.class.file(digital_object).nil?
-        errors << NodeNotFoundError.new(digital_object.line, '<file>', ParsingError.for(digital_object))
-      end
-      begin
-        m = CreateRecordService.new(digital_object).run
-        m.valid?
-        m.errors.full_messages.each do |message|
-          errors << ModelValidationError.new(digital_object.line, message, ParsingError.for(digital_object))
-        end
-      rescue MetadataXmlParserError => e
-        errors << e
-      end
-    end
-
+    validate_generated_records
     errors
   end
 
   def build_record(document_filename)
     node = find_node_for_file(document_filename)
 
-    CreateRecordService.new(node).run
+    BuildRecordService.new(node).run
   end
 
   def find_node_for_file(document_filename)
@@ -55,50 +40,72 @@ class MetadataXmlParser
     @records ||= doc.xpath('//digitalObject').map { |elem| ImportRecord.new(elem) }
   end
 
-  class << self
-    def file(node)
-      node.xpath("./file").map(&:content).first
-    end
-
-  end
-
   private
-  def validate_blank_files
-    digital_objects = doc.xpath("//digitalObject")
-    digital_objects.xpath("./file").each do |file_node|
-      if file_node.text.blank?
-        errors << MissingFilenameError.new(file_node.line)
+
+    def validate_blank_files
+      digital_objects = doc.xpath("//digitalObject")
+      digital_objects.xpath("./file").each do |file_node|
+        if file_node.text.blank?
+          errors << MissingFilenameError.new(file_node.line)
+        end
       end
     end
-  end
 
-  def validate_duplicate_filename
-    files = doc.xpath("//digitalObject/file/text()")
-    files.group_by(&:content).values.map { |nodes| nodes.drop(1) }.flatten.each do |duplicate|
-      errors << DuplicateFilenameError.new(duplicate.line, ParsingError.for(duplicate))
+    def validate_duplicate_filename
+      files = doc.xpath("//digitalObject/file/text()")
+      files.group_by(&:content).values.map { |nodes| nodes.drop(1) }.flatten.each do |duplicate|
+        errors << DuplicateFilenameError.new(duplicate.line, ParsingError.for(duplicate))
+      end
     end
-  end
 
-  def validate_duplicate_pids
-    pid_text.group_by(&:content).values.map { |nodes| nodes.drop(1) }.flatten.each do |duplicate|
-      errors << DuplicatePidError.new(duplicate.line, ParsingError.for(duplicate))
+    def validate_duplicate_pids
+      pid_text.group_by(&:content).values.map { |nodes| nodes.drop(1) }.flatten.each do |duplicate|
+        errors << DuplicatePidError.new(duplicate.line, ParsingError.for(duplicate))
+      end
     end
-  end
 
-  def validate_pids
-    pid_text.reject { |pid| TuftsBase.valid_pid?(pid.content) }.each do |invalid|
-      errors << InvalidPidError.new(invalid.line, ParsingError.for(invalid))
+    def validate_pids
+      pid_text.reject { |pid| TuftsBase.valid_pid?(pid.content) }.each do |invalid|
+        errors << InvalidPidError.new(invalid.line, ParsingError.for(invalid))
+      end
     end
-  end
 
-  def errors
-    doc.errors
-  end
+    def validate_generated_records
+      doc.xpath('//digitalObject').each do |digital_object|
+        if digital_object.xpath("./file").map(&:content).blank?
+          errors << NodeNotFoundError.new(digital_object.line, '<file>', ParsingError.for(digital_object))
+        end
+        begin
+          m = BuildRecordService.new(digital_object).run
+          m.valid?
+          m.errors.full_messages.each do |message|
+            errors << ModelValidationError.new(digital_object.line, message, ParsingError.for(digital_object))
+          end
 
-  def pid_text
-    doc.xpath("//digitalObject/pid/text()")
-  end
+          validate_datastreams_for_record(m, digital_object)
+        rescue MetadataXmlParserError => e
+          errors << e
+        end
+      end
+    end
 
+    def validate_datastreams_for_record(record, node)
+      node.xpath("./file").each do |file|
+        dsid = file.attributes['datastream']
+        if dsid && !record.datastreams.key?(dsid)
+          errors << InvalidDatastreamError.new(dsid, record.class, node.line, ParsingError.for(node))
+        end
+      end
+    end
+
+
+    def errors
+      doc.errors
+    end
+
+    def pid_text
+      doc.xpath("//digitalObject/pid/text()")
+    end
 end
 
 class MetadataXmlParserError < StandardError
@@ -161,6 +168,18 @@ class ModelValidationError < MetadataXmlParserError
 
   def message
     "#{@error_message} for record beginning at line #{@line}" + append_details
+  end
+end
+
+class InvalidDatastreamError < MetadataXmlParserError
+  def initialize(datastream, model_name, line, details={})
+    @datastream = datastream
+    @model_name = model_name
+    super(line, details)
+  end
+
+  def message
+    "Invalid datastream ID '#{@datastream}' for #{@model_name}" + append_details
   end
 end
 
