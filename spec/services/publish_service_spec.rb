@@ -14,7 +14,14 @@ describe PublishService do
     context "when he object displays in DL" do
       let(:displays) { ['dl'] }
 
+      context "and the identifier is nil" do
+        it "registers a handle" do
+          expect(Job::RegisterHandle).to receive(:create)
+          subject
+        end
+      end
       context "and the identifier is blank" do
+        let(:identifier) { [''] }
         it "registers a handle" do
           expect(Job::RegisterHandle).to receive(:create)
           subject
