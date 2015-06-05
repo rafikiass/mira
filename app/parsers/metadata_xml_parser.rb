@@ -91,7 +91,7 @@ class MetadataXmlParser
 
     def validate_datastreams_for_record(record, node)
       node.xpath("./file").each do |file|
-        dsid = file.attributes['datastream']
+        dsid = file.attributes['datastream'].try(:value)
         if dsid && !record.datastreams.key?(dsid)
           errors << InvalidDatastreamError.new(dsid, record.class, node.line, ParsingError.for(node))
         end
