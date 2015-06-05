@@ -27,17 +27,17 @@ class ImportRecord
   end
 
   def build_model
-    @model ||= create_record_service.run
+    @model ||= build_record_service.run
   end
 
-  def create_record_service
-    @create_record_service ||= CreateRecordService.new(node)
+  def build_record_service
+    @build_record_service ||= BuildRecordService.new(node)
   end
 
   private
 
     def dsid_for_node(file_node)
       datastream_attribute = file_node.attributes['datastream']
-      datastream_attribute ? datastream_attribute.value : create_record_service.valid_record_class.default_datastream
+      datastream_attribute ? datastream_attribute.value : build_record_service.valid_record_class.default_datastream
     end
 end
