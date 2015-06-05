@@ -50,7 +50,7 @@ describe RegisterHandleService do
         it "registers a handle" do
           expect_any_instance_of(Handle::Record).to receive(:save).and_return(true)
           service.run
-          expect(object.identifier).to_not be_blank
+          expect(object.identifier).to eq ['http://hdl.handle.net/10427.TEST/000001']
           expect(object).not_to be_published # ensure we haven't changed the status
         end
       end

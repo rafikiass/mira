@@ -10,7 +10,7 @@ class RegisterHandleService
   def run
     handle = generate_handle
     if build_record(handle).save
-      RecordHandleService.new(object, handle).run
+      RecordHandleService.new(object, "http://hdl.handle.net/#{handle}").run
     else
       message = "Unable to register handle #{handle} for #{object.pid}"
       HandleLogService.log(nil, object.pid, message)
