@@ -29,7 +29,7 @@ class PublishService < WorkflowService
     end
 
     def has_handle?
-      object.identifier.present?
+      object.identifier.reject(&:blank?).present?
     end
 
     # Mark that this object has been published
