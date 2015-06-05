@@ -21,7 +21,7 @@ class RegisterHandleService
   private
 
     def build_record(handle)
-      conn = Handle::Connection.new(admin, 300, key_path, password)
+      conn = Handle::Connection.new(admin, 300, key_path, passphrase)
 
       conn.create_record(handle).tap do |record|
         record.add(:URL, url).index = 2
@@ -30,8 +30,8 @@ class RegisterHandleService
       end
     end
 
-    def password
-      Rails.application.secrets.handle_password
+    def passphrase
+      Rails.application.secrets.handle_passphrase
     end
 
     # @example 0.NA/10427.TEST
@@ -51,12 +51,12 @@ class RegisterHandleService
       Settings.handle_batch_tool
     end
 
-    def namespace
-      Settings.handle_namespace
+    def handle_prefix
+      Settings.handle_prefix
     end
 
     def generate_handle
-      "#{namespace}/#{sequence_number}"
+      "#{handle_prefix}/#{sequence_number}"
     end
 
     def sequence_number
