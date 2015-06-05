@@ -99,6 +99,22 @@ describe MetadataXmlParser do
       end
     end
 
+    context "multiple datastreams without a pid" do
+      let(:xml) { '<items xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:admin="http://nils.lib.tufts.edu/dcaadmin/" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
+            <digitalObject>
+              <file datastream="Archival.pdf">Adelita.pdf</file>
+              <file datastream="Transfer.binary">Adelita.sib</file>
+              <rel:hasModel>info:fedora/cm:Text.PDF</rel:hasModel>
+              <admin:displays>nowhere</admin:displays>
+              <dc:title>Adelita</dc:title>
+            </digitalObject></items>'
+      }
+
+      it 'is valid' do
+        expect(errors.first).to eq 'Because it has multiple datastreams, you must also provide a pid for the record beginning at line 2'
+      end
+    end
+
     context "with duplicate filename" do
       let(:xml) { "<input>" +
         build_node('file' => ['foo.pdf']).to_xml +

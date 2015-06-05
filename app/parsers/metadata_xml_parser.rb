@@ -16,6 +16,7 @@ class MetadataXmlParser
     validate_duplicate_filename
     validate_duplicate_pids
     validate_pids
+    validate_multiple_files_must_have_pid
     validate_generated_records
     errors
   end
@@ -70,8 +71,16 @@ class MetadataXmlParser
       end
     end
 
+    def validate_multiple_files_must_have_pid
+      each_digital_object do |node|
+        if node.xpath('./file').count > 1 && node.xpath('./pid').blank?
+          errors << MissingPidWithMultipleFilesError.new(node.line)
+        end
+      end
+    end
+
     def validate_generated_records
-      doc.xpath('//digitalObject').each do |digital_object|
+      each_digital_object do |digital_object|
         if digital_object.xpath("./file").map(&:content).blank?
           errors << NodeNotFoundError.new(digital_object.line, '<file>', ParsingError.for(digital_object))
         end
@@ -105,6 +114,10 @@ class MetadataXmlParser
 
     def pid_text
       doc.xpath("//digitalObject/pid/text()")
+    end
+
+    def each_digital_object &block
+      doc.xpath('//digitalObject').each &block
     end
 end
 
@@ -151,6 +164,12 @@ end
 class DuplicatePidError < MetadataXmlParserError
   def message
     "Multiple PIDs defined for record beginning at line #{@line}" + append_details
+  end
+end
+
+class MissingPidWithMultipleFilesError < MetadataXmlParserError
+  def message
+    "Because it has multiple datastreams, you must also provide a pid for the record beginning at line #{@line}" + append_details
   end
 end
 
