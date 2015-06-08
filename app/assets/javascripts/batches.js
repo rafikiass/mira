@@ -21,7 +21,7 @@ function setupFileUpload(selectors) {
 
   // Enable 'Next' button only if all the added files have been uploaded.
   function setNextButtonState() {
-    if(queue_length == 0 && file_count > 0) {
+    if (queue_length == 0 && file_count > 0) {
       next_link.removeClass('disabled');
     } else {
       next_link.addClass('disabled');
@@ -38,17 +38,17 @@ function setupFileUpload(selectors) {
       var that = this;
       queue_length = queue_length + 1;
       file_count = file_count + 1;
+
       setNextButtonState();
 
       // Call super
       $.blueimp.fileupload.prototype.options.add.call(that, e, data);
     },
 
-    // Whether upload succeeds or fails, enable 'Next' button.
-    always: function(e, data) {
+    // upload finished
+    success: function(e, data) {
       queue_length = queue_length - 1;
       setNextButtonState();
-      next_link.removeClass('disabled');
     },
 
     // This gets called when user clicks 'cancel' for any added file.
