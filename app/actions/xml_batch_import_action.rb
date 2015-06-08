@@ -48,7 +48,7 @@ class XmlBatchImportAction < BatchImportAction
     def create_file(model, dsid, filename)
       file = @documents.find { |d| d.original_filename == filename }
       return unless file  # nop if file isn't found
-      ArchivalStorageService.new(model, dsid, file).run
+      storage_service_class(model).new(model, dsid, file).run
       save_attached_files(model, file, dsid)
       warning = collect_warning(model, dsid, file)
       @document_statuses << [filename, model, warning, nil]
@@ -63,6 +63,10 @@ class XmlBatchImportAction < BatchImportAction
       missing_files.each do |filename|
         @document_statuses << [filename, nil, nil, "#{filename} doesn't exist in the metadata file"]
       end
+    end
+
+    def storage_service_class(model)
+      model.is_a?(TuftsGenericObject) ? GenericObjectArchivalStorageService : ArchivalStorageService
     end
 
     # Add errors if uploaded file was already uploaded.

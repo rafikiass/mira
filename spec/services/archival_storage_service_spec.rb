@@ -14,14 +14,4 @@ describe ArchivalStorageService do
       to("http://bucket01.lib.tufts.edu/data01/tufts/sas/archival_pdf/#{pid}.archival.pdf")
   end
 
-  context "when the object is a TuftsGenericObject" do
-    let(:object_class) { TuftsGenericObject }
-    let(:dsid) { 'GENERIC-CONTENT' }
-    it "stores the file and writes a manifest" do
-      service.run
-      expect(datastream.item.fileName).to eq ['hello.pdf']
-      expect(datastream.item.link).to eq ['http://bucket01.lib.tufts.edu/data01/tufts/sas/1234/generic/1234.pdf']
-      expect(datastream.item.mimeType).to eq ['application/pdf']
-    end
-  end
 end
