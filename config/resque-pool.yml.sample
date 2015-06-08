@@ -11,5 +11,8 @@ test:
   "*": 2
 
 production:
-  "*": 5
+  "derivatives,handle,templates,import,publish,unpublish,export,purge,revert": 5
+# all manifest jobs must be processed by a single worker
+# to avoid concurrency issues
+  "manifest": 1
 
