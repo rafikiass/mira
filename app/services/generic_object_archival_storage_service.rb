@@ -1,20 +1,15 @@
 # A storage service just for TuftsGenericObject
 class GenericObjectArchivalStorageService < ArchivalStorageService
   def run
-    object.datastreams[dsid].tap do |ds|
-      write_manifest(ds)
-    end
-    object.content_will_update = dsid
+    link = write_file
+    # Because many processes may be running this method simultaneously,
+    # we put all the updates to GENERIC-CONTENT in a queue and only have one
+    # worker on that queue. This prevents one process from wiping out the update
+    # done by another process.
+    Job::ManifestUpdate.create(pid: object.pid, link: write_file, mime_type: file.content_type, filename: file.original_filename)
   end
 
   private
-    # Write the manifest
-    def write_manifest(ds)
-      ds.item.link = write_file
-      ds.item.mimeType = file.content_type
-      ds.item.fileName = file.original_filename
-    end
-
     def path_service
       @path_service ||= GenericObjectPathService.new(object, dsid, extension, file.original_filename)
     end

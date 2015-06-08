@@ -9,10 +9,8 @@ describe GenericObjectArchivalStorageService do
   let(:service) { described_class.new(object, dsid, file) }
   let(:pid) { PidUtils.stripped_pid(object.pid) }
 
-  it "stores the file with the original name and writes a manifest" do
+  it "stores the file and creates a job to write the manifest" do
+    expect(Job::ManifestUpdate).to receive(:create).with(pid: 'tufts:1234', filename: 'hello.pdf', link: 'http://bucket01.lib.tufts.edu/data01/tufts/sas/1234/generic/hello.pdf', mime_type: 'application/pdf')
     service.run
-    expect(datastream.item.fileName).to eq ['hello.pdf']
-    expect(datastream.item.link).to eq ['http://bucket01.lib.tufts.edu/data01/tufts/sas/1234/generic/hello.pdf']
-    expect(datastream.item.mimeType).to eq ['application/pdf']
   end
 end
