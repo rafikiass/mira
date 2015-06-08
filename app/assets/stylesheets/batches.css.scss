@@ -8,6 +8,7 @@
 
   // Used by javascript to add an invisible file input over the select files button.
   .overlay-select-files {
+    height: 100%;
     position: absolute;
     opacity: 0;
     top: 0;
