@@ -29,7 +29,7 @@ describe "batch/xml_imports/show.html.erb" do
 
     before do
       allow(item_status).to receive(:status).and_return(line_item_status)
-      allow(item_status).to receive(:review_status).and_return(true)
+      allow(item_status).to receive(:reviewed?).and_return(true)
     end
 
     it "shows batch information" do
@@ -53,8 +53,8 @@ describe "batch/xml_imports/show.html.erb" do
         allow(presenter).to receive(:review_status) { 'Incomplete' }
         allow(reviewed_item).to receive(:record).and_return(alt_record)
         allow(reviewed_item).to receive(:status).and_return('Complete')
-        allow(reviewed_item).to receive(:review_status) { true }
-        allow(item_status).to receive(:review_status) { false }
+        allow(reviewed_item).to receive(:reviewed?) { true }
+        allow(item_status).to receive(:reviewed?) { false }
         render
       end
 

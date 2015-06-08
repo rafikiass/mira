@@ -20,7 +20,7 @@
           <td class="record_status"><%= item.status %></td>
           <td class="record_reviewed_status">
             <% if item.pid %>
-              <%= check_box_tag :reviewed, :reviewed, item.review_status, type: :checkbox, disabled: true  %>
+              <%= check_box_tag :reviewed, :reviewed, item.reviewed?, type: :checkbox, disabled: true  %>
             <% else %>
               N/A
             <% end %>

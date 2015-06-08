@@ -12,9 +12,9 @@ describe BatchItemStatus do
     end
   end
 
-  describe "#review_status" do
+  describe "#reviewed?" do
     before { allow(item).to receive(:record).and_return(record) }
-    subject { item.review_status }
+    subject { item.reviewed? }
 
     context "when the record is reviewed" do
       let(:record) { double(reviewed?: true) }

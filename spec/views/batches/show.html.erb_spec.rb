@@ -30,6 +30,7 @@ describe "batches/show.html.erb" do
     before do
       allow(item_status).to receive(:record).and_return(pdf)
       allow(item_status).to receive(:status).and_return(line_item_status)
+      allow(item_status).to receive(:reviewed?).and_return(true)
     end
 
     it "shows batch information" do
@@ -54,8 +55,8 @@ describe "batches/show.html.erb" do
         allow(presenter).to receive(:review_status) { 'Incomplete' }
         allow(reviewed_item).to receive(:record).and_return(alt_record)
         allow(reviewed_item).to receive(:status).and_return('Complete')
-        allow(reviewed_item).to receive(:review_status) { true }
-        allow(item_status).to receive(:review_status) { false }
+        allow(reviewed_item).to receive(:reviewed?) { true }
+        allow(item_status).to receive(:reviewed?) { false }
       end
 
       it "shows a complete reviewed status" do
@@ -67,7 +68,9 @@ describe "batches/show.html.erb" do
     end
 
     context "with all records reviewed" do
-      before { allow(presenter).to receive(:review_status) { 'Complete' } }
+      before do
+        allow(presenter).to receive(:review_status) { 'Complete' }
+      end
 
       it "shows an complete reviewed status" do
         render
