@@ -24,8 +24,8 @@ class BatchItemStatus
     pid
   end
 
-  def review_status
-    record.try(:reviewed?)
+  def reviewed?
+    record.reviewed?
   end
 
   def status

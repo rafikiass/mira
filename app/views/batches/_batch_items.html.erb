@@ -13,7 +13,7 @@
           <td class="record_title"><%= item.record_title %></td>
           <td class="record_status"><%= item.status %></td>
           <td class="record_reviewed_status">
-            <%= check_box_tag :reviewed, :reviewed, item.review_status, type: :checkbox, disabled: true  %>
+            <%= check_box_tag :reviewed, :reviewed, item.reviewed?, type: :checkbox, disabled: true  %>
           </td>
         </tr>
       <% end %>
