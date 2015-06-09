@@ -1,6 +1,7 @@
 module Job
   class Import
     include Resque::Plugins::Status
+    include RunAsBatchItem
 
     def self.queue
       :import
@@ -19,7 +20,10 @@ module Job
     def perform
       tick # give resque-status a chance to kill this
 
-      ImportService.new(pid: options['record_id'], batch_id: options['batch_id']).run
+      run_as_batch_item(options['record_id'], options['batch_id']) do |record, batch|
+# TODO pass record?
+        ImportService.new(record: record, batch: batch).run
+      end
     end
 
   end
