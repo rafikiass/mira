@@ -2,11 +2,16 @@ require 'spec_helper'
 
 describe PurgeService do
   describe '#run' do
-    let(:draft) { TuftsImage.build_draft_version(title: 'My title', displays: ['dl']) }
+    before do
+      ActiveFedora::Base.find(draft_pid).delete if ActiveFedora::Base.exists?(draft_pid)
+      ActiveFedora::Base.find(published_pid).delete if ActiveFedora::Base.exists?(published_pid)
+    end
+
+    let(:draft) { TuftsImage.new(pid: draft_pid, title: 'My title', displays: ['dl']) }
 
     let(:user) { create(:user) }
-    let(:draft_pid) { PidUtils.to_draft(draft.pid) }
-    let(:published_pid) { PidUtils.to_published(draft.pid) }
+    let(:draft_pid) { 'draft:123' }
+    let(:published_pid) { 'tufts:123' }
 
     context "when only the published version exists" do
       # not a very likely scenario
@@ -17,8 +22,8 @@ describe PurgeService do
       end
 
       it "hard-deletes the published version" do
-        expect(AuditLogService).to receive(:log).with(user.user_key, draft.id, "Purged published version")
-        expect(AuditLogService).not_to receive(:log).with(user.user_key, draft.id, "Purged draft version")
+        expect(AuditLogService).to receive(:log).with(user.user_key, draft.id, "Purged published version | []")
+        expect(AuditLogService).not_to receive(:log).with(user.user_key, draft.id, "Purged draft version | []")
         expect {
           PurgeService.new(draft, user).run
         }.to change { TuftsImage.exists?(published_pid) }.from(true).to(false)
@@ -31,8 +36,8 @@ describe PurgeService do
       end
 
       it "hard-deletes the draft version" do
-        expect(AuditLogService).not_to receive(:log).with(user.user_key, draft.id, "Purged published version")
-        expect(AuditLogService).to receive(:log).with(user.user_key, draft.id, "Purged draft version")
+        expect(AuditLogService).not_to receive(:log).with(user.user_key, draft.id, "Purged published version | []")
+        expect(AuditLogService).to receive(:log).with(user.user_key, draft.id, "Purged draft version | []")
 
         expect {
           PurgeService.new(draft, user).run
@@ -40,15 +45,22 @@ describe PurgeService do
       end
     end
 
-    context "when both versions exist" do
+    context "when both versions exist and files are attached" do
       before do
+        draft.datastreams['Archival.tif'].dsLocation = 'http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/archival_pdf/123.tif'
+        draft.datastreams['Thumbnail.png'].dsLocation = 'http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/archival_pdf/123.png'
         draft.save!
         PublishService.new(draft).run
+        allow(LocalPathService).to receive(:new).and_return(path_service)
+        allow(path_service).to receive(:local_path).and_return('foo.png', 'bar.tif')
       end
 
+      let(:path_service) { double }
+
+
       it "hard-deletes both versions" do
-        expect(AuditLogService).to receive(:log).with(user.user_key, draft.id, "Purged published version")
-        expect(AuditLogService).to receive(:log).with(user.user_key, draft.id, "Purged draft version")
+        expect(AuditLogService).to receive(:log).with(user.user_key, draft.id, "Purged published version | [\"foo.png\", \"bar.tif\"]")
+        expect(AuditLogService).to receive(:log).with(user.user_key, draft.id, "Purged draft version | [\"foo.png\", \"bar.tif\"]")
 
         expect {
           PurgeService.new(draft, user).run
