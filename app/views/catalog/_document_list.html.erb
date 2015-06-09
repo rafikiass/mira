@@ -18,45 +18,13 @@
 
 
   <div class="exportButtonWrapper dropdown" style="display: inline;">
-    <button id="exportButton" class="btn btn-primary" type="button" data-toggle="dropdown" data-behavior="batch-create" aria-haspopup-"true" aria-expanded="False">
+    <button id="exportButton" class="btn btn-primary" type="button" data-toggle="dropdown" data-behavior="batch-create" aria-haspopup="true" aria-expanded="False">
       Export...
 
       <span class="caret"></span>
     </button>
-    <ul class="dropdown-menu" role="menu" aria-labelledby="exportButton">
-      <h4>Data Streams:</h4>
-      <li>
-        <label>
-          <input class="datastream" type="checkbox" name="datastream_ids[]" checked="checked" value="DCA-META" />
-          DCA-META
-        </label>
-      </li>
-      <li>
-        <label>
-          <input class="datastream" type="checkbox" name="datastream_ids[]" checked="checked" value="DCA-DETAIL-META" />
-          DCA-DETAIL-META
-        </label>
-      </li>
-      <li>
-        <label>
-          <input class="datastream" type="checkbox" name="datastream_ids[]" value="DCA-ADMIN" />
-          DCA-ADMIN
-        </label>
-      </li>
-      <li>
-        <label>
-          <input class="datastream" type="checkbox" name="datastream_ids[]" value="RELS-EXT" />
-          RELS-EXT
-        </label>
-      </li>
 
-      <%= button_to "Continue", batch_exports_path,
-        class: "btn btn-primary",
-        data: { behavior: 'batch-create' },
-        value: "BatchExport",
-        disabled: true
-      %>
-    </ul>
+    <%= render partial: 'catalog/export_datastream_form' %>
   </div>
 
   <div id='selected_documents_count'> <br /> </div>

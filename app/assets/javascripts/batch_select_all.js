@@ -56,7 +56,7 @@ function serializeCheckboxes(form, elements, fieldName) {
 $(document).ready(function() {
   batchElements = {
     checkAll: $('#documents #check_all'),
-    singleCheckboxes: $('#documents .batch_document_selector'),
+    singleCheckboxes: $('.batch_document_selector'),
     buttons: $('[data-behavior=batch-create]'),
     selectedDocumentsCount: $('#selected_documents_count'),
     datastreamIds: $('input.datastream'),
