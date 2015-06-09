@@ -37,6 +37,7 @@ class DraftExportService
       existing_record_ids = record_ids.select { |r| ActiveFedora::Base.exists?(r) }
 
       ActiveFedora::Base.find(existing_record_ids).each do |object|
+        assign_batch_id(object)
         xml.digitalObject do
           xml.pid object.pid
 
@@ -51,6 +52,12 @@ class DraftExportService
       end
     end # xml.export
   end # generate_xml
+
+  # Store the batch_id on the object
+  def assign_batch_id(object)
+    object.batch_id += [@batch_id]
+    object.save!
+  end
 
   def write_output_to_file
     ensure_export_directory_exists

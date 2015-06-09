@@ -57,11 +57,11 @@ describe DraftExportService do
     }
 
     let(:pdf) {
-      mock_model(TuftsPdf, title: 'text export pdf', displays: ['dl'], pid: 'tufts:123', datastreams: fake_datastreams)
+      TuftsPdf.new(title: 'text export pdf', displays: ['dl'], pid: 'tufts:123')
     }
 
     let(:img) {
-      mock_model(TuftsImage, title: 'text export pdf', displays: ['dl'], pid: 'tufts:456', datastreams: fake_datastreams)
+      TuftsImage.new(title: 'text export image', displays: ['dl'], pid: 'tufts:456')
     }
 
     let(:record_ids) { [pdf.pid, img.pid] }
@@ -69,6 +69,8 @@ describe DraftExportService do
     let(:doc) { Nokogiri::XML(File.read(svc.full_export_file_path)) }
 
     before do
+      expect(pdf).to receive(:save!)
+      expect(img).to receive(:save!)
       allow(ActiveFedora::Base).to receive(:exists?).with('draft:123') { true }
       allow(ActiveFedora::Base).to receive(:exists?).with('draft:456') { true }
       allow(ActiveFedora::Base).to receive(:exists?).with('draft:999') { false }
@@ -83,7 +85,11 @@ describe DraftExportService do
     end
 
     it 'generates a file in the expected location' do
-      expect(File.exist?(svc.full_export_file_path)).to be_truthy
+      expect(File).to exist(svc.full_export_file_path)
+    end
+
+    it 'adds batchID to the objects' do
+      expect(pdf.batch_id).to eq ['1234']
     end
 
     describe '#full_export_file_path' do
@@ -102,10 +108,10 @@ describe DraftExportService do
       it 'is in the correct format' do
         expect(subject.xpath('/items/digitalObject').count).to eq(2)
         expect(subject.xpath('/items/digitalObject[1]/pid').text).to eq(pdf.pid)
-        expect(subject.xpath('/items/digitalObject[1]/datastream').count).to eq(2)
+        expect(subject.xpath('/items/digitalObject[1]/datastream').count).to eq(4)
 
         expect(subject.xpath('/items/digitalObject[2]/pid').text).to eq(img.pid)
-        expect(subject.xpath('/items/digitalObject[2]/datastream').count).to eq(2)
+        expect(subject.xpath('/items/digitalObject[2]/datastream').count).to eq(4)
       end
     end
 
