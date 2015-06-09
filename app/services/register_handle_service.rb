@@ -28,6 +28,10 @@ class RegisterHandleService
         record.add(:Email, email).index = 6
         record << Handle::Field::HSAdmin.new(admin)
       end
+    rescue Handle::HandleError => e
+      message = "Unable to register handle #{handle} for #{object.pid}\n#{e.message}"
+      HandleLogService.log(nil, object.pid, message)
+      raise e
     end
 
     def passphrase
