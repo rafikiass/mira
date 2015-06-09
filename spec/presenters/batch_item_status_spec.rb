@@ -44,5 +44,24 @@ describe BatchItemStatus do
       it { is_expected.to eq 'Status not available' }
     end
   end
+
+  context "when the record does not exist" do
+    before do
+      allow(ActiveFedora::Base).to receive(:find).and_raise(ActiveFedora::ObjectNotFoundError)
+    end
+
+    describe "#reviewed?" do
+      it "returns false" do
+        expect(item).to_not be_reviewed
+      end
+    end
+
+    describe "#record_title" do
+      it "returns a blank string" do
+        expect(item.record_title).to eq("")
+      end
+    end
+
+  end
 end
 

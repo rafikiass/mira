@@ -11,12 +11,11 @@ class BatchItemStatus
   end
 
   def record
-    @record ||= ActiveFedora::Base.find(@pid, cast: true)
-  rescue ActiveFedora::ObjectNotFoundError
+    @record ||= load_record
   end
 
   def record_title
-    record.try(&:title)
+    record.title
   end
 
   # An Xml Import batch has one pids is mapped to the uploaded files
@@ -40,4 +39,21 @@ class BatchItemStatus
     end
   end
 
+  private
+  def load_record
+    ActiveFedora::Base.find(@pid, cast: true)
+  rescue ActiveFedora::ObjectNotFoundError
+    NullRecord.new
+  end
+
+  class NullRecord
+    def reviewed?
+      false
+    end
+
+    def title
+      ""
+    end
+  end
 end
+
