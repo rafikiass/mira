@@ -1,19 +1,13 @@
 class ImportService
-  def initialize(pid:, batch_id:)
-    @pid = pid
-    @batch_id = batch_id
+  def initialize(record:, batch:)
+    @object = record
+    @batch = batch
   end
 
-  def batch
-    @batch ||= Batch.find(@batch_id)
-  end
-
-  def object
-    @object ||= ActiveFedora::Base.find(@pid)
-  end
+  attr_accessor :object, :batch
 
   def record
-    @record ||= file.xpath("//digitalObject[pid='#{@pid}']").first
+    @record ||= file.xpath("//digitalObject[pid='#{@object.id}']").first
   end
 
   def file

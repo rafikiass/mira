@@ -7,7 +7,7 @@ module Job
       record = ActiveFedora::Base.find(record_id, cast: true)
       record.batch_id += [batch_id.to_s]
       record.working_user = batch.creator
-      yield record
+      yield record, batch
     end
 
   end
