@@ -18,30 +18,22 @@ describe RegisterHandleService do
       expect(batch[1]).to eq "6 EMAIL 86400 1110 UTF8 brian.goodmon@tufts.edu"
       expect(batch[2]).to eq "100 HS_ADMIN 86400 1110 ADMIN 300:111111111111:0.NA/10427.TEST"
     end
-
-    context "when an error occurs" do
-      before do
-        allow_any_instance_of(Handle::Connection).to receive(:create_record).and_raise Handle::HandleError.new('Invalid admin')
-      end
-
-      it "logs errors and re-raises" do
-        expect(HandleLogService).to receive(:log).with(nil, object.pid, "Unable to register handle hdl/hdl1 for draft:1\nInvalid admin")
-        expect { subject }.to raise_error Handle::HandleError, 'Invalid admin'
-      end
-    end
   end
+
 
   describe "#run" do
 
     context "when there is an error registering the handle" do
       before do
-        allow_any_instance_of(Handle::Record).to receive(:save).and_return(false)
+        allow_any_instance_of(Handle::Record).to receive(:save).and_raise Handle::HandleError.new('Invalid admin')
+        allow(service).to receive(:generate_handle).and_return 'hdl/hdl1'
       end
 
       subject { service.run }
 
-      it "makes a batch file" do
-        expect { subject }.to raise_error RegisterHandleService::HandleServiceError, "Unable to register handle 10427.TEST/000001 for #{object.pid}"
+      it "logs errors and re-raises" do
+        expect(HandleLogService).to receive(:log).with(nil, object.pid, "Unable to register handle hdl/hdl1 for draft:1\nInvalid admin")
+        expect { subject }.to raise_error Handle::HandleError, "Invalid admin"
         expect(object.identifier).to be_blank
       end
     end

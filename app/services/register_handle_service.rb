@@ -9,12 +9,14 @@ class RegisterHandleService
 
   def run
     handle = generate_handle
-    if build_record(handle).save
+    record = build_record(handle)
+    begin
+      record.save
       RecordHandleService.new(object, "http://hdl.handle.net/#{handle}").run
-    else
-      message = "Unable to register handle #{handle} for #{object.pid}"
+    rescue Handle::HandleError => e
+      message = "Unable to register handle #{handle} for #{object.pid}\n#{e.message}"
       HandleLogService.log(nil, object.pid, message)
-      raise HandleServiceError, message
+      raise e
     end
   end
 
@@ -28,10 +30,6 @@ class RegisterHandleService
         record.add(:Email, email).index = 6
         record << Handle::Field::HSAdmin.new(admin)
       end
-    rescue Handle::HandleError => e
-      message = "Unable to register handle #{handle} for #{object.pid}\n#{e.message}"
-      HandleLogService.log(nil, object.pid, message)
-      raise e
     end
 
     def passphrase
@@ -69,9 +67,6 @@ class RegisterHandleService
 
     def url
       "http://dl.tufts.edu/catalog/#{PidUtils.to_published(object.id)}"
-    end
-    # Raised when there is a problem registering the handle
-    class HandleServiceError < StandardError
     end
 end
 
