@@ -1,3 +1,4 @@
+# This parser handles the raw metadata import, which has actual XML datastreams
 class MetadataImportParser
   attr_reader :errors
   ALLOWED_DSIDS = Set['DCA-META', 'DCA-DETAIL-META', 'DCA-ADMIN', 'RELS-EXT']
@@ -24,12 +25,20 @@ class MetadataImportParser
 
     def validate
       ensure_contains_digital_objects
+      ensure_objects_have_pids
       ensure_datastreams_are_valid
+    end
+
+    def ensure_objects_have_pids
+      unless document.xpath('//items/digitalObject').all? { |n| n.xpath('./pid').present? }
+        errors << "Some of the digitalObjects don't have a pid"
+        return
+      end
     end
 
     def ensure_contains_digital_objects
       unless document.xpath('//items/digitalObject').any?
-        self.errors << "The file you uploaded doesn't contain any digital objects"
+        errors << "The file you uploaded doesn't contain any digital objects"
         return
       end
     end
@@ -40,7 +49,7 @@ class MetadataImportParser
         unless found.subset? ALLOWED_DSIDS
           pid = node.xpath('./pid').first.content
           not_allowed = (found - ALLOWED_DSIDS).to_a.map(&:inspect).join(', ')
-          self.errors << "The object #{pid} specifies the datastream: #{not_allowed} which is not allowed."
+          errors << "The object #{pid} specifies the datastream: #{not_allowed} which is not allowed."
         end
       end
     end
