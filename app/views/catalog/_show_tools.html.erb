@@ -47,6 +47,16 @@
     <%= link_to "View in Fedora", @document.preview_fedora_path %>
   </li>
 
+  <li>
+    <div class="exportButtonWrapper dropdown" style="display: inline;">
+      <% # This hidden checkbox is needed for the javascript that submits the form to export datastreams %>
+      <%= check_box_tag "pids[]", @document.id, true, class:"batch_document_selector", hidden: true %>
+
+      <%= link_to 'Export Datastreams', '#', id: "exportButton", 'data-target' => "#", 'data-toggle' => "dropdown", 'aria-haspopup' => "true", role: "button", 'aria-expanded' => "false" %>
+      <%= render partial: 'catalog/export_datastream_form' %>
+    </div>
+  </li>
+
   <% if @document.preview_dl_path.present? %>
     <li>
       <%= link_to dl_link_text(@document), @document.preview_dl_path %>

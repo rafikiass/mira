@@ -1,0 +1,34 @@
+<ul class="dropdown-menu" role="menu" aria-labelledby="exportButton">
+  <h4>Datastreams:</h4>
+  <li>
+    <label>
+      <input class="datastream" type="checkbox" name="datastream_ids[]" checked="checked" value="DCA-META" />
+      DCA-META
+    </label>
+  </li>
+  <li>
+    <label>
+      <input class="datastream" type="checkbox" name="datastream_ids[]" checked="checked" value="DCA-DETAIL-META" />
+      DCA-DETAIL-META
+    </label>
+  </li>
+  <li>
+    <label>
+      <input class="datastream" type="checkbox" name="datastream_ids[]" value="DCA-ADMIN" />
+      DCA-ADMIN
+    </label>
+  </li>
+  <li>
+    <label>
+      <input class="datastream" type="checkbox" name="datastream_ids[]" value="RELS-EXT" />
+      RELS-EXT
+    </label>
+  </li>
+
+  <%= button_to "Continue", batch_exports_path,
+      class: "btn btn-primary",
+      data: { behavior: 'batch-create' },
+      value: "BatchExport",
+      disabled: true
+  %>
+</ul>
