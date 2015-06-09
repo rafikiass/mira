@@ -17,6 +17,13 @@ GIT
       settingslogic
       titleize
 
+GIT
+  remote: git://github.com/jcoyne/handle.git
+  revision: 75986eeedaa99c7100b335f51a2f49f907742d9a
+  ref: 75986ee
+  specs:
+    handle-system (0.0.7)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -165,7 +172,6 @@ GEM
     ffi (1.9.8)
     haml (4.0.6)
       tilt
-    handle-system (0.0.7)
     hike (1.2.3)
     hooks (0.3.6)
       uber (~> 0.0.4)
@@ -514,7 +520,7 @@ DEPENDENCIES
   devise
   disable_assets_logger
   factory_girl_rails
-  handle-system (~> 0.0.7)
+  handle-system!
   hydra-batch-edit (= 1.1.1)
   hydra-editor (~> 0.5.0)
   hydra-head (~> 7.2.1)
