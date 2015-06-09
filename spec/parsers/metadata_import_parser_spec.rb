@@ -13,11 +13,19 @@ describe MetadataImportParser do
       end
     end
 
-    context "with a file that lacks pids" do
+    context "with a file that lacks digitalObjects" do
       let(:file) { "<derp/>" }
       it "isn't valid and has errors" do
         expect(parser).not_to be_valid
         expect(parser.errors).to eq ["The file you uploaded doesn't contain any digital objects"]
+      end
+    end
+
+    context "with a file that lacks pids" do
+      let(:file) { "<items><digitalObject/></items>" }
+      it "isn't valid and has errors" do
+        expect(parser).not_to be_valid
+        expect(parser.errors).to eq ["Some of the digitalObjects don't have a pid"]
       end
     end
 
