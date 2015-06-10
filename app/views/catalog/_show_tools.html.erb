@@ -57,14 +57,28 @@
     </div>
   </li>
 
-  <% if @document.preview_dl_path.present? %>
-    <li>
-      <%= link_to dl_link_text(@document), @document.preview_dl_path %>
-    </li>
-  <% else %>
-    <li class="disabled">
-      <%= link_to "Preview in DL", '#' %>
-    </li>
+  <% if @document.preview_dl_path %>
+    <% if @document.published? %>
+      <li class="disabled">
+        <%= link_to "Preview draft in DL", '#' %>
+      </li>
+    <% else %>
+      <li>
+        <%= link_to 'Preview draft in DL', @document.preview_dl_path %>
+      </li>
+    <% end %>
+  <% end %>
+
+  <% if @document.show_dl_path %>
+    <% if enable_show_dl_link?(@document) %>
+      <li>
+        <%= link_to 'Show in DL', @document.show_dl_path %>
+      </li>
+    <% else %>
+      <li class="disabled">
+        <%= link_to 'Show in DL', '#' %>
+      </li>
+    <% end %>
   <% end %>
 
 </ul>
