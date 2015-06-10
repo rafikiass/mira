@@ -9,9 +9,14 @@ describe ArchivalStorageService do
   let(:datastream) { object.datastreams[dsid] }
   let(:pid) { PidUtils.stripped_pid(object.pid) }
 
+  before do
+    datastream.checksum = 'abcdef1234'
+  end
+
   it "stores the file" do
     expect { service.run }.to change { datastream.dsLocation }.from(nil).
-      to("http://bucket01.lib.tufts.edu/data01/tufts/sas/archival_pdf/#{pid}.archival.pdf")
+      to("http://bucket01.lib.tufts.edu/data01/tufts/sas/archival_pdf/#{pid}.archival.pdf").
+    and change { datastream.checksum }.to(nil)
   end
 
 end

@@ -11,6 +11,7 @@ class ArchivalStorageService
     object.datastreams[dsid].tap do |ds|
       ds.dsLocation = write_file
       ds.mimeType = file.content_type
+      ds.checksum = nil
     end
     object.content_will_update = dsid
   end
