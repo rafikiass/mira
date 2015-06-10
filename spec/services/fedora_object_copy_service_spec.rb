@@ -8,8 +8,8 @@ describe FedoraObjectCopyService do
 
     it "changes the pid and removes invalid checksums" do
       expect(subject).not_to match 'REMOVE-THIS'
-      expect(subject).not_to match 'ExceptionReadingStream'
-      expect(subject).to match '40fb74bc5a85dd1339741af571ef6f0e'
+      expect(subject).to match 'e82678d5d66fab8735ae0f698b193776' # checksum for Archival.tif
+      expect(subject).to match '40fb74bc5a85dd1339741af571ef6f0e' # checksum for DCA-META
       expect(subject).not_to match 'draft:5'
       expect(subject).to match 'tufts:5'
     end
@@ -68,7 +68,7 @@ describe FedoraObjectCopyService do
 </foxml:datastream>
 <foxml:datastream ID="Archival.tif" STATE="A" CONTROL_GROUP="E" VERSIONABLE="true">
 <foxml:datastreamVersion ID="Archival.tif.0" LABEL="File Datastream" CREATED="2015-04-27T18:16:06.171Z" MIMETYPE="image/tiff">
-<foxml:contentDigest TYPE="MD5" DIGEST="ExceptionReadingStream"/>
+<foxml:contentDigest TYPE="MD5" DIGEST="e82678d5d66fab8735ae0f698b193776"/>
 
 <foxml:contentLocation TYPE="URL" REF="http://bucket01.lib.tufts.edu/data01/tufts/sas/archival_tif/5.archival.tif"/>
 </foxml:datastreamVersion>
