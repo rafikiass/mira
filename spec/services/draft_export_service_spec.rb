@@ -8,7 +8,7 @@ describe DraftExportService do
     {
       record_ids: record_ids,
       datastream_ids: datastream_ids,
-      batch_id: '1234',
+      batch_id: 1234,
       export_directory: export_directory
     }
   }

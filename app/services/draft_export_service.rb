@@ -55,7 +55,7 @@ class DraftExportService
 
   # Store the batch_id on the object
   def assign_batch_id(object)
-    object.batch_id += [@batch_id]
+    object.batch_id += [@batch_id.to_s]
     object.save!
   end
 
