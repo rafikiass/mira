@@ -11,7 +11,7 @@ feature 'Export datastreams' do
     # Clicking 'Export Datastreams' makes the drop-down visible
     expect(page).to_not have_button 'Continue'
     click_link 'Export Datastreams'
-    expect(page).to     have_button 'Continue'
+    expect(page).to have_button 'Continue'
 
     # Clicking 'Continue' submits the form to export datastreams
     expect(Job::Export).to receive(:create).once

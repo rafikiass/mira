@@ -68,5 +68,13 @@
     }
   }
 
-  a#exportButton { padding: 10px 15px; }
+  a#exportButton {
+    padding: 10px 15px;
+    display: block;
+
+    &:hover {
+      background-color: #eee;
+      text-decoration: none;
+    }
+  }
 }
