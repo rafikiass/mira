@@ -19,10 +19,10 @@ GIT
 
 GIT
   remote: git://github.com/jcoyne/handle.git
-  revision: 75986eeedaa99c7100b335f51a2f49f907742d9a
-  ref: 75986ee
+  revision: 8ae4cebd5ada4fc138a58dba3899a0507f6141cc
+  ref: 8ae4ceb
   specs:
-    handle-system (0.0.7)
+    handle-system (0.1.0)
 
 GEM
   remote: https://rubygems.org/
