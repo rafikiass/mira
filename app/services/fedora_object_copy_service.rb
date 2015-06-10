@@ -29,7 +29,7 @@ class FedoraObjectCopyService
 
     def remove_checksums(foxml)
       ngxml = Nokogiri::XML(foxml)
-      ['RELS-EXT', 'DC', 'Archival.tif'].each do |dsid|
+      ['RELS-EXT', 'DC', 'Archival.tif', 'Thumbnail.png'].each do |dsid|
         ngxml.search("//foxml:datastream[@ID=\"#{dsid}\"]//foxml:contentDigest", 'foxml'=>"info:fedora/fedora-system:def/foxml#").remove
       end
       ngxml.to_xml
