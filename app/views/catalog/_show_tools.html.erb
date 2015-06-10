@@ -48,13 +48,17 @@
   </li>
 
   <li>
-    <div class="exportButtonWrapper dropdown" style="display: inline;">
+    <span class="exportButtonWrapper dropdown">
       <% # This hidden checkbox is needed for the javascript that submits the form to export datastreams %>
       <%= check_box_tag "pids[]", @document.id, true, class:"batch_document_selector", hidden: true %>
+      <a href='#' id="exportButton" role="button" data-target="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 
-      <%= link_to 'Export Datastreams', '#', id: "exportButton", 'data-target' => "#", 'data-toggle' => "dropdown", 'aria-haspopup' => "true", role: "button", 'aria-expanded' => "false" %>
+        Export Datastreams
+        <span class="caret"></span>
+      </a>
+
       <%= render partial: 'catalog/export_datastream_form' %>
-    </div>
+    </span>
   </li>
 
   <% if @document.preview_dl_path.present? %>

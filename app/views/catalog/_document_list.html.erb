@@ -17,15 +17,14 @@
     data: { confirm: "All pending edits will be reverted for the selected records.  This action cannot be undone. Do you wish to proceed?",  behavior: 'batch-create' } %>
 
 
-  <div class="exportButtonWrapper dropdown" style="display: inline;">
+  <span class="exportButtonWrapper dropdown">
     <button id="exportButton" class="btn btn-primary" type="button" data-toggle="dropdown" data-behavior="batch-create" aria-haspopup="true" aria-expanded="False">
-      Export...
-
+      Export Datastreams
       <span class="caret"></span>
     </button>
 
     <%= render partial: 'catalog/export_datastream_form' %>
-  </div>
+  </span>
 
   <div id='selected_documents_count'> <br /> </div>
 
