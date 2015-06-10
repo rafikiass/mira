@@ -38,6 +38,8 @@ function serializeForm(e) {
   //console.log(e);
   form = $(e.currentTarget).closest('form');
 
+  $(form).find('.batchData').remove();
+
   serializeCheckboxes(form, e.data.singleCheckboxes, "pids[]");
   serializeCheckboxes(form, e.data.datastreamIds, "datastream_ids[]");
 }
@@ -48,6 +50,7 @@ function serializeCheckboxes(form, elements, fieldName) {
       $('<input />').attr('type', 'hidden')
             .attr('name', fieldName)
             .attr('value', element.value)
+            .addClass('batchData')
             .appendTo(form);
     }
   });
