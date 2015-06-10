@@ -5,6 +5,68 @@ describe SolrDocument do
     expect(SolrDocument.ancestors).to include(Blacklight::Solr::Document, Tufts::SolrDocument)
   end
 
+  describe "#preview_dl_path" do
+    before { subject['id'] = 'draft:7'}
+    let(:url) { 'http://dev-dl.lib.tufts.edu/catalog/draft:7' }
+
+    describe "when the object has a published PID" do
+      before { subject['id'] = 'tufts:7' }
+
+      it "converts to the draft PID to construct the URL" do
+        expect(subject.preview_dl_path).to eq url
+      end
+    end
+
+    describe "when the object is a template" do
+      before do
+        subject['displays_ssim'] = ['dl']
+        subject['active_fedora_model_ssi'] = 'TuftsTemplate'
+      end
+
+      it "has no link to DL" do
+        expect(subject.preview_dl_path).to be_nil
+      end
+    end
+
+    describe "when displays is 'dl'" do
+      before { subject['displays_ssim'] = ['dl'] }
+
+      it "has a link to the fedora object" do
+        expect(subject.preview_dl_path).to eq url
+      end
+    end
+
+    describe "when displays is not set" do
+      it "has a link to the fedora object" do
+        subject['displays_ssim'] = nil
+        expect(subject.preview_dl_path).to eq url
+        subject['displays_ssim'] = ['']
+        expect(subject.preview_dl_path).to eq url
+      end
+    end
+
+    describe "when displays is something else" do
+      it "has no link to DL" do
+        subject['displays_ssim'] = ['tisch']
+        expect(subject.preview_dl_path).to be_nil
+        subject['displays_ssim'] = ['', 'tisch']
+        expect(subject.preview_dl_path).to be_nil
+      end
+    end
+  end
+
+  describe "#show_dl_path" do
+    let(:url) { 'http://dev-dl.lib.tufts.edu/catalog/tufts:7' }
+
+    describe "when the object has a draft PID" do
+      before { subject['id'] = 'draft:7' }
+
+      it "converts to the published PID to construct the URL" do
+        expect(subject.show_dl_path).to eq url
+      end
+    end
+  end
+
   describe "#published_at" do
     let(:doc) { SolrDocument.new("published_at_dtsi" => '2015-04-27') }
     subject { doc.published_at }

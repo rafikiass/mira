@@ -69,6 +69,57 @@ describe 'catalog/_show_tools.html.erb' do
       end
 
     end
-
   end
+
+  describe 'the links to DL' do
+    let(:pid) { 'draft:7' }
+
+    let(:obj_url)   { "http://dev-dl.lib.tufts.edu/catalog/#{PidUtils.to_published(pid)}" }
+    let(:draft_url) { "http://dev-dl.lib.tufts.edu/catalog/#{pid}" }
+
+    let(:draft_link_text) { 'Preview draft in DL' }
+    let(:obj_link_text)   { 'Show in DL' }
+
+    before { render }
+
+    context 'when the object is unpublished' do
+      let(:doc) { SolrDocument.new(id: pid, displays_ssim: ['dl'], edited_at_dtsi: 'some date', published_at_dtsi: nil) }
+
+      it 'has preview link, but disables show link' do
+        expect(doc.workflow_status).to eq :unpublished
+        expect(rendered).to have_link(draft_link_text, href: draft_url)
+        expect(rendered).to have_link(obj_link_text, href: '#')
+      end
+    end
+
+    context 'when the object is edited' do
+      let(:doc) { SolrDocument.new(id: pid, displays_ssim: ['dl'], edited_at_dtsi: 'some date', published_at_dtsi: 'different from edited_at') }
+
+      it 'has both preview and show links' do
+        expect(doc.workflow_status).to eq :edited
+        expect(rendered).to have_link(draft_link_text, href: draft_url)
+        expect(rendered).to have_link(obj_link_text, href: obj_url)
+      end
+    end
+
+    context 'when the object is published' do
+      let(:doc) { SolrDocument.new(id: pid, displays_ssim: ['dl'], edited_at_dtsi: 'the same date', published_at_dtsi: 'the same date') }
+
+      it 'has the show link, but disables the preview link' do
+        expect(doc.workflow_status).to eq :published
+        expect(rendered).to have_link(draft_link_text, href: '#')
+        expect(rendered).to have_link(obj_link_text, href: obj_url)
+      end
+    end
+
+    context 'when the solr doc has no DL path' do
+      let(:doc) { SolrDocument.new(id: pid, displays_ssim: ['tisch']) }
+
+      it 'has neither link' do
+        expect(rendered).to_not have_link(draft_link_text)
+        expect(rendered).to_not have_link(obj_link_text)
+      end
+    end
+  end
+
 end

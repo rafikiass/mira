@@ -29,4 +29,24 @@ class SolrDocument
     !datastreams.fetch(dsid, {}).empty?
   end
 
+  # Link to the draft object in DL
+  def preview_dl_path
+    dl_path(PidUtils.to_draft(id))
+  end
+
+  # Link to the published object in DL
+  def show_dl_path
+    dl_path(PidUtils.to_published(id))
+  end
+
+private
+
+  def dl_path(pid)
+    return nil if template?
+    displays = Array(self['displays_ssim'])
+    if displays.include?('dl') || displays.all?{|x| x.blank? }
+      Settings.preview_dl_url + "/catalog/#{pid}"
+    end
+  end
+
 end
