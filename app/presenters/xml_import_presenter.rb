@@ -3,7 +3,11 @@ class XmlImportPresenter < BatchPresenter
   delegate :missing_files, to: :@batch
 
   def item_count
-    @batch.pids.count
+    @batch.pids.uniq.count
+  end
+
+  def datastream_count
+    @batch.uploaded_files.count
   end
 
   def items

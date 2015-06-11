@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "batch/xml_imports/show.html.erb" do
 
-  let(:batch) { mock_model(BatchXmlImport, pids: [], missing_files:[], display_name: 'foo', creator: creator, status: batch_status) }
+  let(:batch) { mock_model(BatchXmlImport, pids: [], uploaded_files: [], missing_files:[], display_name: 'foo', creator: creator, status: batch_status) }
   let(:batch_status) { :queued }
 
   let(:creator) { mock_model(User, display_name: 'bob') }
@@ -37,6 +37,7 @@ describe "batch/xml_imports/show.html.erb" do
       expect(rendered).to have_selector(".type", text: batch.display_name)
       expect(rendered).to have_selector(".batch_id", text: batch.id)
       expect(rendered).to have_selector(".record_count", text: '0')
+      expect(rendered).to have_selector(".datastream_count", text: '0')
       expect(rendered).to have_selector(".creator", text: batch.creator.display_name)
       expect(rendered).to have_selector(".created_at", text: batch.created_at)
       expect(rendered).to have_selector(".status", text: 'Queued')
@@ -101,7 +102,7 @@ describe "batch/xml_imports/show.html.erb" do
 
     context 'a batch with missing files' do
       let(:missing_file) { 'missing_file.pdf' }
-      let(:batch) { mock_model(BatchXmlImport, pids: [], missing_files: [missing_file], display_name: 'howdy', creator: creator, status: batch_status, pid: 'tufts:123') }
+      let(:batch) { mock_model(BatchXmlImport, pids: [], uploaded_files: [], missing_files: [missing_file], display_name: 'howdy', creator: creator, status: batch_status, pid: 'tufts:123') }
 
       it 'it displays the list of missing files' do
         render
