@@ -68,6 +68,10 @@ describe PublishService do
     context "when a published version does not exist" do
       let(:published_pid) { PidUtils.to_published(obj.pid) }
 
+      before do
+        ActiveFedora::Base.find(published_pid).delete if ActiveFedora::Base.exists?(published_pid)
+      end
+
       it "results in a published copy of the draft" do
         expect(subject).to receive(:register_handle)
         expect { subject.run }.to change { TuftsImage.exists?(published_pid) }.
