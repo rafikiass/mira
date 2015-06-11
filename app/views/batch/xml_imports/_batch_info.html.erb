@@ -1,0 +1,16 @@
+  <div class="batch_info">
+    <%= make_dl "Batch Type", batch.display_name, "type" %>
+    <%= make_dl "Batch id", batch.id, "batch_id" %>
+    <%= make_dl "Record Count", batch.item_count, "record_count" %>
+    <%= make_dl "Datastream Count", batch.datastream_count, "datastream_count" %>
+    <%= make_dl "Creator", batch.creator.display_name, "creator" %>
+    <%= make_dl "Created at", batch.created_at, "created_at" %>
+    <%= make_dl "Status", batch.status_text, "status" %>
+
+    <% if batch.export? %>
+      <%= make_dl 'Download', batch_export_download_link(batch), "export_download" %>
+    <% end %>
+
+    <%= make_dl "Review Status", batch.review_status, "review_status" %>
+  </div>
+
