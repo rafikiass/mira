@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Job::ManifestUpdate do
   let(:pid) { 'tufts:123' }
-  let(:job) { described_class.new('uuid', 'pid' => pid, link: 'http://bucket.tufts.edu/foo/bar/hello.pdf', mime_type: 'application/pdf', filename: 'hello.pdf') }
+  let(:job) { described_class.new('uuid', 'pid' => pid, 'link' => 'http://bucket.tufts.edu/foo/bar/hello.pdf', 'mime_type' => 'application/pdf', 'filename' => 'hello.pdf') }
   let(:record) { TuftsGenericObject.new }
   let(:datastream) { record.datastreams['GENERIC-CONTENT'] }
 

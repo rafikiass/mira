@@ -21,9 +21,9 @@ module Job
       object = TuftsGenericObject.find(options.fetch('pid'))
       ds = object.datastreams['GENERIC-CONTENT']
       new_item = build_item(ds)
-      new_item.link = options.fetch(:link)
-      new_item.mimeType = options.fetch(:mime_type)
-      new_item.fileName = options.fetch(:filename)
+      new_item.link = options.fetch('link')
+      new_item.mimeType = options.fetch('mime_type')
+      new_item.fileName = options.fetch('filename')
 
       ds.save
     end
