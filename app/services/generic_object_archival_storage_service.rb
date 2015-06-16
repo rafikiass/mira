@@ -1,7 +1,6 @@
 # A storage service just for TuftsGenericObject
 class GenericObjectArchivalStorageService < ArchivalStorageService
   def run
-    link = write_file
     # Because many processes may be running this method simultaneously,
     # we put all the updates to GENERIC-CONTENT in a queue and only have one
     # worker on that queue. This prevents one process from wiping out the update
