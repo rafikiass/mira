@@ -31,12 +31,11 @@ gem "jquery-fileupload-rails"
 
 gem "devise"
 gem 'bootstrap_form'
-gem 'rmagick', '2.13.2', require: 'RMagick'
 gem 'resque-status'
 gem 'carrierwave', '~> 0.10.0'
 
 gem 'blacklight_advanced_search'
-gem 'tufts_models', github: 'curationexperts/tufts_models', ref: 'update_rmagick'
+gem 'tufts_models', github: 'curationexperts/tufts_models', ref: 'b35948da8aa551ee91f8883d2f6d69605b63629d'
 # gem 'handle-system', '~> 0.0.7'
 gem 'handle-system', github: 'jcoyne/handle', ref: '8ae4ceb'
 

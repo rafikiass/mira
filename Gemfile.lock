@@ -1,7 +1,7 @@
 GIT
   remote: git://github.com/curationexperts/tufts_models.git
-  revision: dce5aa0df991cb84b8d4bb9ce24474080b6eeab7
-  ref: update_rmagick
+  revision: b35948da8aa551ee91f8883d2f6d69605b63629d
+  ref: b35948da8aa551ee91f8883d2f6d69605b63629d
   specs:
     tufts_models (0.0.1)
       active-fedora (~> 7.1)
@@ -13,7 +13,7 @@ GIT
       jettywrapper (>= 1.8, < 2)
       railties (>= 3.2, < 5)
       resque-status
-      rmagick (= 2.13.2)
+      rmagick (= 2.15.2)
       settingslogic
       titleize
 
@@ -384,7 +384,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
-    rmagick (2.13.2)
+    rmagick (2.15.2)
     rsolr (1.0.10)
       builder (>= 2.1.2)
     rspec-activemodel-mocks (1.0.1)
@@ -535,7 +535,6 @@ DEPENDENCIES
   rails (= 4.1.6)
   resque-pool
   resque-status
-  rmagick (= 2.13.2)
   rsolr (= 1.0.10)
   rspec-activemodel-mocks
   rspec-rails (~> 3.2)
