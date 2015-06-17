@@ -13,14 +13,7 @@
       </tr>
       <% @batches.each do |batch| %>
 
-        <% presenter = case batch # TODO move to a presenter factory
-                       when BatchTemplateImport
-                         TemplateImportPresenter.new(batch)
-                       when BatchXmlImport
-                         XmlImportPresenter.new(batch)
-                       else
-                         BatchPresenter.new(batch)
-                       end %>
+        <% presenter = BatchPresenter.presenter_for(batch) %>
 
         <tr>
           <td class="batch_id"><%= link_to batch.id, batch %></td>

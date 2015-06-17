@@ -41,4 +41,39 @@ describe BatchPresenter do
       it { is_expected.to eq 'Complete' }
     end
   end
+
+  describe 'presenter_for' do
+
+    subject { described_class.presenter_for(batch) }
+
+    context 'for BatchTemplateImports' do
+      let(:batch) { BatchTemplateImport.new }
+
+      it 'returns a TemplateImportPresenter' do
+        expect(subject.class).to eq(TemplateImportPresenter)
+      end
+    end
+
+    context 'for BatchXmlImports' do
+      let(:batch) { BatchXmlImport.new }
+
+      it 'returns a TemplateImportPresenter' do
+        expect(subject.class).to eq(XmlImportPresenter)
+      end
+    end
+
+    context 'for BatchExports' do
+      let(:batch) { BatchExport.new }
+
+      it 'returns a BatchExportPresenter' do
+        expect(subject.class).to eq(BatchExportPresenter)
+      end
+    end
+
+    context 'for other batches' do
+      it 'returns a BatchPresenter' do
+        expect(subject.class).to eq(BatchPresenter)
+      end
+    end
+  end
 end
