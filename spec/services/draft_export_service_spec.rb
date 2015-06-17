@@ -69,8 +69,10 @@ describe DraftExportService do
     let(:doc) { Nokogiri::XML(File.read(svc.full_export_file_path)) }
 
     before do
-      expect(pdf).to receive(:save!)
-      expect(img).to receive(:save!)
+      # need to use and_call_original to allow model callbacks to work
+      expect(pdf).to receive(:save!).and_call_original
+      expect(img).to receive(:save!).and_call_original
+
       allow(ActiveFedora::Base).to receive(:exists?).with('draft:123') { true }
       allow(ActiveFedora::Base).to receive(:exists?).with('draft:456') { true }
       allow(ActiveFedora::Base).to receive(:exists?).with('draft:999') { false }
@@ -90,6 +92,10 @@ describe DraftExportService do
 
     it 'adds batchID to the objects' do
       expect(pdf.batch_id).to eq ['1234']
+    end
+
+    it 'preserves the edited_at and published_at' do
+      expect(pdf.edited_at).to eq(pdf.published_at)
     end
 
     describe '#full_export_file_path' do
