@@ -94,6 +94,30 @@ describe Batch::ExportsController do
         end
       end
     end
+
+    describe "GET 'show'" do
+      let(:batch_export) { FactoryGirl.create(:batch_export) }
+
+      context 'happy path' do
+        let(:records) { [double(pid: 'tufts:my-pid'), double(pid: 'tufts:another-pid')] }
+
+        before do
+          allow(ActiveFedora::Base).to receive(:find).with('tufts:my-pid', { cast: true }).and_return(records.first)
+          allow(ActiveFedora::Base).to receive(:find).with('tufts:another-pid', { cast: true }).and_return(records.last)
+        end
+
+        it "returns http success" do
+          get :show, id: batch_export.id
+          expect(response).to be_success
+          expect(response).to render_template(:show)
+          expect(assigns[:batch].id).to eq batch_export.id
+          expect(assigns[:batch]).to be_kind_of BatchExportPresenter
+          expect(assigns[:batch].item_count).to eq(2)
+        end
+      end
+
+    end
+
   end
 end
 

@@ -9,6 +9,10 @@ class Batch::ExportsController < BatchesController
     send_file BatchExportFilename.new(@batch.id).full_path
   end
 
+  def show
+    @batch = BatchExportPresenter.new(@batch)
+  end
+
 private
 
   def build_batch

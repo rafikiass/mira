@@ -26,6 +26,14 @@ class BatchPresenter
     @batch.type == 'BatchExport'
   end
 
+  def self.presenter_for(batch)
+    {
+      BatchTemplateImport => TemplateImportPresenter,
+      BatchXmlImport => XmlImportPresenter,
+      BatchExport => BatchExportPresenter
+    }.fetch(batch.class, self).new(batch)
+  end
+
   private
 
     def item_class
