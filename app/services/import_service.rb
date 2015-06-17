@@ -19,6 +19,8 @@ class ImportService
       dsid = ds_node.attributes['id'].value
       object.datastreams[dsid].content = ds_node.children.to_xml.strip
     end
+
+    object.batch_id += [batch.id.to_s]
     object.save!
   end
 end

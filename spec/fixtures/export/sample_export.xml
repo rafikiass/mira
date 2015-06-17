@@ -9,6 +9,7 @@
     </datastream>
     <datastream id="DCA-ADMIN">
       <admin xmlns:ac="http://purl.org/dc/dcmitype/" xmlns:local="http://nils.lib.tufts.edu/dcaadmin/">
+        <local:batchID>321</local:batchID>
         <local:displays>dl</local:displays>
         <local:editedAt>2015-05-22T21:00:41Z</local:editedAt>
       </admin>
