@@ -1,7 +1,7 @@
 # This parser handles the raw metadata import, which has actual XML datastreams
 class MetadataImportParser
   attr_reader :errors
-  ALLOWED_DSIDS = Set['DCA-META', 'DCA-DETAIL-META', 'DCA-ADMIN', 'RELS-EXT']
+  ALLOWED_DSIDS = Set['DCA-META', 'DC-DETAIL-META', 'DCA-ADMIN', 'RELS-EXT']
 
   def initialize(file)
     @file = file
