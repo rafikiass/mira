@@ -21,14 +21,33 @@ describe DownloadsController do
         @pdf.inner_object.pid = 'tufts:MISS.ISS.IPPI'
         @pdf.datastreams["Archival.pdf"].dsLocation = "http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/archival_pdf/MISS.ISS.IPPI.archival.pdf"
         @pdf.datastreams["Archival.pdf"].mimeType = "application/pdf"
+
+        @pdf.datastreams["Transfer.binary"].dsLocation = "http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/archival_pdf/MISS.ISS.IPPI.archival.pdf"
+        @pdf.datastreams["Transfer.binary"].mimeType = "application/pdf"
+        @pdf.datastreams["Transfer.binary"].dsLabel = "foo.pdf"
+
         @pdf.save!
       end
-      it "should have a filename" do
-        get :show, id: @pdf.pid, datastream_id: "Archival.pdf"
-        response.headers['Content-Disposition'].should =="inline; filename=\"MISS.ISS.IPPI.archival.pdf\""
-        response.headers['Content-Type'].should =="application/pdf"
+
+      context "downloading the archival PDF datastream" do
+        it "has the filename of the local asset" do
+          get :show, id: @pdf.pid, datastream_id: "Archival.pdf"
+
+          expect(response.headers['Content-Disposition']).to eq("inline; filename=\"MISS.ISS.IPPI.archival.pdf\"")
+          expect(response.headers['Content-Type']).to eq("application/pdf")
+        end
+      end
+
+      context "downloading the transfer.binary datastream" do
+        it "has the filename from the dsLabel" do
+          get :show, id: @pdf.pid, datastream_id: "Transfer.binary"
+
+          expect(response.headers['Content-Disposition']).to eq("inline; filename=\"foo.pdf\"")
+          expect(response.headers['Content-Type']).to eq("application/pdf")
+        end
       end
     end
+
 
     context "for a generic file" do
       let(:generic_object) { TuftsGenericObject.new(pid: 'tufts:99', displays: ['dl'], title: 'test 1') }

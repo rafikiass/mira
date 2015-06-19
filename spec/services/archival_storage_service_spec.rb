@@ -19,4 +19,9 @@ describe ArchivalStorageService do
     and change { datastream.checksum }.to(nil)
   end
 
+  it "sets the dsLabel of the datastream to the filename" do
+    service.run
+    expect(datastream.dsLabel).to eq('hello.pdf')
+  end
+
 end

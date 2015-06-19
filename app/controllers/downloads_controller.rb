@@ -18,13 +18,12 @@ class DownloadsController < ApplicationController
     end
   end
 
-  # Create some headers for the datastream
-  def content_options
-    {disposition: 'inline', type: datastream.mimeType, filename: datastream_name}
-  end
-
   def datastream_name
-    File.basename(asset.local_path_for(params[:datastream_id]))
+    if params[:datastream_id] == 'Transfer.binary'
+      asset.datastreams['Transfer.binary'].dsLabel
+    else
+      File.basename(asset.local_path_for(params[:datastream_id]))
+    end
   end
 
   def datastream_to_show
