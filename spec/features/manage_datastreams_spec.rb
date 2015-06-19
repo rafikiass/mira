@@ -18,7 +18,7 @@ feature 'Manage datastreams' do
 
   scenario 'delete a datastream' do
     visit catalog_path(pdf)
-    expect(page).to have_link('Download Transfer.binary')
+    expect(page).to have_link('Download hello2.pdf')
 
     click_link 'Manage Datastreams'
     expect(page).to have_link('Remove', href: "/records/#{pdf.id}/attachments/Transfer.binary")

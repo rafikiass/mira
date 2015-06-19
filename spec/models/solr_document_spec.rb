@@ -55,6 +55,25 @@ describe SolrDocument do
     end
   end
 
+  describe '#transfer_binary_filename' do
+    before do
+      subject["object_profile_ssm"] = [
+        {
+          "datastreams" => {
+            "Transfer.binary" => {
+              "dsLabel" => "foo.pdf"
+            }
+          }
+        }.to_json
+      ]
+    end
+
+    it 'is the dsLabel of the datastream' do
+      expect(subject.transfer_binary_filename).to eq('foo.pdf')
+    end
+
+  end
+
   describe "#show_dl_path" do
     let(:url) { 'http://dev-dl.lib.tufts.edu/catalog/tufts:7' }
 
