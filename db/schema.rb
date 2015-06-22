@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150601221522) do
+ActiveRecord::Schema.define(version: 20150622172948) do
 
   create_table "batches", force: true do |t|
     t.integer  "creator_id"
@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 20150601221522) do
     t.datetime "created_at"
     t.text     "job_ids"
     t.string   "record_type"
-    t.text     "metadata_file"
+    t.text     "metadata_file", limit: 4294967295
     t.string   "behavior"
   end
 
