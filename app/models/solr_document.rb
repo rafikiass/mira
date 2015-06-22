@@ -34,6 +34,15 @@ class SolrDocument
     dl_path(PidUtils.to_draft(id))
   end
 
+  def transfer_binary_filename
+    begin
+      json = JSON.parse(self['object_profile_ssm'].first)
+      json['datastreams']['Transfer.binary']['dsLabel']
+    rescue
+      "Transfer.binary"
+    end
+  end
+
   # Link to the published object in DL
   def show_dl_path
     dl_path(PidUtils.to_published(id))
