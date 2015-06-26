@@ -41,6 +41,9 @@ describe Batch::MetadataImportsController do
           expect(response).to redirect_to assigns[:metadata_import]
           expect(assigns[:metadata_import].pids).to eq ["draft:12440", "draft:12439"]
         end
+
+        pending "works with files longer than 64K"
+        # is there a way to dynamically pad export/sample_export.xml with 64K spaces?
       end
 
       context "with a bad import file" do
