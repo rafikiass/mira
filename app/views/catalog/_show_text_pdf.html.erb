@@ -1,8 +1,8 @@
 <%= render partial: 'show_default', locals: {document: document} %>
 
-<% download_links = { 'Archival.pdf' => {title: 'Archival PDF', filename: 'Archival.pdf'},
-                      'Transfer.binary' => {title: 'Transfer.binary', filename: document.transfer_binary_filename}  } %>
+<% download_links = { 'Archival.pdf' => 'Archival PDF' ,
+                      'Transfer.binary' => 'Original source file' } %>
 
-<% download_links.each do |dsid, file_info| %>
-  <%= render partial: 'show_datastream_download_link', locals: { document: document, dsid: dsid, title: file_info[:title], filename: file_info[:filename] } %>
+<% download_links.each do |dsid, title| %>
+  <%= render partial: 'show_datastream_download_link', locals: { document: document, dsid: dsid, download_section_title: title } %>
 <% end %>

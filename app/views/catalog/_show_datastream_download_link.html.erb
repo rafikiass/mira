@@ -1,4 +1,6 @@
 <% if document.has_datastream_content?(dsid) %>
-  <h3><%= title %></h3>
-  <%= link_to "Download #{filename}", download_path(document.id, datastream_id: dsid) %>
+  <% download_label = dsid %>
+  <% download_label = document.transfer_binary_filename if dsid == "Transfer.binary" #shows actual filename instead of datastream ID for Transfer.binary%>
+  <h3><%= download_section_title %></h3>
+  <%= link_to "Download #{download_label}", download_path(document.id, datastream_id: dsid) %>
 <% end %>
