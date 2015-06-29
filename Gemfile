@@ -35,7 +35,7 @@ gem 'resque-status'
 gem 'carrierwave', '~> 0.10.0'
 
 gem 'blacklight_advanced_search'
-gem 'tufts_models', github: 'curationexperts/tufts_models', ref: '582a702421326c69f0535288a1c8d720ca2bee66'
+gem 'tufts_models', github: 'curationexperts/tufts_models', ref: 'v4.0.1'
 # gem 'handle-system', '~> 0.0.7'
 gem 'handle-system', github: 'jcoyne/handle', ref: '8ae4ceb'
 
