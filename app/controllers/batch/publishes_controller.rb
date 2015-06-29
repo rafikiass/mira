@@ -7,10 +7,11 @@ class Batch::PublishesController < BatchesController
 private
 
   def build_batch
-    @batch = BatchPublish.new(pids: params[:pids])
+    @batch = BatchPublish.new(pids: unique_pids)
   end
 
   def load_batch
     @batch = BatchPublish.lock.find(params.require(:id))
   end
+
 end

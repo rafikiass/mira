@@ -27,6 +27,9 @@ class BatchesController < ApplicationController
     end
 
 private
+  def unique_pids
+    Array(params[:pids]).uniq
+  end
 
   def paginate
     @batches = @batches.order('created_at DESC').page(params[:page]).per(10)

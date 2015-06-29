@@ -8,7 +8,7 @@ class Batch::PurgesController < BatchesController
 private
 
   def build_batch
-    @batch = BatchPurge.new(pids: params[:pids])
+    @batch = BatchPurge.new(pids: unique_pids)
   end
 
   def load_batch

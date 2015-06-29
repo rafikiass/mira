@@ -37,6 +37,17 @@ describe Batch::UnpublishesController do
         end
       end
 
+      context "with duplicate pids" do
+        let(:pids) { %w(tufts:1 tufts:2 tufts:1) }
+
+        it "creates a batch with just the unique pids" do
+          expect(BatchUnpublish).to receive(:new).with(pids: pids.uniq) { mock_model(BatchUnpublish) }
+
+          post "create", pids: pids
+        end
+
+      end
+
       context 'error path - no pids were selected:' do
 
         context "with a referrer" do
