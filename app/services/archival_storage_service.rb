@@ -8,16 +8,36 @@ class ArchivalStorageService
   end
 
   def run
-    object.datastreams[dsid].tap do |ds|
-      ds.dsLocation = write_file
+    write_datastream_attributes(object.datastreams[dsid], write_file)
+    object.content_will_update = dsid
+    update_production_datastream
+  end
+
+  private
+
+    # If a production object exists and points at this file, then updating the file
+    # will invalidate the checksum on the production object. So clear it out.
+    def update_production_datastream
+      return unless object.draft?
+      begin
+        published = object.find_published
+      rescue ActiveFedora::ObjectNotFoundError
+        # Not published yet.
+        return
+      end
+      published.datastreams[dsid].tap do |ds|
+        ds.delete
+        write_datastream_attributes(ds, path_service.remote_url)
+        ds.save
+      end
+    end
+
+    def write_datastream_attributes(ds, path)
+      ds.dsLocation = path
       ds.dsLabel = file.original_filename
       ds.mimeType = file.content_type
       ds.checksum = nil
     end
-    object.content_will_update = dsid
-  end
-
-  private
 
     # Writes the file to the local datastore
     # @return the remote URL of the file

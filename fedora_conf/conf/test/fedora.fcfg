@@ -228,7 +228,7 @@
             This specifies the minimum amount of time that each uploaded
             file should be kept in temporary storage.</comment>
     </param>
-    <param name="autoChecksum" value="false">
+    <param name="autoChecksum" value="true">
       <comment>Controls whether a checksum is automatically computed for 
 			every datastream as the datastream is added to the repository. This 
 			will allow the integrity of datastream contents to be periodically 

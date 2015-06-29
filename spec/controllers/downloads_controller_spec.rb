@@ -19,10 +19,10 @@ describe DownloadsController do
       before do
         @pdf = TuftsPdf.new(title: 'test download', displays: ['dl'])
         @pdf.inner_object.pid = 'tufts:MISS.ISS.IPPI'
-        @pdf.datastreams["Archival.pdf"].dsLocation = "http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/archival_pdf/MISS.ISS.IPPI.archival.pdf"
+        @pdf.datastreams["Archival.pdf"].dsLocation = "file://#{Rails.root}/spec/fixtures/local_object_store/data01/tufts/central/dca/MISS/archival_pdf/MISS.ISS.IPPI.archival.pdf"
         @pdf.datastreams["Archival.pdf"].mimeType = "application/pdf"
 
-        @pdf.datastreams["Transfer.binary"].dsLocation = "http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/archival_pdf/MISS.ISS.IPPI.archival.pdf"
+        @pdf.datastreams["Transfer.binary"].dsLocation = "file://#{Rails.root}/spec/fixtures/local_object_store/data01/tufts/central/dca/MISS/archival_pdf/MISS.ISS.IPPI.archival.pdf"
         @pdf.datastreams["Transfer.binary"].mimeType = "application/pdf"
         @pdf.datastreams["Transfer.binary"].dsLabel = "foo.pdf"
 
@@ -52,13 +52,13 @@ describe DownloadsController do
     context "for a generic file" do
       let(:generic_object) { TuftsGenericObject.new(pid: 'tufts:99', displays: ['dl'], title: 'test 1') }
       let(:xml) {
-        '<content xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.fedora.info/definitions/">
+        %Q{<content xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.fedora.info/definitions/">
                         <item id="0">
-                           <link>http://bucket01.lib.tufts.edu/data05/tufts/central/dca/MS115/generic/MS115.003.001.00001.zip</link>
+                           <link>file://#{Rails.root}/spec/fixtures/local_object_store/data05/tufts/central/dca/MS115/generic/MS115.003.001.00001.zip</link>
                            <fileName>MS115.003.001.00001</fileName>
                            <mimeType>application/zip</mimeType>
                         </item>
-                    </content>' }
+                    </content>} }
       before do
         generic_object.datastreams['GENERIC-CONTENT'].content = xml
         generic_object.save!
