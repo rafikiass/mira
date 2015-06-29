@@ -14,8 +14,8 @@ class HonorsThesis < Contribution
   private
 
   def creatordept
-    terms = Qa::Authorities::Local.sub_authority('departments').terms
-    if term = terms.find { |t| t[:term] == department }
+    terms = Qa::Authorities::Local.subauthority_for('departments').all
+    if term = terms.find { |t| t[:label] == department }
       term[:id]
     else
       'NEEDS FIXING'

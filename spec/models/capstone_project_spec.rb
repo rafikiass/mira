@@ -7,8 +7,8 @@ describe CapstoneProject do
   describe "validation" do
     describe "on degree" do
       it "should require a degree" do
-        subject.should_not be_valid
-        subject.errors[:degree].should == ["can't be blank"]
+        expect(subject).to_not be_valid
+        expect(subject.errors[:degree]).to eq ["can't be blank"]
       end
     end
   end

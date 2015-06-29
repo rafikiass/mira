@@ -87,7 +87,7 @@ describe RecordsController do
         end
 
         it "assigns a draft pid" do
-          get :new, type: 'TuftsAudio', pid: pid, title: 'An audiophile', displays: 'dark'
+          get :new, type: 'TuftsAudio', pid: pid, title: 'An audiophile', displays: 'perseus'
           expect(assigns[:record]).to be_kind_of TuftsAudio
           expect(assigns[:record]).to be_persisted
           expect(response).to redirect_to Tufts::Application.routes.url_helpers.record_attachments_path(assigns[:record])
