@@ -177,10 +177,10 @@ class CatalogController < ApplicationController
     # label in pulldown is followed by the name of the SOLR field to sort by and
     # whether the sort is ascending or descending (it must be asc or desc
     # except in the relevancy case).
-    config.add_sort_field 'score desc, system_create_dtsi desc, title_tesi asc', label: 'Relevance'
-    config.add_sort_field 'system_create_dtsi desc, title_tesi asc', label: 'Date Added'
-    config.add_sort_field 'creator_tesi asc, title_tesi asc', label: 'Creator'
-    config.add_sort_field 'title_tesi asc, system_create_dtsi desc', label: 'Title'
+    config.add_sort_field 'score desc, system_create_dtsi desc, title_si asc', label: 'Relevance'
+    config.add_sort_field 'system_create_dtsi desc, title_si asc', label: 'Date Added'
+    config.add_sort_field 'creator_tesi asc, title_si asc', label: 'Creator'
+    config.add_sort_field 'title_si asc, system_create_dtsi desc', label: 'Title'
 
     # If there are more than this many search results, no spelling ("did you
     # mean") suggestion is offered.
