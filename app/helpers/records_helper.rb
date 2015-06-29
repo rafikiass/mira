@@ -66,9 +66,7 @@ module RecordsHelper
   end
 
   def displays_options
-    Qa::Authorities::Local.sub_authority('displays').terms.map do |element|
-      element[:term]
-    end
+    Qa::Authorities::Local.subauthority_for('displays'.freeze).all.map { |t| t['label'.freeze] }
   end
 
 end

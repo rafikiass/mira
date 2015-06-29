@@ -11,7 +11,7 @@ gem 'active-fedora', '~> 7.1.1'
 gem 'hydra-editor', '~> 0.5.0'
 gem 'hydra-role-management', '0.2.0'
 gem 'hydra-batch-edit', '1.1.1'
-gem 'qa', '0.3.0'
+gem 'qa', '0.5.0'
 
 gem 'sanitize', '2.0.6'
 
@@ -35,7 +35,7 @@ gem 'resque-status'
 gem 'carrierwave', '~> 0.10.0'
 
 gem 'blacklight_advanced_search'
-gem 'tufts_models', github: 'curationexperts/tufts_models', ref: 'v4.0.0'
+gem 'tufts_models', github: 'curationexperts/tufts_models', ref: '582a702421326c69f0535288a1c8d720ca2bee66'
 # gem 'handle-system', '~> 0.0.7'
 gem 'handle-system', github: 'jcoyne/handle', ref: '8ae4ceb'
 

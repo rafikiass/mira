@@ -15,7 +15,7 @@ class CapstoneProject < Contribution
   private
 
   def long_degree
-    Qa::Authorities::Local.sub_authority('fletcher_degrees').full_record(degree)[:term]
+    Qa::Authorities::Local.subauthority_for('fletcher_degrees'.freeze).find(degree)['term'.freeze]
   end
 
   def parent_collection
