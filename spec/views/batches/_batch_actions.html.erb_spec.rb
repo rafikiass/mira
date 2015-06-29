@@ -13,7 +13,8 @@ describe 'batches/_batch_actions.html.erb' do
     let(:batch_status) { :completed }
 
     it 'displays the form to operate on the batch' do
-      expect(rendered).to have_link('Review Batch', href: catalog_index_path(search_field: 'batch', q: batch.id.to_s))
+      # Must be sorted by ID, otherwise it will default to sorting by relevance, which will change as they review the batch.
+      expect(rendered).to have_link('Review Batch', href: catalog_index_path(search_field: 'batch', q: batch.id.to_s, sort: 'id desc'))
 
       #button to publish
       expect(rendered).to have_selector("form[method=post][action='#{batch_publishes_path}'] " +
@@ -45,7 +46,7 @@ describe 'batches/_batch_actions.html.erb' do
     it 'disables the batch operation buttons' do
       expect(rendered).to have_selector("input[type=submit][value='Publish Batch'][disabled=disabled]")
       expect(rendered).to have_selector("input[type=submit][value='Unpublish Batch'][disabled=disabled]")
-      expect(rendered).to have_selector("a[href='#{catalog_index_path(search_field: 'batch', q: batch.id.to_s)}'][disabled]", text: 'Review Batch')
+      expect(rendered).to have_selector("a[href='#{catalog_index_path(search_field: 'batch', q: batch.id.to_s, sort: 'id desc')}'][disabled]", text: 'Review Batch')
     end
   end
 end

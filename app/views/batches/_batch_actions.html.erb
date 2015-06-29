@@ -1,7 +1,7 @@
   <div class="batch-actions">
       <% disabled = batch.status != :completed %>
 
-      <%= link_to 'Review Batch', catalog_index_path(search_field: 'batch', q: batch.id),
+      <%= link_to 'Review Batch', catalog_index_path(search_field: 'batch', q: batch.id, sort: 'id desc'),
         disabled: disabled,
         class: 'btn btn-primary' %>
 
