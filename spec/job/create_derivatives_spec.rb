@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Job::CreateDerivatives do
 
   it 'uses the "derivatives" queue' do
-    Job::CreateDerivatives.queue.should == :derivatives
+    expect(Job::CreateDerivatives.queue).to eq :derivatives
   end
 
   describe '::create' do
@@ -21,7 +21,7 @@ describe Job::CreateDerivatives do
     end
 
     before(:each) do
-      subject.datastreams["Archival.video"].dsLocation = "http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/archival_video/sample.mp4"
+      subject.datastreams["Archival.video"].dsLocation = "file://#{Rails.root}/spec/fixtures/local_object_store/data01/tufts/central/dca/MISS/archival_video/sample.mp4"
       subject.datastreams["Archival.video"].mimeType = "video/mp4"
       subject.save
     end
@@ -67,7 +67,7 @@ describe Job::CreateDerivatives do
     end
 
     before(:each) do
-      subject.datastreams["Archival.pdf"].dsLocation = "http://bucket01.lib.tufts.edu/data01/tufts/central/dca/MISS/archival_pdf/MISS.ISS.IPPI.archival.pdf"  # a PDF with 3 pages
+      subject.datastreams["Archival.pdf"].dsLocation = "file://#{Rails.root}/spec/fixtures/local_object_store/data01/tufts/central/dca/MISS/archival_pdf/MISS.ISS.IPPI.archival.pdf"  # a PDF with 3 pages
       subject.datastreams["Archival.pdf"].mimeType = "application/pdf"
       subject.save
     end

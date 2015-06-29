@@ -4,6 +4,7 @@ class PublishService < WorkflowService
     raise UnpublishableModelError unless object.publishable?
   end
 
+  # @return [ActiveFedora::Base] the published object
   def run
     published_pid = PidUtils.to_published(object.pid)
 
@@ -15,6 +16,7 @@ class PublishService < WorkflowService
     published!(object, user)
     audit('Published')
     register_handle
+    published
   end
 
   private
