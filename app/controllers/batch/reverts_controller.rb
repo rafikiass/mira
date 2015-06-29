@@ -7,7 +7,7 @@ class Batch::RevertsController < BatchesController
 private
 
   def build_batch
-    @batch = BatchRevert.new(pids: params[:pids])
+    @batch = BatchRevert.new(pids: unique_pids)
   end
 
   def load_batch

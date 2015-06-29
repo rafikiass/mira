@@ -7,7 +7,7 @@ class Batch::UnpublishesController < BatchesController
 private
 
   def build_batch
-    @batch = BatchUnpublish.new(pids: params[:pids])
+    @batch = BatchUnpublish.new(pids: unique_pids)
   end
 
   def load_batch
