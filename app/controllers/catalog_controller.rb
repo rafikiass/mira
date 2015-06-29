@@ -181,6 +181,7 @@ class CatalogController < ApplicationController
     config.add_sort_field 'system_create_dtsi desc, title_si asc', label: 'Date Added'
     config.add_sort_field 'creator_tesi asc, title_si asc', label: 'Creator'
     config.add_sort_field 'title_si asc, system_create_dtsi desc', label: 'Title'
+    config.add_sort_field 'id desc', label: 'ID'
 
     # If there are more than this many search results, no spelling ("did you
     # mean") suggestion is offered.
